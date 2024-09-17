@@ -6,9 +6,9 @@ import cn.yapeteam.yolbi.module.impl.combat.KillAura;
 import cn.yapeteam.yolbi.module.impl.combat.Target;
 import cn.yapeteam.yolbi.module.impl.misc.SelfDestruct;
 import cn.yapeteam.yolbi.module.impl.movement.StrafeFix;
-import cn.yapeteam.yolbi.module.impl.render.HUD;
-import cn.yapeteam.yolbi.module.impl.render.Rotations;
 import cn.yapeteam.yolbi.module.impl.visual.ClientTheme;
+import cn.yapeteam.yolbi.module.impl.visual.HUD;
+import cn.yapeteam.yolbi.module.impl.visual.Rotations;
 import cn.yapeteam.yolbi.module.impl.world.Scaffold;
 import lombok.Getter;
 

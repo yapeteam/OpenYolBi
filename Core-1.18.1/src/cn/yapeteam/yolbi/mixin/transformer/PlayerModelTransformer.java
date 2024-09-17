@@ -2,7 +2,7 @@ package cn.yapeteam.yolbi.mixin.transformer;
 
 import cn.yapeteam.ymixin.ASMTransformer;
 import cn.yapeteam.yolbi.YolBi;
-import cn.yapeteam.yolbi.module.impl.render.Rotations;
+import cn.yapeteam.yolbi.module.impl.visual.Rotations;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.player.LocalPlayer;

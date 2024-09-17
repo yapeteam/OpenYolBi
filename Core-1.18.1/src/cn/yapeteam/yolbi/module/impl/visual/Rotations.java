@@ -1,9 +1,8 @@
-package cn.yapeteam.yolbi.module.impl.render;
+package cn.yapeteam.yolbi.module.impl.visual;
 
 
 import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.event.Listener;
-import cn.yapeteam.yolbi.event.impl.player.EventMotion;
 import cn.yapeteam.yolbi.event.impl.render.EventView;
 import cn.yapeteam.yolbi.module.Module;
 import cn.yapeteam.yolbi.module.ModuleCategory;
