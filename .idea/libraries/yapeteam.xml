@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="yapeteam">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/deps/yapeteam" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+    <jarDirectory url="file://$PROJECT_DIR$/deps/yapeteam" recursive="false" />
+  </library>
+</component>

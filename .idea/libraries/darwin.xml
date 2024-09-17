@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="darwin">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/deps/darwin" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/deps/darwin" />
+    </SOURCES>
+    <jarDirectory url="file://$PROJECT_DIR$/deps/darwin" recursive="false" />
+    <jarDirectory url="file://$PROJECT_DIR$/deps/darwin" recursive="false" type="SOURCES" />
+  </library>
+</component>

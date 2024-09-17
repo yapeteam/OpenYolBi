@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root>
+    <rootdir>./</rootdir>
+    <output>build</output>
+    <build>
+        <artifact name="agent.jar">
+            <files>out/production/Agent</files>
+            <file>YOLBI_LICENSE.md</file>
+            <file>GPL3_LICENSE.md</file>
+        </artifact>
+        <artifact name="ymixin.jar">
+            <files>out/production/YMixin</files>
+            <file>YOLBI_LICENSE.md</file>
+            <file>GPL3_LICENSE.md</file>
+        </artifact>
+        <artifact name="injection-1.8.9.jar" proguard-config="injection-1.8.9.pro">
+            <files>out/production/Core-1.8.9</files>
+            <files>out/production/VersionInfo</files>
+            <file>YOLBI_LICENSE.md</file>
+            <file>GPL3_LICENSE.md</file>
+        </artifact>
+        <artifact name="injection-1.12.2.jar" proguard-config="injection-1.12.2.pro">
+            <files>out/production/Core-1.12.2</files>
+            <files>out/production/VersionInfo</files>
+            <file>YOLBI_LICENSE.md</file>
+            <file>GPL3_LICENSE.md</file>
+        </artifact>
+        <artifact name="injection-1.18.1.jar" proguard-config="injection-1.18.1.pro">
+            <files>out/production/Core-1.18.1</files>
+            <files>out/production/VersionInfo</files>
+            <file>YOLBI_LICENSE.md</file>
+            <file>GPL3_LICENSE.md</file>
+        </artifact>
+        <artifact name="injector.jar">
+            <files>out/production/Injector</files>
+            <files>out/production/VersionInfo</files>
+            <dir>Injector/META-INF</dir>
+            <file>YOLBI_LICENSE.md</file>
+            <file>GPL3_LICENSE.md</file>
+            <extract>deps/shared/jna.jar</extract>
+            <extract>deps/shared/flatlaf.jar</extract>
+            <extract>deps/shared/flatlaf-intellij-themes.jar</extract>
+            <extract platform="windows">deps/windows/tools.jar</extract>
+            <extract platform="mac">deps/darwin/tools.jar</extract>
+            <archive name="injection.zip">
+                <dir>resources</dir>
+                <dir name="injection">
+                    <file>build/injection-1.8.9.jar</file>
+                    <file>build/injection-1.12.2.jar</file>
+                    <file>build/injection-1.18.1.jar</file>
+                </dir>
+                <dir name="dependencies">
+                    <file>deps/shared/asm-all-9.2.jar</file>
+                </dir>
+                <!--为防止特征，对loader部分进行闭源-->
+                <files>deps/yapeteam/natives</files>
+                <file>deps/yapeteam/definer.jar</file>
+                <file>deps/yapeteam/loader.jar</file>
+                <file>deps/yapeteam/hooker.jar</file>
+                <files platform="windows">deps/yapeteam/dll</files>
+                <file>build/ymixin.jar</file>
+                <!--agent 注入尚未完善-->
+                <!--<file>build/agent.jar</file>-->
+                <!--<file platform="windows">Loader/dll/build/libagent.dll</file>-->
+                <!--<file platform="mac">Loader/dll/build/libagent.dylib</file>-->
+            </archive>
+        </artifact>
+    </build>
+</root>
