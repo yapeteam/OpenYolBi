@@ -17,7 +17,7 @@
 -dontwarn
 -ignorewarnings
 
--keep class cn.yapeteam.yolbi.mixin.injection.** {
+-keep class cn.yapeteam.yolbi.mixin.** {
     <fields>;
     <methods>;
 }

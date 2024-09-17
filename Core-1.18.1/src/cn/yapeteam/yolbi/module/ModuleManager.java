@@ -4,6 +4,7 @@ import cn.yapeteam.yolbi.event.Listener;
 import cn.yapeteam.yolbi.event.impl.game.EventKey;
 import cn.yapeteam.yolbi.module.impl.combat.AutoClicker;
 import cn.yapeteam.yolbi.module.impl.misc.SelfDestruct;
+import cn.yapeteam.yolbi.module.impl.movement.Eagle;
 import cn.yapeteam.yolbi.module.impl.visual.ClientTheme;
 import cn.yapeteam.yolbi.module.impl.visual.HUD;
 import lombok.Getter;
@@ -21,6 +22,7 @@ public class ModuleManager {
         modules.add(new SelfDestruct());
         modules.add(new ClientTheme());
         modules.add(new AutoClicker());
+        modules.add(new Eagle());
         modules.add(new HUD());
         modules.sort((m1, m2) -> -Integer.compare(m2.getName().charAt(0), m1.getName().charAt(0)));
     }

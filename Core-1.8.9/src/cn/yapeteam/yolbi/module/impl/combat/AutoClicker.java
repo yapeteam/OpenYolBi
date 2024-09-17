@@ -28,10 +28,10 @@ public class AutoClicker extends Module {
 
     @Override
     public void onEnable() {
-        delay = generate(cps.getValue(), range.getValue());
+        delay = 1000 / generate(cps.getValue(), range.getValue());
         clickThread = new Thread(() -> {
             while (isEnabled()) {
-                delay = generate(cps.getValue(), range.getValue());
+                delay = 1000 / generate(cps.getValue(), range.getValue());
                 try {
                     sendClick();
                 } catch (InterruptedException e) {
@@ -63,7 +63,7 @@ public class AutoClicker extends Module {
         do {
             noise = mean + random.nextGaussian() * stddev;
         } while (noise <= 0);
-        return noise;
+        return Math.max(noise, 1);
     }
 
     private final Runnable leftClickRunnable = () -> {
@@ -101,26 +101,16 @@ public class AutoClicker extends Module {
         if (left && right) {
             if (clickprio.getValue().equals("Left")) {
                 leftClickRunnable.run();
-                Thread.sleep((long) (1000 / delay)); // Delay between consecutive clicks
                 rightClickRunnable.run();
             } else {
                 rightClickRunnable.run();
-                Thread.sleep((long) (1000 / delay)); // Delay between consecutive clicks
                 leftClickRunnable.run();
             }
         } else {
-            if (clickprio.getValue().equals("Left") && left) {
+            if (left) {
                 leftClickRunnable.run();
-                Thread.sleep((long) (1000 / delay)); // Ensure delay after each click
             } else if (right) {
                 rightClickRunnable.run();
-                return;
-            }
-            if (clickprio.getValue().equals("Right") && right) {
-                rightClickRunnable.run();
-                Thread.sleep((long) (1000 / delay)); // Ensure delay after each click
-            } else if (left) {
-                leftClickRunnable.run();
             }
         }
     }

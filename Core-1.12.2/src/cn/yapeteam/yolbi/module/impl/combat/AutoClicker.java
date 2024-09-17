@@ -30,11 +30,11 @@ public class AutoClicker extends Module {
 
     @Override
     public void onEnable() {
-        delay = generate(cps.getValue(), range.getValue());
+        delay = 1000 / generate(cps.getValue(), range.getValue());
         clickThread = new Thread(() -> {
             while (isEnabled()) {
                 try {
-                    delay = generate(cps.getValue(), range.getValue());
+                    delay = 1000 / generate(cps.getValue(), range.getValue());
                     sendClick();
                 } catch (Exception ex) {
                     Logger.exception(ex);
@@ -81,7 +81,7 @@ public class AutoClicker extends Module {
                 noise = (noise + newNoise) / 2;
             else j--;
         }
-        return noise;
+        return Math.max(noise, 1);
     }
 
     private final Runnable leftClickRunnable = () -> {
@@ -117,16 +117,20 @@ public class AutoClicker extends Module {
         //noinspection ConstantValue
         if ((mc.player.getHeldItem(EnumHand.MAIN_HAND) != null && mc.player.getHeldItem(EnumHand.MAIN_HAND).getItem() instanceof ItemFood) && noeat.getValue())
             right = false;
-        if (clickprio.getValue().equals("Left") && left) {
-            leftClickRunnable.run();
-        } else if (right) {
-            rightClickRunnable.run();
-            return;
-        }
-        if (clickprio.getValue().equals("Right") && right) {
-            rightClickRunnable.run();
-        } else if (left) {
-            leftClickRunnable.run();
+        if (left && right) {
+            if (clickprio.getValue().equals("Left")) {
+                leftClickRunnable.run();
+                rightClickRunnable.run();
+            } else {
+                rightClickRunnable.run();
+                leftClickRunnable.run();
+            }
+        } else {
+            if (left) {
+                leftClickRunnable.run();
+            } else if (right) {
+                rightClickRunnable.run();
+            }
         }
     }
 
