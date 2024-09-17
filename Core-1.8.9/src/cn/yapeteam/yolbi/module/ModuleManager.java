@@ -33,7 +33,6 @@ public class ModuleManager {
 
     public void load() {
         modules.add(new VanillaAura());
-        modules.add(new BlatantVelocity());
         modules.add(new Criticals());
         modules.add(new AimAssist());
         modules.add(new AntiBot());

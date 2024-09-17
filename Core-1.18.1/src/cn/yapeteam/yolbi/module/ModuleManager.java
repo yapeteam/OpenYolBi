@@ -2,14 +2,10 @@ package cn.yapeteam.yolbi.module;
 
 import cn.yapeteam.yolbi.event.Listener;
 import cn.yapeteam.yolbi.event.impl.game.EventKey;
-import cn.yapeteam.yolbi.module.impl.combat.KillAura;
-import cn.yapeteam.yolbi.module.impl.combat.Target;
+import cn.yapeteam.yolbi.module.impl.combat.AutoClicker;
 import cn.yapeteam.yolbi.module.impl.misc.SelfDestruct;
-import cn.yapeteam.yolbi.module.impl.movement.StrafeFix;
 import cn.yapeteam.yolbi.module.impl.visual.ClientTheme;
 import cn.yapeteam.yolbi.module.impl.visual.HUD;
-import cn.yapeteam.yolbi.module.impl.visual.Rotations;
-import cn.yapeteam.yolbi.module.impl.world.Scaffold;
 import lombok.Getter;
 
 import java.util.List;
@@ -24,12 +20,8 @@ public class ModuleManager {
     public void load() {
         modules.add(new SelfDestruct());
         modules.add(new ClientTheme());
-        modules.add(new KillAura());
-        modules.add(new Target());
-        modules.add(new Scaffold());
+        modules.add(new AutoClicker());
         modules.add(new HUD());
-        modules.add(new Rotations());
-        modules.add(new StrafeFix());
         modules.sort((m1, m2) -> -Integer.compare(m2.getName().charAt(0), m1.getName().charAt(0)));
     }
 

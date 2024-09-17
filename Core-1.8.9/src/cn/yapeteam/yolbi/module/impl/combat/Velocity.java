@@ -1,82 +1,100 @@
 package cn.yapeteam.yolbi.module.impl.combat;
 
-import cn.yapeteam.loader.Natives;
 import cn.yapeteam.yolbi.event.Listener;
 import cn.yapeteam.yolbi.event.impl.network.EventPacket;
+import cn.yapeteam.yolbi.managers.ReflectionManager;
 import cn.yapeteam.yolbi.module.Module;
 import cn.yapeteam.yolbi.module.ModuleCategory;
+import cn.yapeteam.yolbi.module.values.impl.ModeValue;
 import cn.yapeteam.yolbi.module.values.impl.NumberValue;
-import cn.yapeteam.yolbi.utils.math.MathUtils;
-import cn.yapeteam.yolbi.utils.misc.VirtualKeyBoard;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.client.C0FPacketConfirmTransaction;
 import net.minecraft.network.play.server.S12PacketEntityVelocity;
-
-import java.util.Random;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import net.minecraft.network.play.server.S27PacketExplosion;
+import net.minecraft.network.play.server.S32PacketConfirmTransaction;
 
 public class Velocity extends Module {
+    enum Mode {
+        Normal,
+        Cancel,
+        Modify,
+        CancelS32,
+        CancelC0F,
+        Matrix,
+        Vulcan,
+        Hypixel
+    }
 
-    //probability for having a perfect jump
-    private final NumberValue<Double> probability = new NumberValue<>("Probability", 100.0, 0.0, 100.0, 1.0);
-
-    //delay for jumping after the perfect jump
-    private final NumberValue<Double> maxJumpDelay = new NumberValue<>("Max Jump Delay", 0.0, 0.0, 1000.0, 10.0);
-
-    private final NumberValue<Double> minJumpDelay = new NumberValue<>("Min Jump Delay", 0.0, 0.0, 1000.0, 10.0);
-
-    // how long you hold the space bar
-    private final NumberValue<Double> maxJumpHold = new NumberValue<>("Max Jump Hold", 400.0, 0.0, 1000.0, 10.0);
-
-    private final NumberValue<Double> minJumpHold = new NumberValue<>("Min Jump Hold", 400.0, 0.0, 1000.0, 10.0);
-
+    private final ModeValue<Mode> mode = new ModeValue<>("Mode", Mode.Normal, Mode.values());
+    private final NumberValue<Float> Horizontal = new NumberValue<>("Horizontal", () -> mode.is(Mode.Modify), 0f, -100f, 100f, 1f);
+    private final NumberValue<Float> Vertical = new NumberValue<>("Vertical", () -> mode.is(Mode.Modify), 0f, -100f, 100f, 1f);
 
     public Velocity() {
         super("Velocity", ModuleCategory.COMBAT);
-        NumberValue.setBound(minJumpDelay, maxJumpDelay);
-        NumberValue.setBound(minJumpHold, maxJumpHold);
-        addValues(probability, maxJumpDelay, minJumpDelay, maxJumpHold, minJumpHold);
-    }
-
-    public void jumpreset() {
-        Natives.SetKeyBoard(VirtualKeyBoard.VK_SPACE, true);
-
-        // Create a ScheduledExecutorService
-        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-
-        // Generate a random delay in milliseconds
-        int delay = (int) MathUtils.getRandom(minJumpHold.getValue(), maxJumpHold.getValue()); // replace 1000 with the maximum delay you want
-
-        // Schedule a task to set the jump keybind to false after the delay
-        executorService.schedule(() -> Natives.SetKeyBoard(VirtualKeyBoard.VK_SPACE, false), delay, TimeUnit.MILLISECONDS);
-
-        // Shut down the executor service
-        executorService.shutdown();
+        addValues(mode, Horizontal, Vertical);
     }
 
     @Listener
-    public void onPacket(EventPacket event) {
-        if (mc.currentScreen != null) return;
-        if (event.getPacket() instanceof S12PacketEntityVelocity && ((S12PacketEntityVelocity) event.getPacket()).getEntityID() == mc.thePlayer.getEntityId()) {
-//            YolBi.instance.getNotificationManager().post(
-//                    new Notification(
-//                            "Velocity",
-//                            Easing.EASE_IN_OUT_QUAD,
-//                            Easing.EASE_IN_OUT_QUAD,
-//                            2500, NotificationType.WARNING
-//                    )
-//            );//等下
-
-            if ((new Random((long) (Math.random() * 114514)).nextInt(101) <= probability.getValue())) {
-                jumpreset();
-            } else {
-                // this means to delay the jump
-                ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-                int delay = (int) MathUtils.getRandom(minJumpDelay.getValue(), maxJumpDelay.getValue());
-                executorService.schedule(this::jumpreset, delay, TimeUnit.MILLISECONDS);
-                executorService.shutdown();
+    private void onReceive(EventPacket e) {
+        Mode mode = this.mode.getValue();
+        Packet<?> packet = e.getPacket();
+        boolean isS12 = packet instanceof S12PacketEntityVelocity && ((S12PacketEntityVelocity) packet).getEntityID() == mc.thePlayer.getEntityId();
+        if (isS12) {
+            S12PacketEntityVelocity s12PacketEntityVelocity = (S12PacketEntityVelocity) packet;
+            switch (mode) {
+                case Normal:
+                    ReflectionManager.S12PacketEntityVelocity$setMotionX(s12PacketEntityVelocity, 0);
+                    ReflectionManager.S12PacketEntityVelocity$setMotionY(s12PacketEntityVelocity, (int) ((double) s12PacketEntityVelocity.getMotionY() * 0.99905));
+                    ReflectionManager.S12PacketEntityVelocity$setMotionZ(s12PacketEntityVelocity, 0);
+                    break;
+                case Vulcan:
+                case Cancel:
+                    e.setCancelled(true);
+                    break;
+                case Modify:
+                    ReflectionManager.S12PacketEntityVelocity$setMotionX(s12PacketEntityVelocity, (int) ((double) s12PacketEntityVelocity.getMotionX() * this.Horizontal.getValue().doubleValue() / 100.0));
+                    ReflectionManager.S12PacketEntityVelocity$setMotionY(s12PacketEntityVelocity, (int) ((double) s12PacketEntityVelocity.getMotionY() * this.Vertical.getValue().doubleValue() / 100.0));
+                    ReflectionManager.S12PacketEntityVelocity$setMotionZ(s12PacketEntityVelocity, (int) ((double) s12PacketEntityVelocity.getMotionZ() * this.Horizontal.getValue().doubleValue() / 100.0));
+                    break;
             }
+        }
+        switch (mode) {
+            case CancelS32:
+                if (packet instanceof S32PacketConfirmTransaction)
+                    e.setCancelled(true);
+                if (isS12)
+                    e.setCancelled(true);
+                if (packet instanceof S27PacketExplosion)
+                    e.setCancelled(true);
+                break;
+            case CancelC0F:
+                if (packet instanceof C0FPacketConfirmTransaction)
+                    e.setCancelled(true);
+                if (isS12)
+                    e.setCancelled(true);
+                if (packet instanceof S27PacketExplosion)
+                    e.setCancelled(true);
+                break;
+            case Matrix:
+                if (isS12) {
+                    S12PacketEntityVelocity s12PacketEntityVelocity = (S12PacketEntityVelocity) packet;
+                    ReflectionManager.S12PacketEntityVelocity$setMotionX(s12PacketEntityVelocity, (int) ((double) s12PacketEntityVelocity.getMotionX() * 0.36));
+                    ReflectionManager.S12PacketEntityVelocity$setMotionZ(s12PacketEntityVelocity, (int) ((double) s12PacketEntityVelocity.getMotionZ() * 0.36));
+                    if (mc.thePlayer.onGround) {
+                        ReflectionManager.S12PacketEntityVelocity$setMotionX(s12PacketEntityVelocity, (int) ((double) s12PacketEntityVelocity.getMotionX() * 0.9));
+                        ReflectionManager.S12PacketEntityVelocity$setMotionZ(s12PacketEntityVelocity, (int) ((double) s12PacketEntityVelocity.getMotionZ() * 0.9));
+                    }
+                }
+                break;
+            case Hypixel:
+                if (isS12) {
+                    S12PacketEntityVelocity s12PacketEntityVelocity = (S12PacketEntityVelocity) packet;
+                    if (mc.thePlayer.onGround) {
+                        ReflectionManager.S12PacketEntityVelocity$setMotionX(s12PacketEntityVelocity, 0);
+                        ReflectionManager.S12PacketEntityVelocity$setMotionZ(s12PacketEntityVelocity, 0);
+                    } else e.setCancelled(true);
+                }
+                break;
         }
     }
 }
-

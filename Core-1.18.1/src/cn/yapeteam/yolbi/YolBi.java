@@ -66,7 +66,7 @@ public class YolBi {
             instance.rotationManager = new RotationManager();
         instance.commandManager = new CommandManager();
         instance.configManager = new ConfigManager();
-        instance.eventManager.register(instance.rotationManager);
+        // instance.eventManager.register(instance.rotationManager);
         instance.eventManager.register(instance.moduleManager);
         instance.eventManager.register(instance.commandManager);
         instance.moduleManager.load();

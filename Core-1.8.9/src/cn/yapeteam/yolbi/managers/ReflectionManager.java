@@ -290,34 +290,7 @@ public class ReflectionManager {
         }
     }
 
-    public static double S12PacketEntityVelocity$getMotionX(S12PacketEntityVelocity s12PacketEntityVelocity) {
-        try {
-            return S12PacketEntityVelocity$motionX.getDouble(s12PacketEntityVelocity);
-        } catch (Exception e) {
-            Logger.exception(e);
-        }
-        return 0;
-    }
-
-    public static double S12PacketEntityVelocity$getMotionY(S12PacketEntityVelocity s12PacketEntityVelocity) {
-        try {
-            return S12PacketEntityVelocity$motionY.getDouble(s12PacketEntityVelocity);
-        } catch (Exception e) {
-            Logger.exception(e);
-        }
-        return 0;
-    }
-
-    public static double S12PacketEntityVelocity$getMotionZ(S12PacketEntityVelocity s12PacketEntityVelocity) {
-        try {
-            return S12PacketEntityVelocity$motionZ.getDouble(s12PacketEntityVelocity);
-        } catch (Exception e) {
-            Logger.exception(e);
-        }
-        return 0;
-    }
-
-    public static void S12PacketEntityVelocity$setMotionX(S12PacketEntityVelocity s12PacketEntityVelocity, double value) {
+    public static void S12PacketEntityVelocity$setMotionX(S12PacketEntityVelocity s12PacketEntityVelocity, int value) {
         try {
             S12PacketEntityVelocity$motionX.setDouble(s12PacketEntityVelocity, value);
         } catch (Exception e) {
@@ -325,7 +298,7 @@ public class ReflectionManager {
         }
     }
 
-    public static void S12PacketEntityVelocity$setMotionY(S12PacketEntityVelocity s12PacketEntityVelocity, double value) {
+    public static void S12PacketEntityVelocity$setMotionY(S12PacketEntityVelocity s12PacketEntityVelocity, int value) {
         try {
             S12PacketEntityVelocity$motionY.setDouble(s12PacketEntityVelocity, value);
         } catch (Exception e) {
@@ -333,7 +306,7 @@ public class ReflectionManager {
         }
     }
 
-    public static void S12PacketEntityVelocity$setMotionZ(S12PacketEntityVelocity s12PacketEntityVelocity, double value) {
+    public static void S12PacketEntityVelocity$setMotionZ(S12PacketEntityVelocity s12PacketEntityVelocity, int value) {
         try {
             S12PacketEntityVelocity$motionZ.setDouble(s12PacketEntityVelocity, value);
         } catch (Exception e) {
