@@ -292,7 +292,7 @@ public class ReflectionManager {
 
     public static void S12PacketEntityVelocity$setMotionX(S12PacketEntityVelocity s12PacketEntityVelocity, int value) {
         try {
-            S12PacketEntityVelocity$motionX.setDouble(s12PacketEntityVelocity, value);
+            S12PacketEntityVelocity$motionX.setInt(s12PacketEntityVelocity, value);
         } catch (Exception e) {
             Logger.exception(e);
         }
@@ -300,7 +300,7 @@ public class ReflectionManager {
 
     public static void S12PacketEntityVelocity$setMotionY(S12PacketEntityVelocity s12PacketEntityVelocity, int value) {
         try {
-            S12PacketEntityVelocity$motionY.setDouble(s12PacketEntityVelocity, value);
+            S12PacketEntityVelocity$motionY.setInt(s12PacketEntityVelocity, value);
         } catch (Exception e) {
             Logger.exception(e);
         }
@@ -308,7 +308,7 @@ public class ReflectionManager {
 
     public static void S12PacketEntityVelocity$setMotionZ(S12PacketEntityVelocity s12PacketEntityVelocity, int value) {
         try {
-            S12PacketEntityVelocity$motionZ.setDouble(s12PacketEntityVelocity, value);
+            S12PacketEntityVelocity$motionZ.setInt(s12PacketEntityVelocity, value);
         } catch (Exception e) {
             Logger.exception(e);
         }
