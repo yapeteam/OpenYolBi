@@ -20,4 +20,5 @@ public interface AbstractFontRenderer {
     float getStringHeight();
 
     Font getFont();
+    void update();
 }

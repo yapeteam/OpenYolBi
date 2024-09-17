@@ -42,6 +42,10 @@ public class CFontRenderer extends CFont implements AbstractFontRenderer {
     }
 
     @Override
+    public void update() {
+    }
+
+    @Override
     public float drawStringWithShadow(String text, float x, float y, int color) {
         double shadowWidth = drawString(text, x + 1, y + .5f, color, true);
         return drawString(text, x, y, color, false);

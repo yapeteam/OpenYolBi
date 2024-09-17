@@ -1,13 +1,19 @@
 package cn.yapeteam.yolbi.font;
 
 import cn.yapeteam.loader.ResourceManager;
+import cn.yapeteam.yolbi.event.Listener;
+import cn.yapeteam.yolbi.event.impl.game.EventTick;
 import cn.yapeteam.yolbi.font.awt.AWTFontRenderer;
 import lombok.Getter;
 
 import java.awt.*;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Getter
 public class FontManager {
+    public static final List<AbstractFontRenderer> renderers = new CopyOnWriteArrayList<>();
+
     public FontManager() {
         JelloRegular18 = new AWTFontRenderer(getFont("JelloRegular.ttf", 18), false);
         PingFang10 = new AWTFontRenderer(getFont("PingFang_Normal.ttf", 10), true);
@@ -27,6 +33,11 @@ public class FontManager {
 
     private static Font getFont(String name, int size) {
         return FontUtil.getFontFromTTF(ResourceManager.resources.getStream("fonts/" + name), size, Font.PLAIN);
+    }
+
+    @Listener
+    private static void onTick(EventTick e) {
+        renderers.forEach(AbstractFontRenderer::update);
     }
 
     private final AbstractFontRenderer JelloRegular18;

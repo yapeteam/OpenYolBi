@@ -2,6 +2,7 @@ package cn.yapeteam.yolbi.font.awt;
 
 import cn.yapeteam.loader.logger.Logger;
 import cn.yapeteam.yolbi.font.AbstractFontRenderer;
+import cn.yapeteam.yolbi.font.FontManager;
 import lombok.Getter;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.MathHelper;
@@ -14,8 +15,10 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Pattern;
 
 
@@ -34,9 +37,8 @@ public class AWTFontRenderer implements AbstractFontRenderer {
     private final java.awt.Font font;
     @Getter
     private final float fontHeight;
-    private final Map<Character, FontCharacter> defaultCharacters = new HashMap<>();
-    private final Map<Character, FontCharacter> boldCharacters = new HashMap<>();
-    private final Map<Character, FontCharacter> chineseCharacters = new HashMap<>();
+    private final Map<Character, FontCharacter> defaultCharacters = new ConcurrentHashMap<>();
+    private final Map<Character, FontCharacter> boldCharacters = new ConcurrentHashMap<>();
     private final boolean chinese;
 
     public AWTFontRenderer(java.awt.Font font, boolean chinese) {
@@ -44,8 +46,11 @@ public class AWTFontRenderer implements AbstractFontRenderer {
         this.fontHeight = (float) (font.getStringBounds("ABCDEFGHOKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", new FontRenderContext(new AffineTransform(), true, true)).getHeight() / 4.0D);
         this.chinese = chinese;
 
-        this.fillCharacters(this.defaultCharacters, 0, chinese);
-        this.fillCharacters(this.boldCharacters, 1, chinese);
+        new Thread(() -> {
+            this.fillCharacters(this.defaultCharacters, 0, chinese);
+            this.fillCharacters(this.boldCharacters, 1, chinese);
+        }).start();
+        FontManager.renderers.add(this);
     }
 
     public float getMiddleOfBox(float height) {
@@ -92,6 +97,8 @@ public class AWTFontRenderer implements AbstractFontRenderer {
         }
     }
 
+    private final List<Runnable> tasks = new CopyOnWriteArrayList<>();
+
     private void fillCharacter(char character, Map<Character, FontCharacter> map, Graphics2D fontGraphics, FontMetrics fontMetrics) {
         Rectangle2D charRectangle = fontMetrics.getStringBounds(character + "", fontGraphics);
 
@@ -108,10 +115,20 @@ public class AWTFontRenderer implements AbstractFontRenderer {
         this.preDraw(charGraphics);
         charGraphics.drawString(character + "", 4, font.getSize());
 
-        int charTexture = GL11.glGenTextures();
-        this.uploadTexture(charTexture, charImage, width, height);
+        tasks.add(() -> {
+            int charTexture = GL11.glGenTextures();
+            this.uploadTexture(charTexture, charImage, width, height);
 
-        map.put(character, new FontCharacter(charTexture, (float) width, (float) height));
+            map.put(character, new FontCharacter(charTexture, (float) width, (float) height));
+        });
+    }
+
+    @Override
+    public void update() {
+        if (!tasks.isEmpty()) {
+            tasks.get(0).run();
+            tasks.remove(0);
+        }
     }
 
     private void preDraw(Graphics2D graphics) {
@@ -161,7 +178,8 @@ public class AWTFontRenderer implements AbstractFontRenderer {
             String nextChar = "";
             for (int i = startIndex; i <= text.length() - 1 && i >= 0 && getStringWidth(builder + nextChar) <= width; i += step) {
                 builder.append(text.charAt(i));
-                nextChar = reverse ? (i == 0 ? "" : String.valueOf(text.charAt(i + step))) : (i == text.length() - 1 ? "" : String.valueOf(text.charAt(i + step)));
+                String s = String.valueOf(text.charAt(i + step));
+                nextChar = reverse ? s : i == text.length() - 1 ? "" : s;
             }
 
             if (reverse) builder.reverse();
