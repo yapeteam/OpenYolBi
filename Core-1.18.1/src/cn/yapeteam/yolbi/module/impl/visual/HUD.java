@@ -26,9 +26,9 @@ public class HUD extends Module {
     @Listener
     private void renderArrayList(EventRender2D e) {
         PoseStack poseStack = e.getPoseStack();
-        AbstractFontRenderer font = YolBi.instance.getFontManager().getPingFang18();
+        AbstractFontRenderer font = YolBi.instance.getFontManager().getPingFang14();
 
-        float y = 2, height = (float) font.getStringHeight("F");
+        float y = 2, height = 8;
         font.drawStringWithShadow(poseStack, "Oxycontin v" + VersionInfo.version, 2, 2, -1);
         y += height;
         for (Module module : YolBi.instance.getModuleManager().getModules().stream().filter(Module::isEnabled).collect(Collectors.toList())) {
