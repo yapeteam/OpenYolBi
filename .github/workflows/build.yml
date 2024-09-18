@@ -26,7 +26,7 @@ jobs:
         run: sudo chmod -R 777 Builder/
 
       - name: Setup and build
-        run:  sudo cd Builder/src/cn/yapeteam/builder & sudo javac Builder.java & sudo javac OS.java & sudo javac ProcessBar.java & sudo javac SSLUtils.java & sudo jar cvf Builder.jar ../../../META-INF/MANIFEST.MF cn/yapeteam/builder & cd ../../../../.. & sudo java -jar Builder/src/Builder.jar release
+        run:  sudo javac Builder/src/cn/yapeteam/builder/Builder.java & sudo javac Builder/src/cn/yapeteam/builder/OS.java & sudo javac Builder/src/cn/yapeteam/builder/ProcessBar.java & sudo javac Builder/src/cn/yapeteam/builder/SSLUtils.java & sudo jar cvf Builder.jar Builder/src/META-INF/MANIFEST.MF Builder/src/cn/yapeteam/builder & sudo java -jar Builder.jar release
         
       - name: Upload artifact
         run: |
