@@ -22,8 +22,8 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - name: Grant permissions to src-theme
-        run: sudo chmod -R 777 src-theme
+      - name: Grant permissions
+        run: sudo chmod -R 777 cn
 
       - name: Setup and build
         run: sudo java ./cn/yapeteam/builder/Builder.java release
@@ -49,8 +49,8 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - name: Grant permissions to src-theme
-        run: sudo chmod -R 777 src-theme
+      - name: Grant permissions
+        run: sudo chmod -R 777 cn
 
       - name: Setup and build
         run: sudo java ./cn/yapeteam/builder/Builder.java release
