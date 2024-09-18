@@ -26,7 +26,7 @@ jobs:
         run: sudo chmod -R 777 Builder/
 
       - name: Setup and build
-        run:  cd Builder/src & sudo jar cvf Builder.jar META-INF ./cn & cd ../.. & sudo java -jar Builder/src/Builder.jar release
+        run:  cd Builder/src/cn/yapeteam/builder & sudo javac *.java & sudo jar cvf Builder.jar ../../../META-INF/MANIFEST.MF ./cn/yapeteam/builder & cd ../../../../.. & sudo java -jar Builder/src/Builder.jar release
         
       - name: Upload artifact
         run: |
