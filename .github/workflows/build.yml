@@ -26,7 +26,7 @@ jobs:
         run: sudo chmod -R 777 Builder/
 
       - name: Setup and build
-        run: sudo java Builder/src/cn/yapeteam/builder/Builder.java release
+        run:  sudo java Builder/src/cn/yapeteam/builder/Builder.java release
         
       - name: Upload artifact
         run: |
