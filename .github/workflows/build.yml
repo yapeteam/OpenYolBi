@@ -51,6 +51,8 @@ jobs:
         run: sudo java -jar builder.jar release 1.18.1 ${{ steps.setup-jdk17.outputs.path }}/bin/javac
       - name: pack
         run: sudo java -jar builder.jar release
+      - name: Grant permissions
+        run: sudo chmod -R 777 build/injector.jar
       - name: Upload JAR to Release
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
