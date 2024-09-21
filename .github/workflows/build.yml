@@ -37,27 +37,27 @@ jobs:
         run: |
           sudo mkdir Builder/build
           sudo javac -cp "Builder/libs/asm-9.7.jar:Builder/libs/asm-analysis-9.7.jar:Builder/libs/asm-commons-9.7.jar:Builder/libs/asm-tree-9.7.jar:Builder/libs/asm-util-9.7.jar:Builder/libs/proguard.jar" -d Builder/build Builder/src/cn/yapeteam/builder/Builder.java Builder/src/cn/yapeteam/builder/OS.java Builder/src/cn/yapeteam/builder/Compiler.java Builder/src/cn/yapeteam/builder/Terminal.java Builder/src/cn/yapeteam/builder/ProcessBar.java Builder/src/cn/yapeteam/builder/SSLUtils.java
-          sudo jar cvf Builder.jar Builder/src/META-INF/MANIFEST.MF Builder/build
+          sudo jar cvfm builder.jar Builder/src/META-INF/MANIFEST.MF -C Builder/build/ .
       - name: build deps
         env:
           JAVA_HOME: ${{ steps.setup-jdk8.outputs.path }}
-        run: sudo java -jar Builder.jar release deps
+        run: sudo java -jar builder.jar release deps
       - name: build 1.8.9
         env:
           JAVA_HOME: ${{ steps.setup-jdk8.outputs.path }}
-        run: sudo java -jar Builder.jar release 1.8.9
+        run: sudo java -jar builder.jar release 1.8.9
       - name: build 1.12.2
         env:
           JAVA_HOME: ${{ steps.setup-jdk8.outputs.path }}
-        run: sudo java -jar Builder.jar release 1.12.2
+        run: sudo java -jar builder.jar release 1.12.2
       - name: build 1.18.1
         env:
           JAVA_HOME: ${{ steps.setup-jdk17.outputs.path }}
-        run: sudo java -jar Builder.jar release 1.18.1
+        run: sudo java -jar builder.jar release 1.18.1
       - name: pack
         env:
           JAVA_HOME: ${{ steps.setup-jdk8.outputs.path }}
-        run: sudo java -jar Builder.jar release
+        run: sudo java -jar builder.jar release
       - name: Upload artifact
         run: |
           cd build/libs
