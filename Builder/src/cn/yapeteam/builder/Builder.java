@@ -3,6 +3,9 @@ package cn.yapeteam.builder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import proguard.ClassPathEntry;
+import proguard.Configuration;
+import proguard.ConfigurationParser;
 import proguard.ProGuard;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -15,9 +18,7 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Permission;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Stream;
 import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
@@ -229,6 +230,8 @@ public class Builder {
                     case "deps":
                         buildModule(new String[]{"VersionInfo/src"}, new String[]{}, "build/VersionInfo", javac);
                         buildModule(new String[]{"YMixin/src"}, new String[]{"libs", "deps"}, "build/YMixin", javac);
+                        buildModule(new String[]{"Injector/src"}, new String[]{"libs", "deps", "build/VersionInfo:"}, "build/Injector", javac);
+                        buildModule(new String[]{"Agent/src"}, new String[]{}, "build/Agent", javac);
                         break;
                     case "1.8.9":
                         buildModule(new String[]{"Core-1.8.9/src"}, new String[]{"libs", "libs-low", "deps", "minecraft-lib/minecraft-1.8.9.jar", "build/VersionInfo:", "build/YMixin:"}, "out/production/Core-1.8.9", javac);
@@ -296,8 +299,36 @@ public class Builder {
                         File tobe_proguard = new File(build_dir, artifact_name);
                         File artifact_file = new File(output_dir, artifact_name);
                         copyStream(Files.newOutputStream(tobe_proguard.toPath()), Files.newInputStream(artifact_file.toPath()));
-                        try {
-                            ProGuard.main(new String[]{"@" + proguard_cfg.getNodeValue()});
+                        try (ConfigurationParser parser = new ConfigurationParser(new String[]{"@" + proguard_cfg.getNodeValue()}, System.getProperties());) {
+                            Configuration configuration = new Configuration();
+                            parser.parse(configuration);
+                            if (configuration.targetClassVersion == 3407872) {
+                                Arrays.stream(Objects.requireNonNull(new File(System.getProperty("java.home"), "lib").listFiles()))
+                                        .filter(file -> file.getName().endsWith(".jar"))
+                                        .forEach(file -> {
+                                            System.out.println(file.getAbsolutePath());
+                                            configuration.libraryJars.add(new ClassPathEntry(file, false));
+                                        });
+                            } else {
+                                File[] list = new File(System.getProperty("java.home"), "jmods").listFiles();
+                                if (list != null)
+                                    Arrays.stream(list)
+                                            .filter(file -> file.getName().endsWith(".jmod"))
+                                            .forEach(file -> {
+                                                System.out.println(file.getAbsolutePath());
+                                                configuration.libraryJars.add(new ClassPathEntry(file, false));
+                                            });
+                                else {
+                                    Arrays.stream(Objects.requireNonNull(new File(System.getProperty("java.home"), "lib").listFiles()))
+                                            .filter(file -> file.getName().endsWith(".jar"))
+                                            .forEach(file -> {
+                                                System.out.println(file.getAbsolutePath());
+                                                configuration.libraryJars.add(new ClassPathEntry(file, false));
+                                            });
+                                }
+                            }
+                            parser.close();
+                            new ProGuard(configuration).execute();
                         } catch (ExitException ignored1) {
                         }
                         copyStream(Files.newOutputStream(artifact_file.toPath()), Files.newInputStream(new File(build_dir, artifact_name + "-obf.jar").toPath()));

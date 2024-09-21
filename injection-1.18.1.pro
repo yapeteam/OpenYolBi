@@ -2,7 +2,6 @@
 -outjars build/injection-1.18.1/injection-1.18.1.jar-obf.jar
 
 -libraryjars minecraft-lib/minecraft-1.18.1.jar
--libraryjars Builder/libs/rt.jar
 
 -forceprocessing
 -dontshrink
