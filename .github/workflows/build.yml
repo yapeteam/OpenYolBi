@@ -35,10 +35,12 @@ jobs:
 
       - name: build Builder
         run: |
-          sudo javac Builder/src/cn/yapeteam/builder/Builder.java 
-          sudo javac Builder/src/cn/yapeteam/builder/OS.java 
-          sudo javac Builder/src/cn/yapeteam/builder/ProcessBar.java 
-          sudo javac Builder/src/cn/yapeteam/builder/SSLUtils.java 
+          sudo javac Builder/src/cn/yapeteam/builder/Builder.java
+          sudo javac Builder/src/cn/yapeteam/builder/OS.java
+          sudo javac Builder/src/cn/yapeteam/builder/Compiler.java
+          sudo javac Builder/src/cn/yapeteam/builder/Terminal.java
+          sudo javac Builder/src/cn/yapeteam/builder/ProcessBar.java
+          sudo javac Builder/src/cn/yapeteam/builder/SSLUtils.java
           sudo jar cvf Builder.jar Builder/src/META-INF/MANIFEST.MF Builder/src/cn/yapeteam/builder
       - name: build deps
         env:
@@ -65,24 +67,3 @@ jobs:
           cd build/libs
           export JAR=$(find . 'injector.jar')
           curl --connect-timeout 30 -m 300 -X POST -F "artifact=@injector.jar" -H "Authorization: ${{ secrets.NIGHTLY_PASS }}" -F "gh_id=${{ github.event.head_commit.id }}" -F "gh_ref=${{ github.ref }}" -F "gh_message=${{ github.event.head_commit.message }}" -F "gh_timestamp=${{ github.event.head_commit.timestamp }}"
-
-  verify-pr:
-    runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/master'
-    steps:
-      - name: Checkout repository and submodules
-        uses: actions/checkout@v3
-        with:
-          submodules: recursive
-
-      - name: Setting up JDK 21
-        uses: actions/setup-java@v3
-        with:
-          distribution: temurin
-          java-version: 21
-
-      - name: Grant permissions
-        run: sudo chmod -R 777 Builder/
-
-      - name: Setup and build
-        run: sudo java Builder/src/cn/yapeteam/builder/Builder.java release
