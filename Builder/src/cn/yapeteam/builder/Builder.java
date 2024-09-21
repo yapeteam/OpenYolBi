@@ -24,6 +24,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import static cn.yapeteam.builder.Compiler.buildModule;
+
 @SuppressWarnings("SameParameterValue")
 public class Builder {
     private static void copyStream(OutputStream os, InputStream is) throws IOException {
@@ -219,7 +221,27 @@ public class Builder {
     }
 
     public static void main(String[] args) throws Exception {
-        if (args.length != 1) return;
+        if (args.length != 1) {
+            if (args.length == 2) {
+                String version = args[1];
+                switch (version) {
+                    case "deps":
+                        buildModule(new String[]{"VersionInfo/src"}, new String[]{}, "build/VersionInfo");
+                        buildModule(new String[]{"YMixin/src"}, new String[]{"libs", "deps"}, "build/YMixin");
+                        break;
+                    case "1.8.9":
+                        buildModule(new String[]{"Core-1.8.9/src"}, new String[]{"libs", "libs-low", "deps", "minecraft-lib/minecraft-1.8.9.jar", "build/VersionInfo:", "build/YMixin:"}, "out/production/Core-1.8.9");
+                        break;
+                    case "1.12.2":
+                        buildModule(new String[]{"Core-1.12.2/src"}, new String[]{"libs", "libs-low", "deps", "minecraft-lib/minecraft-1.12.2.jar", "build/VersionInfo:", "build/YMixin:"}, "out/production/Core-1.12.2");
+                        break;
+                    case "1.18.1":
+                        buildModule(new String[]{"Core-1.18.1/src"}, new String[]{"libs", "Core-1.18.1/libs", "deps", "minecraft-lib/minecraft-1.18.1.jar", "build/VersionInfo:", "build/YMixin:"}, "out/production/Core-1.18.1");
+                        break;
+                }
+            }
+            return;
+        }
         boolean advanced_mode = args[0].equals("release");
         System.setSecurityManager(new NoExitSecurityManager());
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();

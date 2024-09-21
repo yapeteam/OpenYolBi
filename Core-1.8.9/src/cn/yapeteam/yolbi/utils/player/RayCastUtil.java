@@ -7,14 +7,13 @@ import cn.yapeteam.yolbi.managers.ReflectionManager;
 import cn.yapeteam.yolbi.utils.IMinecraft;
 import cn.yapeteam.yolbi.utils.vector.Vector2f;
 import com.google.common.base.Predicates;
-import kotlin.Triple;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.*;
-import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Patrick
@@ -151,49 +150,5 @@ public final class RayCastUtil implements IMinecraft {
         } catch (IllegalAccessException e) {
             return new EnumFacing[0];
         }
-    }
-
-    private static final Set<EnumFacing> FACINGS = new HashSet<>(Arrays.asList(EnumFacing$VALUES()));
-
-    public static @NotNull Optional<Triple<BlockPos, EnumFacing, Vec3>> getPlaceSide(@NotNull BlockPos blockPos) {
-        return getPlaceSide(blockPos, FACINGS);
-    }
-
-    public static @NotNull Optional<Triple<BlockPos, EnumFacing, Vec3>> getPlaceSide(@NotNull BlockPos blockPos, Set<EnumFacing> limitFacing) {
-        final List<BlockPos> possible = Arrays.asList(
-                blockPos.down(), blockPos.east(), blockPos.west(),
-                blockPos.north(), blockPos.south(), blockPos.up()
-        );
-
-        for (BlockPos pos : possible) {
-            if (!PlayerUtil.replaceable(pos)) {
-                EnumFacing facing;
-                Vec3 hitPos;
-                if (pos.getY() < blockPos.getY()) {
-                    facing = EnumFacing.UP;
-                    hitPos = new Vec3(pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5);
-                } else if (pos.getX() > blockPos.getX()) {
-                    facing = EnumFacing.WEST;
-                    hitPos = new Vec3(pos.getX(), pos.getY() + 0.5, pos.getZ() + 0.5);
-                } else if (pos.getX() < blockPos.getX()) {
-                    facing = EnumFacing.EAST;
-                    hitPos = new Vec3(pos.getX() + 1, pos.getY() + 0.5, pos.getZ() + 0.5);
-                } else if (pos.getZ() < blockPos.getZ()) {
-                    facing = EnumFacing.SOUTH;
-                    hitPos = new Vec3(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 1);
-                } else if (pos.getZ() > blockPos.getZ()) {
-                    facing = EnumFacing.NORTH;
-                    hitPos = new Vec3(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ());
-                } else {
-                    facing = EnumFacing.DOWN;
-                    hitPos = new Vec3(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
-                }
-
-                if (!limitFacing.contains(facing)) continue;
-
-                return Optional.of(new Triple<>(pos, facing, hitPos));
-            }
-        }
-        return Optional.empty();
     }
 }
