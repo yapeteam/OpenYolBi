@@ -7,11 +7,11 @@ import java.util.List;
 public class Compiler {
 
 
-    public static void buildModule(String[] sourcePath, String[] libraryPath, String buildDir, String javac) throws Exception {
+    public static void buildModule(String[] sourcePath, String[] libraryPath, String buildDir) throws Exception {
         boolean ignored = new File(buildDir).mkdirs();
         List<String> command = new ArrayList<>();
 
-        command.add(javac); // 指定 javac 命令
+        command.add(new File(System.getProperty("java.home"), "bin/javac").getAbsolutePath()); // 指定 javac 命令
 
         command.add("-encoding");
         command.add("UTF-8");
