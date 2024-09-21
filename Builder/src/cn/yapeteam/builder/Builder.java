@@ -231,7 +231,7 @@ public class Builder {
                         buildModule(new String[]{"VersionInfo/src"}, new String[]{}, "build/VersionInfo", javac);
                         buildModule(new String[]{"YMixin/src"}, new String[]{"libs", "deps"}, "build/YMixin", javac);
                         buildModule(new String[]{"Injector/src"}, new String[]{"libs", "deps", "build/VersionInfo:"}, "build/Injector", javac);
-                        buildModule(new String[]{"Agent/src"}, new String[]{}, "build/Agent", javac);
+                        buildModule(new String[]{"Agent/src"}, new String[]{"deps"}, "build/Agent", javac);
                         break;
                     case "1.8.9":
                         buildModule(new String[]{"Core-1.8.9/src"}, new String[]{"libs", "libs-low", "deps", "minecraft-lib/minecraft-1.8.9.jar", "build/VersionInfo:", "build/YMixin:"}, "out/production/Core-1.8.9", javac);
