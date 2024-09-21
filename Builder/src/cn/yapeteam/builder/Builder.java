@@ -314,7 +314,7 @@ public class Builder {
                             Configuration configuration = new Configuration();
                             parser.parse(configuration);
                             if (configuration.targetClassVersion == 3407872) {
-                                Arrays.stream(Objects.requireNonNull(new File(System.getProperty("java.home"), "lib").listFiles()))
+                                Arrays.stream(Objects.requireNonNull(new File(System.getProperty("java.home").replace("/jre", ""), "jre/lib").listFiles()))
                                         .filter(file -> file.getName().endsWith(".jar"))
                                         .forEach(file -> {
                                             System.out.println(file.getAbsolutePath());
@@ -330,7 +330,7 @@ public class Builder {
                                                 configuration.libraryJars.add(new ClassPathEntry(file, false));
                                             });
                                 else {
-                                    Arrays.stream(Objects.requireNonNull(new File(System.getProperty("java.home"), "lib").listFiles()))
+                                    Arrays.stream(Objects.requireNonNull(new File(System.getProperty("java.home").replace("/jre", ""), "jre/lib").listFiles()))
                                             .filter(file -> file.getName().endsWith(".jar"))
                                             .forEach(file -> {
                                                 System.out.println(file.getAbsolutePath());
