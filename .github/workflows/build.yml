@@ -28,7 +28,10 @@ jobs:
         id: setup-jdk17
 
       - name: Grant permissions
-        run: sudo chmod -R 777 Builder/
+        run: |
+          sudo chmod -R 777 Builder/
+          sudo chmod -R 777 ${{ steps.setup-jdk8.outputs.path }}/bin/java
+          sudo chmod -R 777 ${{ steps.setup-jdk17.outputs.path }}/bin/java
 
       - name: build Builder
         run: |
@@ -42,13 +45,13 @@ jobs:
           cd ..
           sudo jar cvfm builder.jar Builder/src/META-INF/MANIFEST.MF -C Builder/build/ . -C temp_dir/ .
       - name: build deps
-        run: ${{ steps.setup-jdk8.outputs.path }}/java -jar builder.jar release deps
+        run: ${{ steps.setup-jdk8.outputs.path }}/bin/java -jar builder.jar release deps
       - name: build 1.8.9
-        run: ${{ steps.setup-jdk8.outputs.path }}/java -jar builder.jar release 1.8.9
+        run: ${{ steps.setup-jdk8.outputs.path }}/bin/java -jar builder.jar release 1.8.9
       - name: build 1.12.2
-        run: ${{ steps.setup-jdk8.outputs.path }}/java -jar builder.jar release 1.12.2
+        run: ${{ steps.setup-jdk8.outputs.path }}/bin/java -jar builder.jar release 1.12.2
       - name: build 1.18.1
-        run: ${{ steps.setup-jdk17.outputs.path }}/java -jar builder.jar release 1.18.1
+        run: ${{ steps.setup-jdk17.outputs.path }}/bin/java -jar builder.jar release 1.18.1
       - name: pack
         run: sudo java -jar builder.jar release
       - name: Upload JAR to Release
