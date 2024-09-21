@@ -313,31 +313,21 @@ public class Builder {
                         try (ConfigurationParser parser = new ConfigurationParser(new String[]{"@" + proguard_cfg.getNodeValue()}, System.getProperties());) {
                             Configuration configuration = new Configuration();
                             parser.parse(configuration);
-                            System.out.println(new File(System.getProperty("java.home").replace("/jre", ""), "jre/lib").getAbsolutePath());
-                            if (configuration.targetClassVersion == 3407872) {
+                            File[] list = new File(System.getProperty("java.home"), "jmods").listFiles();
+                            if (list != null)
+                                Arrays.stream(list)
+                                        .filter(file -> file.getName().endsWith(".jmod"))
+                                        .forEach(file -> {
+                                            System.out.println(file.getAbsolutePath());
+                                            configuration.libraryJars.add(new ClassPathEntry(file, false));
+                                        });
+                            else {
                                 Arrays.stream(Objects.requireNonNull(new File(System.getProperty("java.home").replace("/jre", ""), "jre/lib").listFiles()))
                                         .filter(file -> file.getName().endsWith(".jar"))
                                         .forEach(file -> {
                                             System.out.println(file.getAbsolutePath());
                                             configuration.libraryJars.add(new ClassPathEntry(file, false));
                                         });
-                            } else {
-                                File[] list = new File(System.getProperty("java.home"), "jmods").listFiles();
-                                if (list != null)
-                                    Arrays.stream(list)
-                                            .filter(file -> file.getName().endsWith(".jmod"))
-                                            .forEach(file -> {
-                                                System.out.println(file.getAbsolutePath());
-                                                configuration.libraryJars.add(new ClassPathEntry(file, false));
-                                            });
-                                else {
-                                    Arrays.stream(Objects.requireNonNull(new File(System.getProperty("java.home").replace("/jre", ""), "jre/lib").listFiles()))
-                                            .filter(file -> file.getName().endsWith(".jar"))
-                                            .forEach(file -> {
-                                                System.out.println(file.getAbsolutePath());
-                                                configuration.libraryJars.add(new ClassPathEntry(file, false));
-                                            });
-                                }
                             }
                             parser.close();
                             new ProGuard(configuration).execute();

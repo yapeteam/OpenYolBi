@@ -53,7 +53,7 @@ jobs:
       - name: build 1.18.1
         run: ${{ steps.setup-jdk17.outputs.path }}/bin/java -jar builder.jar release 1.18.1
       - name: pack
-        run: sudo java -jar builder.jar release
+        run: ${{ steps.setup-jdk8.outputs.path }}/bin/java -jar builder.jar release
       - name: Upload JAR to Release
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
