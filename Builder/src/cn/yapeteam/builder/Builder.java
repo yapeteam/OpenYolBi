@@ -222,21 +222,22 @@ public class Builder {
 
     public static void main(String[] args) throws Exception {
         if (args.length != 1) {
-            if (args.length == 2) {
+            if (args.length == 3) {
                 String version = args[1];
+                String javac = args[2];
                 switch (version) {
                     case "deps":
-                        buildModule(new String[]{"VersionInfo/src"}, new String[]{}, "build/VersionInfo");
-                        buildModule(new String[]{"YMixin/src"}, new String[]{"libs", "deps"}, "build/YMixin");
+                        buildModule(new String[]{"VersionInfo/src"}, new String[]{}, "build/VersionInfo", javac);
+                        buildModule(new String[]{"YMixin/src"}, new String[]{"libs", "deps"}, "build/YMixin", javac);
                         break;
                     case "1.8.9":
-                        buildModule(new String[]{"Core-1.8.9/src"}, new String[]{"libs", "libs-low", "deps", "minecraft-lib/minecraft-1.8.9.jar", "build/VersionInfo:", "build/YMixin:"}, "out/production/Core-1.8.9");
+                        buildModule(new String[]{"Core-1.8.9/src"}, new String[]{"libs", "libs-low", "deps", "minecraft-lib/minecraft-1.8.9.jar", "build/VersionInfo:", "build/YMixin:"}, "out/production/Core-1.8.9", javac);
                         break;
                     case "1.12.2":
-                        buildModule(new String[]{"Core-1.12.2/src"}, new String[]{"libs", "libs-low", "deps", "minecraft-lib/minecraft-1.12.2.jar", "build/VersionInfo:", "build/YMixin:"}, "out/production/Core-1.12.2");
+                        buildModule(new String[]{"Core-1.12.2/src"}, new String[]{"libs", "libs-low", "deps", "minecraft-lib/minecraft-1.12.2.jar", "build/VersionInfo:", "build/YMixin:"}, "out/production/Core-1.12.2", javac);
                         break;
                     case "1.18.1":
-                        buildModule(new String[]{"Core-1.18.1/src"}, new String[]{"libs", "Core-1.18.1/libs", "deps", "minecraft-lib/minecraft-1.18.1.jar", "build/VersionInfo:", "build/YMixin:"}, "out/production/Core-1.18.1");
+                        buildModule(new String[]{"Core-1.18.1/src"}, new String[]{"libs", "Core-1.18.1/libs", "deps", "minecraft-lib/minecraft-1.18.1.jar", "build/VersionInfo:", "build/YMixin:"}, "out/production/Core-1.18.1", javac);
                         break;
                 }
             }

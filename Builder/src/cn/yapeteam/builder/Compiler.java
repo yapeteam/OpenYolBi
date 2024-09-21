@@ -5,19 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Compiler {
-    public static void main(String[] args) throws Exception {
-        buildModule(new String[]{"VersionInfo/src"}, new String[]{}, "build/VersionInfo");
-        buildModule(new String[]{"YMixin/src"}, new String[]{"libs", "deps"}, "build/YMixin");
-        buildModule(new String[]{"Core-1.8.9/src"}, new String[]{"libs", "libs-low", "deps", "minecraft-lib/minecraft-1.8.9.jar", "build/VersionInfo:", "build/YMixin:"}, "build/Core-1.8.9");
-        buildModule(new String[]{"Core-1.12.2/src"}, new String[]{"libs", "libs-low", "deps", "minecraft-lib/minecraft-1.12.2.jar", "build/VersionInfo:", "build/YMixin:"}, "build/Core-1.12.2");
-        buildModule(new String[]{"Core-1.18.1/src"}, new String[]{"libs", "Core-1.18.1/libs", "deps", "minecraft-lib/minecraft-1.18.1.jar", "build/VersionInfo:", "build/YMixin:"}, "build/Core-1.18.1");
-    }
 
-    public static void buildModule(String[] sourcePath, String[] libraryPath, String buildDir) throws Exception {
+
+    public static void buildModule(String[] sourcePath, String[] libraryPath, String buildDir, String javac) throws Exception {
         boolean ignored = new File(buildDir).mkdirs();
         List<String> command = new ArrayList<>();
 
-        command.add(System.getenv("WORKFLOW_JAVA") + "/bin/javac"); // 指定 javac 命令
+        command.add(javac); // 指定 javac 命令
 
         command.add("-encoding");
         command.add("UTF-8");

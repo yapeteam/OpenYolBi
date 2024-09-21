@@ -39,24 +39,14 @@ jobs:
           sudo javac -cp "Builder/libs/asm-9.7.jar:Builder/libs/asm-analysis-9.7.jar:Builder/libs/asm-commons-9.7.jar:Builder/libs/asm-tree-9.7.jar:Builder/libs/asm-util-9.7.jar:Builder/libs/proguard.jar" -d Builder/build Builder/src/cn/yapeteam/builder/Builder.java Builder/src/cn/yapeteam/builder/OS.java Builder/src/cn/yapeteam/builder/Compiler.java Builder/src/cn/yapeteam/builder/Terminal.java Builder/src/cn/yapeteam/builder/ProcessBar.java Builder/src/cn/yapeteam/builder/SSLUtils.java
           sudo jar cvfm builder.jar Builder/src/META-INF/MANIFEST.MF -C Builder/build/ .
       - name: build deps
-        env:
-          WORKFLOW_JAVA: ${{ steps.setup-jdk8.outputs.path }}
-        run: sudo java -jar builder.jar release deps
+        run: sudo java -jar builder.jar release deps ${{ steps.setup-jdk8.outputs.path }}/bin/javac
       - name: build 1.8.9
-        env:
-          WORKFLOW_JAVA: ${{ steps.setup-jdk8.outputs.path }}
-        run: sudo java -jar builder.jar release 1.8.9
+        run: sudo java -jar builder.jar release 1.8.9 ${{ steps.setup-jdk8.outputs.path }}/bin/javac
       - name: build 1.12.2
-        env:
-          WORKFLOW_JAVA: ${{ steps.setup-jdk8.outputs.path }}
-        run: sudo java -jar builder.jar release 1.12.2
+        run: sudo java -jar builder.jar release 1.12.2 ${{ steps.setup-jdk8.outputs.path }}/bin/javac
       - name: build 1.18.1
-        env:
-          WORKFLOW_JAVA: ${{ steps.setup-jdk17.outputs.path }}
-        run: sudo java -jar builder.jar release 1.18.1
+        run: sudo java -jar builder.jar release 1.18.1 ${{ steps.setup-jdk17.outputs.path }}/bin/javac
       - name: pack
-        env:
-          WORKFLOW_JAVA: ${{ steps.setup-jdk8.outputs.path }}
         run: sudo java -cp "Builder/libs/asm-9.7.jar:Builder/libs/asm-analysis-9.7.jar:Builder/libs/asm-commons-9.7.jar:Builder/libs/asm-tree-9.7.jar:Builder/libs/asm-util-9.7.jar:Builder/libs/proguard.jar" -jar builder.jar release
       - name: Upload artifact
         run: |
