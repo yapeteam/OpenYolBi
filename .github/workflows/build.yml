@@ -40,24 +40,24 @@ jobs:
           sudo jar cvfm builder.jar Builder/src/META-INF/MANIFEST.MF -C Builder/build/ .
       - name: build deps
         env:
-          JAVA_HOME: ${{ steps.setup-jdk8.outputs.path }}
+          WORKFLOW_JAVA: ${{ steps.setup-jdk8.outputs.path }}
         run: sudo java -jar builder.jar release deps
       - name: build 1.8.9
         env:
-          JAVA_HOME: ${{ steps.setup-jdk8.outputs.path }}
+          WORKFLOW_JAVA: ${{ steps.setup-jdk8.outputs.path }}
         run: sudo java -jar builder.jar release 1.8.9
       - name: build 1.12.2
         env:
-          JAVA_HOME: ${{ steps.setup-jdk8.outputs.path }}
+          WORKFLOW_JAVA: ${{ steps.setup-jdk8.outputs.path }}
         run: sudo java -jar builder.jar release 1.12.2
       - name: build 1.18.1
         env:
-          JAVA_HOME: ${{ steps.setup-jdk17.outputs.path }}
+          WORKFLOW_JAVA: ${{ steps.setup-jdk17.outputs.path }}
         run: sudo java -jar builder.jar release 1.18.1
       - name: pack
         env:
-          JAVA_HOME: ${{ steps.setup-jdk8.outputs.path }}
-        run: sudo java -jar builder.jar release
+          WORKFLOW_JAVA: ${{ steps.setup-jdk8.outputs.path }}
+        run: sudo java -cp "Builder/libs/asm-9.7.jar:Builder/libs/asm-analysis-9.7.jar:Builder/libs/asm-commons-9.7.jar:Builder/libs/asm-tree-9.7.jar:Builder/libs/asm-util-9.7.jar:Builder/libs/proguard.jar" -jar builder.jar release
       - name: Upload artifact
         run: |
           cd build/libs

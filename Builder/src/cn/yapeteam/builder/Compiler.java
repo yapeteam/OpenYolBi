@@ -17,7 +17,7 @@ public class Compiler {
         boolean ignored = new File(buildDir).mkdirs();
         List<String> command = new ArrayList<>();
 
-        command.add(System.getenv("JAVA_HOME") + "/bin/javac"); // 指定 javac 命令
+        command.add(System.getenv("WORKFLOW_JAVA") + "/bin/javac"); // 指定 javac 命令
 
         command.add("-encoding");
         command.add("UTF-8");
