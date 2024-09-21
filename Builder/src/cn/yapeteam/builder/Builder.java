@@ -313,6 +313,7 @@ public class Builder {
                         try (ConfigurationParser parser = new ConfigurationParser(new String[]{"@" + proguard_cfg.getNodeValue()}, System.getProperties());) {
                             Configuration configuration = new Configuration();
                             parser.parse(configuration);
+                            System.out.println(new File(System.getProperty("java.home").replace("/jre", ""), "jre/lib").getAbsolutePath());
                             if (configuration.targetClassVersion == 3407872) {
                                 Arrays.stream(Objects.requireNonNull(new File(System.getProperty("java.home").replace("/jre", ""), "jre/lib").listFiles()))
                                         .filter(file -> file.getName().endsWith(".jar"))
