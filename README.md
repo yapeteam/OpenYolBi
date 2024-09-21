@@ -75,4 +75,12 @@ Run `RELEASE BUILD`
 
 For custom build, please edit `YBuild.xml`
 
+# Dependencies
+
+[Reflective DLL injection](https://github.com/stephenfewer/ReflectiveDLLInjection)
+
+[FlatLaf](https://github.com/JFormDesigner/FlatLaf)
+
+[ASM](https://gitlab.ow2.org/asm/asm)
+
 <hr>
