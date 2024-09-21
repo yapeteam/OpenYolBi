@@ -28,7 +28,10 @@ jobs:
         id: setup-jdk17
 
       - name: Grant permissions
-        run: sudo chmod -R 777 Builder/
+        run: |
+          run: sudo chmod -R 777 Builder/
+          sudo chmod -R 777 ${{ steps.setup-jdk8.outputs.path }}/
+          sudo chmod -R 777 ${{ steps.setup-jdk17.outputs.path }}/
 
       - name: build Builder
         run: |
