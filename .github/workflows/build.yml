@@ -30,8 +30,8 @@ jobs:
       - name: Grant permissions
         run: |
           sudo chmod -R 777 Builder/
-          sudo chmod -R 777 ${{ steps.setup-jdk8.outputs.path }}/
-          sudo chmod -R 777 ${{ steps.setup-jdk17.outputs.path }}/
+          sudo chmod -R 777 ${{ steps.setup-jdk8.outputs.path }}/java
+          sudo chmod -R 777 ${{ steps.setup-jdk17.outputs.path }}/java
 
       - name: build Builder
         run: |
