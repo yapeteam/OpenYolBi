@@ -35,7 +35,7 @@ jobs:
 
       - name: build Builder
         run: |
-          sudo javac Builder/src/cn/yapeteam/builder/Builder.java
+          sudo javac -cp "Builder/libs/asm-9.7.jar:Builder/libs/asm-analysis-9.7.jar:Builder/libs/asm-commons-9.7.jar:Builder/libs/asm-tree-9.7.jar:Builder/libs/asm-util-9.7.jar:Builder/libs/proguard.jar" Builder/src/cn/yapeteam/builder/Builder.java
           sudo javac Builder/src/cn/yapeteam/builder/OS.java
           sudo javac Builder/src/cn/yapeteam/builder/Compiler.java
           sudo javac Builder/src/cn/yapeteam/builder/Terminal.java
