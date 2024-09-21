@@ -10,7 +10,7 @@ import cn.yapeteam.yolbi.utils.math.MathUtils;
 import net.minecraft.network.play.client.C03PacketPlayer;
 
 public class Criticals extends Module {
-    private final ModeValue<String> mode = new ModeValue<>("Mode", "Packet", "Packet", "Single Packet", "Low Jump", "Jump");
+    private final ModeValue<String> mode = new ModeValue<>("Mode", "Packet", "Packet", "Single Packet", "Super Hop", "Low Hop", "Jump");
 
     public Criticals() {
         super("Criticals", ModuleCategory.COMBAT);
@@ -39,9 +39,12 @@ public class Criticals extends Module {
             case "Single Packet":
                 PacketManager.sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(x, y + 0.11, z, false));
                 break;
-            case "Low Jump":
-                // just for fun :)
-                mc.thePlayer.motionY = mc.thePlayer.ticksExisted % 3 == 0 ? 0.16 : 0.14;
+            case "Super Hop":
+                mc.thePlayer.motionY = 0.0787000002337;
+                mc.thePlayer.fallDistance = 0.0787000002337f;
+                break;
+            case "Low Hop":
+                mc.thePlayer.motionY = mc.thePlayer.ticksExisted % 10 == 0 ? 0.18 : 0.08;
                 break;
             case "Jump":
                 mc.thePlayer.jump(); // may be legit?

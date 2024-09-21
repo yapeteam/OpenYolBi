@@ -1,9 +1,11 @@
 package cn.yapeteam.yolbi.module.impl.combat;
 
+import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.event.Listener;
 import cn.yapeteam.yolbi.event.impl.player.EventMotion;
 import cn.yapeteam.yolbi.event.impl.player.EventPostMotion;
 import cn.yapeteam.yolbi.managers.PacketManager;
+import cn.yapeteam.yolbi.managers.RotationManager;
 import cn.yapeteam.yolbi.managers.TargetManager;
 import cn.yapeteam.yolbi.module.Module;
 import cn.yapeteam.yolbi.module.ModuleCategory;
@@ -11,6 +13,8 @@ import cn.yapeteam.yolbi.module.values.impl.BooleanValue;
 import cn.yapeteam.yolbi.module.values.impl.ModeValue;
 import cn.yapeteam.yolbi.module.values.impl.NumberValue;
 import cn.yapeteam.yolbi.utils.misc.TimerUtil;
+import cn.yapeteam.yolbi.utils.player.RotationsUtil;
+import cn.yapeteam.yolbi.utils.vector.Vector2f;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemSword;
@@ -29,7 +33,8 @@ public class VanillaAura extends Module {
     private final NumberValue<Double> range = new NumberValue<>("Range", 8d, 1d, 10d, 1d);
     private final BooleanValue autoblock = new BooleanValue("AutoBlock", true);
     private final ModeValue<String> autoblockMode = new ModeValue<>("AutoBlock Mode", autoblock::getValue, "Always", "Always", "Test");
-    private final BooleanValue betterBlock = new BooleanValue("Better Block", autoblock::getValue, true);
+    private final BooleanValue betterBlock = new BooleanValue("Full Block", autoblock::getValue, true);
+    private final BooleanValue rotation = new BooleanValue("Rotation", false);
 
     private EntityLivingBase target;
     private List<Entity> targets = new ArrayList<>();
@@ -41,7 +46,7 @@ public class VanillaAura extends Module {
 
     public VanillaAura() {
         super("VanillaAura", ModuleCategory.COMBAT);
-        addValues(maxCps, minCPS, range, autoblock, autoblockMode, betterBlock);
+        addValues(maxCps, minCPS, range, rotation, autoblock, autoblockMode, betterBlock);
     }
 
     @Override
@@ -68,21 +73,25 @@ public class VanillaAura extends Module {
             // 因为狗屎TargetManager所以只能强制转换
             target = (EntityLivingBase) targets.get(0);
 
+            if (rotation.getValue()) {
+                float[] rotations = new float[]{0, 0};
+                Vector2f vecRotations = new Vector2f(0, 0);
+
+                // TODO More Rotation
+                rotations = RotationsUtil.getRotationsToEntity(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ, target, false);
+
+                vecRotations.x = rotations[0];
+                vecRotations.y = rotations[1];
+
+                YolBi.instance.getRotationManager().setRotations(vecRotations, 10);
+            }
+
             if (Math.sin(cps) + 1 > Math.random() || timer.hasTimePassed(cps) || Math.random() > 0.5) {
                 timer.reset();
                 cps = getCPS();
 
                 mc.thePlayer.swingItem();
                 mc.playerController.attackEntity(mc.thePlayer, target);
-
-                // attackEntity已经call了event
-//                EventAttack attack = new EventAttack(target);
-//                YolBi.instance.getEventManager().post(attack);
-//
-//                if (!attack.isCancelled()) {
-//                    mc.thePlayer.swingItem();
-//                    mc.playerController.attackEntity(mc.thePlayer, target);
-//                }
             }
         } else {
             target = null;
