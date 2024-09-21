@@ -11,7 +11,7 @@ public class Compiler {
         boolean ignored = new File(buildDir).mkdirs();
         List<String> command = new ArrayList<>();
 
-        command.add(new File(System.getProperty("java.home"), "bin/javac").getAbsolutePath()); // 指定 javac 命令
+        command.add(new File(System.getProperty("java.home").replace("/jre", ""), "bin/javac").getAbsolutePath()); // 指定 javac 命令
 
         command.add("-encoding");
         command.add("UTF-8");
