@@ -8,6 +8,8 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.Timer;
 
+import java.util.Objects;
+
 public class RotationsUtil implements IMinecraft {
 
     public static float[] getRotationsToPosition(double x, double y, double z) {
@@ -61,5 +63,26 @@ public class RotationsUtil implements IMinecraft {
 
     public static float getAngleDifference(float f1, float f2) {
         return ((f1 - f2) % 360f + 540f) % 360f - 180f;
+    }
+
+
+    public static float[] getRotationsToPosition(double x, double y, double z, double targetX, double targetY, double targetZ) {
+        double dx = targetX - x;
+        double dy = targetY - y;
+        double dz = targetZ - z;
+        double horizontalDistance = Math.sqrt(dx * dx + dz * dz);
+        float yaw = (float) Math.toDegrees(-Math.atan2(dx, dz));
+        float pitch = (float) Math.toDegrees(-Math.atan2(dy, horizontalDistance));
+        return new float[]{yaw, pitch};
+    }
+
+    public static float[] getRotationsToEntity(double x, double y, double z, EntityLivingBase entity, boolean usePartialTicks) {
+        float partialTicks = Objects.requireNonNull(ReflectionManager.Minecraft$getTimer(mc)).renderPartialTicks;
+        double entityX = usePartialTicks ? entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * (double) partialTicks : entity.posX;
+        double entityY = usePartialTicks ? entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * (double) partialTicks : entity.posY;
+        double entityZ = usePartialTicks ? entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * (double) partialTicks : entity.posZ;
+        double yDiff = mc.thePlayer.posY - entityY;
+        double finalEntityY = yDiff >= 0.0 ? entityY + (double) entity.getEyeHeight() : (-yDiff < (double) mc.thePlayer.getEyeHeight() ? y + (double) mc.thePlayer.getEyeHeight() : entityY);
+        return getRotationsToPosition(x, y + (double) mc.thePlayer.getEyeHeight(), z, entityX, finalEntityY, entityZ);
     }
 }

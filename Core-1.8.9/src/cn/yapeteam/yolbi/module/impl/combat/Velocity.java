@@ -22,16 +22,20 @@ public class Velocity extends Module {
         CancelC0F,
         Matrix,
         Vulcan,
-        Hypixel
+        Hypixel,
+        GrimNoXZ
     }
 
     private final ModeValue<Mode> mode = new ModeValue<>("Mode", Mode.Normal, Mode.values());
     private final NumberValue<Float> Horizontal = new NumberValue<>("Horizontal", () -> mode.is(Mode.Modify), 0f, -100f, 100f, 1f);
     private final NumberValue<Float> Vertical = new NumberValue<>("Vertical", () -> mode.is(Mode.Modify), 0f, -100f, 100f, 1f);
+    private final NumberValue<Float>
+            yawLegitModify = new NumberValue<>("Legit Yaw Modify", () -> mode.is(Mode.GrimNoXZ), 1f, 0f, 2f, 0.1f),
+            offset = new NumberValue<>("Angle Offset", () -> mode.is(Mode.GrimNoXZ), 0f, 180f, -180f, 5f);
 
     public Velocity() {
         super("Velocity", ModuleCategory.COMBAT);
-        addValues(mode, Horizontal, Vertical);
+        addValues(mode, Horizontal, Vertical, yawLegitModify, offset);
     }
 
     @Listener
@@ -93,6 +97,16 @@ public class Velocity extends Module {
                         ReflectionManager.S12PacketEntityVelocity$setMotionX(s12PacketEntityVelocity, 0);
                         ReflectionManager.S12PacketEntityVelocity$setMotionZ(s12PacketEntityVelocity, 0);
                     } else e.setCancelled(true);
+                }
+                break;
+            case GrimNoXZ:
+                float yaw;
+                if (isS12) {
+                    S12PacketEntityVelocity s12PacketEntityVelocity = (S12PacketEntityVelocity) packet;
+                    yaw = -(mc.thePlayer.rotationYaw + offset.getValue() + 180);
+                    double velocity = Math.sqrt(s12PacketEntityVelocity.getMotionX() * s12PacketEntityVelocity.getMotionX() + s12PacketEntityVelocity.getMotionZ() * s12PacketEntityVelocity.getMotionZ()) * yawLegitModify.getValue();
+                    ReflectionManager.S12PacketEntityVelocity$setMotionX(s12PacketEntityVelocity, (int) (velocity * Math.sin(yaw / 180 * Math.PI)));
+                    ReflectionManager.S12PacketEntityVelocity$setMotionZ(s12PacketEntityVelocity, (int) (velocity * Math.cos(yaw / 180 * Math.PI)));
                 }
                 break;
         }
