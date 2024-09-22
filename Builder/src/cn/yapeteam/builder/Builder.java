@@ -342,6 +342,7 @@ public class Builder {
             }
         }
         System.out.println("BUILD SUCCESS");
+        System.setSecurityManager(null);
         System.exit(0);
     }
 
