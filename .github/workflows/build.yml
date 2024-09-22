@@ -16,14 +16,14 @@ jobs:
       - name: Setting up JDK 8
         uses: actions/setup-java@v4
         with:
-          distribution: zulu
+          distribution: adopt
           java-version: 8
         id: setup-jdk8
 
       - name: Setting up JDK 17
         uses: actions/setup-java@v4
         with:
-          distribution: zulu
+          distribution: adopt
           java-version: 17
         id: setup-jdk17
 
