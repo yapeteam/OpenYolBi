@@ -89,10 +89,8 @@ public class Builder {
                     String finalRoot_dir = root_dir;
                     traverseFiles(dir, file -> {
                         String path = file.toString();
-                        System.out.println(path);
                         String entry_name = root.length() > 1 ? finalRoot_dir + path.substring(root.length()).replace("\\", "/").substring(1) : finalRoot_dir + path.replace("\\", "/");
                         ZipEntry entry = new ZipEntry(entry_name);
-                        System.out.println(entry_name);
                         try {
                             output.putNextEntry(entry);
                             output.write(readStream(Files.newInputStream(file.toPath())));
@@ -121,7 +119,6 @@ public class Builder {
                     String entry_name = finalRoot_dir + (finalRoot_dir.isEmpty() ? "" : "/") + path.substring(root.length()).replace("\\", "/");
                     if (entry_name.startsWith("/"))
                         entry_name = entry_name.substring(1);
-                    System.out.println(entry_name);
                     ZipEntry entry = new ZipEntry(entry_name);
                     try {
                         output.putNextEntry(entry);
@@ -140,7 +137,6 @@ public class Builder {
                 String entry_name = root_dir + (root_dir.isEmpty() ? "" : "/") + path.substring(file.getParent() != null ? file.getParent().length() : 0).replace("\\", "/");
                 if (entry_name.startsWith("/"))
                     entry_name = entry_name.substring(1);
-                System.out.println(entry_name);
                 ZipEntry entry = new ZipEntry(entry_name);
                 try {
                     output.putNextEntry(entry);
@@ -167,7 +163,6 @@ public class Builder {
                             entry_name = entry_name.substring(root_dir.length());
                         if (entry_name.startsWith("/"))
                             entry_name = entry_name.substring(1);
-                        System.out.println(entry_name);
                         ZipEntry entry_out = new ZipEntry(root_dir + (root_dir.isEmpty() ? "" : "/") + entry_name);
                         output.putNextEntry(entry_out);
                         copyStream(output, input);
@@ -183,7 +178,6 @@ public class Builder {
                 System.out.println("archive " + name);
                 String entry_name = root_dir + (root_dir.isEmpty() ? "" : "/") + name;
                 ZipEntry entry = new ZipEntry(entry_name);
-                System.out.println(entry_name);
                 try {
                     output.putNextEntry(entry);
                     ZipOutputStream output_inner = new ZipOutputStream(output);

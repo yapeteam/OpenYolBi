@@ -35,6 +35,7 @@
             <files>out/production/Injector</files>
             <files>out/production/VersionInfo</files>
             <dir>Injector/META-INF</dir>
+            <file>Injector/deobf.png</file>
             <file>YOLBI_LICENSE.md</file>
             <file>GPL3_LICENSE.md</file>
             <extract>deps/shared/jna.jar</extract>
