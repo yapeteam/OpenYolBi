@@ -188,6 +188,7 @@ public class Builder {
                         if (child.getNodeType() == Node.ELEMENT_NODE)
                             disposeInclude(child, output_inner, "/");
                     }
+                    output_inner.flush();
                     output_inner.finish();
                     output.closeEntry();
                 } catch (Exception e) {
