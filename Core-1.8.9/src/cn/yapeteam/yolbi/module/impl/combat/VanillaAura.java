@@ -5,7 +5,6 @@ import cn.yapeteam.yolbi.event.Listener;
 import cn.yapeteam.yolbi.event.impl.player.EventMotion;
 import cn.yapeteam.yolbi.event.impl.player.EventPostMotion;
 import cn.yapeteam.yolbi.managers.PacketManager;
-import cn.yapeteam.yolbi.managers.RotationManager;
 import cn.yapeteam.yolbi.managers.TargetManager;
 import cn.yapeteam.yolbi.module.Module;
 import cn.yapeteam.yolbi.module.ModuleCategory;
@@ -31,10 +30,18 @@ public class VanillaAura extends Module {
             maxCps = new NumberValue<>("Max CPS", 12, 1, 20, 1),
             minCPS = new NumberValue<>("Min CPS", 9, 1, 20, 1);
     private final NumberValue<Double> range = new NumberValue<>("Range", 8d, 1d, 10d, 1d);
+    private final BooleanValue rotation = new BooleanValue("Rotation", false);
+    private final BooleanValue smooth = new BooleanValue("Smooth Rotation", rotation::getValue, false);
+    private final NumberValue<Integer> rotationSpeed = new NumberValue<>("Rotation Speed", rotation::getValue, 10, 1, 10, 1);
     private final BooleanValue autoblock = new BooleanValue("AutoBlock", true);
     private final ModeValue<String> autoblockMode = new ModeValue<>("AutoBlock Mode", autoblock::getValue, "Always", "Always", "Test");
-    private final BooleanValue betterBlock = new BooleanValue("Full Block", autoblock::getValue, true);
-    private final BooleanValue rotation = new BooleanValue("Rotation", false);
+    private final ModeValue<BlockTiming> blockTiming = new ModeValue<>("AutoBlock Timing", autoblock::getValue, BlockTiming.Pre, BlockTiming.values());
+
+    private enum BlockTiming {
+        Pre, Post
+    }
+
+    private final BooleanValue swing = new BooleanValue("Swing", true);
 
     private EntityLivingBase target;
     private List<Entity> targets = new ArrayList<>();
@@ -46,7 +53,7 @@ public class VanillaAura extends Module {
 
     public VanillaAura() {
         super("VanillaAura", ModuleCategory.COMBAT);
-        addValues(maxCps, minCPS, range, rotation, autoblock, autoblockMode, betterBlock);
+        addValues(maxCps, minCPS, range, rotation, smooth, rotationSpeed, autoblock, autoblockMode, blockTiming, swing);
     }
 
     @Override
@@ -74,7 +81,7 @@ public class VanillaAura extends Module {
             target = (EntityLivingBase) targets.get(0);
 
             if (rotation.getValue()) {
-                float[] rotations = new float[]{0, 0};
+                float[] rotations;
                 Vector2f vecRotations = new Vector2f(0, 0);
 
                 // TODO More Rotation
@@ -83,29 +90,30 @@ public class VanillaAura extends Module {
                 vecRotations.x = rotations[0];
                 vecRotations.y = rotations[1];
 
-                YolBi.instance.getRotationManager().setRotations(vecRotations, 10);
+                YolBi.instance.getRotationManager().setRotations(vecRotations, rotationSpeed.getValue());
+                if (smooth.getValue()) YolBi.instance.getRotationManager().smooth();
             }
 
             if (Math.sin(cps) + 1 > Math.random() || timer.hasTimePassed(cps) || Math.random() > 0.5) {
                 timer.reset();
                 cps = getCPS();
 
-                mc.thePlayer.swingItem();
+                if (swing.getValue()) mc.thePlayer.swingItem();
                 mc.playerController.attackEntity(mc.thePlayer, target);
             }
         } else {
             target = null;
         }
 
-        preBlock();
+        if (blockTiming.is(BlockTiming.Pre)) runBlock();
     }
 
     @Listener
     private void onMotionPostUpdate(EventPostMotion event) {
-        postBlock();
+        if (blockTiming.is(BlockTiming.Post)) runBlock();
     }
 
-    private void preBlock() {
+    private void runBlock() {
         if (canBlock) {
             PacketManager.sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
             isBlock = true;
@@ -113,15 +121,6 @@ public class VanillaAura extends Module {
             PacketManager.sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.
                     Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
             isBlock = false;
-        }
-    }
-
-    private void postBlock() {
-        if (betterBlock.getValue()) {
-            if (canBlock) {
-                PacketManager.sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
-                isBlock = true;
-            }
         }
     }
 

@@ -94,10 +94,10 @@ import java.util.List;
 
 public class IRC extends Module {
 
-    private String server = "https://27.25.142.18";
-    private int port = 8889;
-    private String channel = "#chat";
-    private String nickname = "[Yolbi]";
+    private final String server = "https://27.25.142.18";
+    private final int port = 8889;
+    private final String channel = "#chat";
+    private final String nickname = "[Yolbi]";
 
     public IRC() {
         super("IRC", ModuleCategory.MISC);
@@ -126,7 +126,7 @@ public class IRC extends Module {
     @Listener
     private void onPacketReceive(EventPacketReceive event) {
         if (event.getPacket() instanceof S38PacketPlayerListItem) {
-            S38PacketPlayerListItem packet = (S38PacketPlayerListItem) event.getPacket();
+            S38PacketPlayerListItem packet = event.getPacket();
             List<S38PacketPlayerListItem.AddPlayerData> players = packet.getEntries();
             for (S38PacketPlayerListItem.AddPlayerData playerData : players) {
                 NetworkPlayerInfo playerInfo = mc.getNetHandler().getPlayerInfo(playerData.getProfile().getId());
@@ -140,39 +140,3 @@ public class IRC extends Module {
         }
     }
 }
-
-
-
-//package cn.yapeteam.yolbi.module.impl.misc;
-//
-//import cn.yapeteam.yolbi.module.Module;
-//import cn.yapeteam.yolbi.module.ModuleCategory;
-//import cn.yapeteam.yolbi.module.values.impl.BooleanValue;
-//import net.minecraft.network.play.client.C01PacketChatMessage;
-//
-//public class IRC extends Module {
-//
-//    private final BooleanValue sendIRCIdentity = new BooleanValue("Send IRC Identity", true);
-//
-//    public IRC() {
-//        super("IRC", ModuleCategory.MISC);
-//        addValues(sendIRCIdentity);
-//    }
-//
-//    @Override
-//    protected void onEnable() {
-//        if (sendIRCIdentity.getValue()) {
-//            sendIRCIdentityPacket();
-//        }
-//    }
-//
-//    private void sendIRCIdentityPacket() {
-//        String message = "/IRCIDENTITY1";
-//        mc.getNetHandler().getNetworkManager().sendPacket(new C01PacketChatMessage(message));
-//    }
-//
-//    @Override
-//    protected void onDisable() {
-//
-//    }
-//}
