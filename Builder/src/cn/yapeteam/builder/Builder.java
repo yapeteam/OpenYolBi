@@ -34,7 +34,7 @@ public class Builder {
         byte[] bytes = new byte[4096];
         while ((len = is.read(bytes)) != -1)
             os.write(bytes, 0, len);
-        os.close();
+        os.flush();
     }
 
     private static byte[] readStream(InputStream inStream) throws IOException {
