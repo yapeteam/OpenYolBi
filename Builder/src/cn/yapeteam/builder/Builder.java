@@ -182,7 +182,7 @@ public class Builder {
                     output.putNextEntry(entry);
                     ZipOutputStream output_inner = new ZipOutputStream(output);
                     output_inner.setMethod(ZipOutputStream.DEFLATED);
-                    output_inner.setLevel(Deflater.BEST_COMPRESSION);
+                    output_inner.setLevel(Deflater.DEFAULT_COMPRESSION);
                     for (int i = 0; i < node.getChildNodes().getLength(); i++) {
                         Node child = node.getChildNodes().item(i);
                         if (child.getNodeType() == Node.ELEMENT_NODE)
@@ -292,7 +292,7 @@ public class Builder {
                     for (int j = 0; j < element.getChildNodes().getLength(); j++) {
                         Node include = element.getChildNodes().item(j);
                         output.setMethod(ZipOutputStream.DEFLATED);
-                        output.setLevel(Deflater.BEST_COMPRESSION);
+                        output.setLevel(Deflater.DEFAULT_COMPRESSION);
                         if (include.getNodeType() == Node.ELEMENT_NODE)
                             includes_list.add(include);
                     }
@@ -342,6 +342,7 @@ public class Builder {
             }
         }
         System.out.println("BUILD SUCCESS");
+        System.exit(0);
     }
 
     public static void deleteFileByStream(String filePath) {
