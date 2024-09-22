@@ -188,7 +188,6 @@ public class Builder {
                         if (child.getNodeType() == Node.ELEMENT_NODE)
                             disposeInclude(child, output_inner, "/");
                     }
-                    output_inner.flush();
                     output_inner.finish();
                     output.closeEntry();
                 } catch (Exception e) {
@@ -289,11 +288,11 @@ public class Builder {
                     Node proguard_cfg = element.getAttributes().getNamedItem("proguard-config");
                     System.out.printf("building artifact %s...%n", artifact_name);
                     ZipOutputStream output = new ZipOutputStream(Files.newOutputStream(output_file.toPath()));
+                    output.setMethod(ZipOutputStream.DEFLATED);
+                    output.setLevel(Deflater.DEFAULT_COMPRESSION);
                     List<Node> includes_list = new ArrayList<>();
                     for (int j = 0; j < element.getChildNodes().getLength(); j++) {
                         Node include = element.getChildNodes().item(j);
-                        output.setMethod(ZipOutputStream.DEFLATED);
-                        output.setLevel(Deflater.DEFAULT_COMPRESSION);
                         if (include.getNodeType() == Node.ELEMENT_NODE)
                             includes_list.add(include);
                     }
@@ -302,6 +301,7 @@ public class Builder {
                         disposeInclude(include, output, root_dir + "/");
                         System.out.printf("artifact %s: included %s, %s of %s%n", artifact_name, include.getNodeName(), j + 1, includes_list.size());
                     }
+                    output.finish();
                     output.close();
                     if (!advanced_mode) continue;
                     if (proguard_cfg != null) {
