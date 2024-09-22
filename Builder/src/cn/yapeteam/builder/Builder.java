@@ -34,6 +34,7 @@ public class Builder {
         byte[] bytes = new byte[4096];
         while ((len = is.read(bytes)) != -1)
             os.write(bytes, 0, len);
+        os.close();
     }
 
     private static byte[] readStream(InputStream inStream) throws IOException {
@@ -96,7 +97,7 @@ public class Builder {
                             output.putNextEntry(entry);
                             output.write(readStream(Files.newInputStream(file.toPath())));
                             output.closeEntry();
-                        } catch (IOException e) {
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
                     });
@@ -126,7 +127,7 @@ public class Builder {
                         output.putNextEntry(entry);
                         output.write(readStream(Files.newInputStream(file.toPath())));
                         output.closeEntry();
-                    } catch (IOException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 });
@@ -145,7 +146,7 @@ public class Builder {
                     output.putNextEntry(entry);
                     output.write(readStream(Files.newInputStream(file.toPath())));
                     output.closeEntry();
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -172,7 +173,7 @@ public class Builder {
                         copyStream(output, input);
                         output.closeEntry();
                     }
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -195,7 +196,7 @@ public class Builder {
                     }
                     output_inner.finish();
                     output.closeEntry();
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -352,7 +353,7 @@ public class Builder {
         try (Stream<Path> walk = Files.walk(path)) {
             walk.sorted(Comparator.reverseOrder()).forEach(Builder::deleteDirectoryStream);
         } catch (NoSuchFileException ignored) {
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -361,7 +362,7 @@ public class Builder {
         try {
             Files.delete(path);
         } catch (NoSuchFileException ignored) {
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
