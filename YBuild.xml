@@ -41,6 +41,7 @@
             <extract>deps/shared/jna.jar</extract>
             <extract>deps/shared/flatlaf.jar</extract>
             <extract>deps/shared/flatlaf-intellij-themes.jar</extract>
+            <extract>deps/shared/uiDesigner.jar</extract>
             <extract platform="windows">deps/windows/tools.jar</extract>
             <extract platform="mac">deps/darwin/tools.jar</extract>
             <archive name="injection.zip">

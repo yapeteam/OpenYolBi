@@ -1,11 +1,15 @@
 package cn.yapeteam.injector;
 
+import com.intellij.uiDesigner.core.GridConstraints;
+import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.sun.tools.attach.AgentInitializationException;
 import com.sun.tools.attach.AgentLoadException;
 import com.sun.tools.attach.AttachNotSupportedException;
 import com.sun.tools.attach.VirtualMachine;
 
 import javax.swing.*;
+import javax.swing.plaf.FontUIResource;
+import javax.swing.text.StyleContext;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
@@ -14,6 +18,7 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class MainFrame extends JFrame {
     private JPanel panel;
@@ -32,6 +37,7 @@ public class MainFrame extends JFrame {
     public MainFrame() {
         super("YolBi Lite v" + Main.version + " - Development Build");
         float width = 500, height = width * 0.618f;
+        $$$setupUI$$$();
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         int screenWidth = (int) screenSize.getWidth();
         int screenHeight = (int) screenSize.getHeight();
@@ -217,5 +223,58 @@ public class MainFrame extends JFrame {
             updateThread.interrupt();
         serverThread.start();
         buttons.removeAll();
+    }
+
+    private void $$$setupUI$$$() {
+        JProgressBar jProgressBar;
+        JProgressBar jProgressBar2;
+        JPanel jPanel;
+        JPanel jPanel2;
+        this.panel = jPanel2 = new JPanel();
+        jPanel2.setLayout(new GridLayoutManager(2, 1, new Insets(0, 0, 0, 0), -1, -1, false, false));
+        jPanel2.setDoubleBuffered(true);
+        ((Component) jPanel2).setEnabled(true);
+        Font font = this.$$$getFont$$$(null, -1, -1, jPanel2.getFont());
+        if (font != null) {
+            jPanel2.setFont(font);
+        }
+        ((Component) jPanel2).setVisible(true);
+        jPanel2.setBorder(BorderFactory.createTitledBorder(null, "", 0, 0, null, null));
+        JPanel jPanel3 = new JPanel();
+        jPanel3.setLayout(new GridLayoutManager(2, 1, new Insets(0, 0, 0, 0), -1, -1, false, false));
+        jPanel2.add(jPanel3, new GridConstraints(0, 0, 1, 1, 2, 1, 3, 3, null, null, null));
+        JLabel jLabel = new JLabel();
+        Font font2 = this.$$$getFont$$$(null, -1, 36, jLabel.getFont());
+        if (font2 != null) {
+            jLabel.setFont(font2);
+        }
+        jLabel.setText("YolBi Lite");
+        jPanel3.add(jLabel, new GridConstraints(0, 0, 1, 1, 0, 0, 0, 0, null, null, null));
+        this.buttons = jPanel = new JPanel();
+        jPanel.setLayout(new FlowLayout(1, 5, 5));
+        jPanel3.add(jPanel, new GridConstraints(1, 0, 1, 1, 0, 3, 3, 3, null, null, null));
+        JPanel jPanel4 = new JPanel();
+        jPanel4.setLayout(new GridLayoutManager(2, 1, new Insets(0, 0, 0, 0), -1, -1, false, false));
+        jPanel2.add(jPanel4, new GridConstraints(1, 0, 1, 1, 0, 3, 3, 3, null, null, null));
+        this.progressBar1 = jProgressBar2 = new JProgressBar();
+        jPanel4.add(jProgressBar2, new GridConstraints(0, 0, 1, 1, 0, 0, 6, 0, new Dimension(200, -1), null, null));
+        this.progressBar2 = jProgressBar = new JProgressBar();
+        jPanel4.add(jProgressBar, new GridConstraints(1, 0, 1, 1, 1, 0, 6, 0, new Dimension(200, -1), null, null));
+    }
+
+    public JComponent $$$getRootComponent$$$() {
+        return this.panel;
+    }
+
+    private Font $$$getFont$$$(String string, int n, int n2, Font font) {
+        Font font2;
+        if (font == null) {
+            return null;
+        }
+        String string2 = string == null ? font.getName() : ((font2 = new Font(string, 0, 10)).canDisplay('a') && font2.canDisplay('1') ? string : font.getName());
+        Font font3 = new Font(string2, n >= 0 ? n : font.getStyle(), n2 >= 0 ? n2 : font.getSize());
+        boolean bl = System.getProperty("os.name", "").toLowerCase(Locale.ENGLISH).startsWith("mac");
+        Font font4 = bl ? new Font(font3.getFamily(), font3.getStyle(), font3.getSize()) : new StyleContext().getFont(font3.getFamily(), font3.getStyle(), font3.getSize());
+        return font4 instanceof FontUIResource ? font4 : new FontUIResource(font4);
     }
 }
