@@ -29,29 +29,7 @@ QQ Group: 699481681
 
 ## Development 如何构建
 
-准备工具 [IntelliJ IDEA](https://www.jetbrains.com/idea/)
-
-下载 [IntelliJ IDEA](https://www.jetbrains.com/idea/)
-
-双击下载的exe文件进行安装(不会的CSDN自己找)
-
-安装完成后 点击github此仓库页面右上角的Fork按钮(要求已经登录github账号)
-
-Fork完成后 进入你自己Fork的仓库界面
-
-在Idea里面 找到“从版本控制中获取”
-
-输入你Fork的仓库URL
-
-导入项目
-
-等待索引编译完成
-
-(无需mingw编译器，因为loader二进制文件已包含在源码中)
-
-(如果报错 尝试额外安装Java22)
-
-(有问题建议先Google)
+查看 `论如何构建OpenYolbi项目.pptx` 或 `论如何构建OpenYolbi项目.pdf`
 
 ### Debug Build
 
