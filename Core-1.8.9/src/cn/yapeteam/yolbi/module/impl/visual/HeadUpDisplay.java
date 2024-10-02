@@ -68,7 +68,7 @@ public class HeadUpDisplay extends Module {
 
         public void renderShadow(ScaledResolution sr) {
             float x = sr.getScaledWidth() + deltaX;
-            RenderUtil.drawBloomShadow(x, y, width, height, 12, 6, color, false);
+            //RenderUtil.drawBloomShadow(x, y, width, height, 12, 6, color, false);
         }
 
         public void render(ScaledResolution sr, float partialTicks) {

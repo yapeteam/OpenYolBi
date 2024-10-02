@@ -57,6 +57,7 @@ public class ModuleManager {
         modules.add(new StrafeFix());
         modules.add(new ClickUI());
         modules.add(new ClientTheme());
+        modules.add(new OldAnimation());
         modules.add(new ESP());
         modules.add(new HeadUpDisplay());
         modules.add(new PacketDebug());

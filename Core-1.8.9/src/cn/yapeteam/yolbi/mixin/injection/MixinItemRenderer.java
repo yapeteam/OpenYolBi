@@ -1,10 +1,12 @@
 package cn.yapeteam.yolbi.mixin.injection;
 
+import cn.yapeteam.ymixin.annotations.Inject;
 import cn.yapeteam.ymixin.annotations.Mixin;
-import cn.yapeteam.ymixin.annotations.Overwrite;
 import cn.yapeteam.ymixin.annotations.Shadow;
+import cn.yapeteam.ymixin.annotations.Target;
 import cn.yapeteam.yolbi.managers.ReflectionManager;
 import cn.yapeteam.yolbi.module.impl.combat.VanillaAura;
+import cn.yapeteam.yolbi.module.impl.visual.OldAnimation;
 import cn.yapeteam.yolbi.utils.player.InventoryUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
@@ -22,7 +24,6 @@ import net.minecraft.src.Config;
 import net.minecraft.util.MathHelper;
 import net.optifine.shaders.Shaders;
 import org.lwjgl.opengl.GL11;
-import pisi.unitedmeows.minecraft.Settings;
 
 @Mixin(ItemRenderer.class)
 public class MixinItemRenderer {
@@ -79,9 +80,9 @@ public class MixinItemRenderer {
     public void renderItem(EntityLivingBase entityIn, ItemStack heldStack, ItemCameraTransforms.TransformType transform) {
     }
 
-    @Overwrite(method = "renderItemInFirstPerson", desc = "(F)V")
+    @Inject(method = "renderItemInFirstPerson", desc = "(F)V", target = @Target("HEAD"))
     public void renderItemInFirstPerson(float partialTicks) {
-        if (!(ReflectionManager.hasOptifine && (Config.isShaders() || Shaders.isSkipRenderHand()))) {
+        if (OldAnimation.instance != null && OldAnimation.instance.isEnabled() && !(ReflectionManager.hasOptifine && (Config.isShaders() || Shaders.isSkipRenderHand()))) {
             float equipProgress = 1.0F - (this.prevEquippedProgress + (this.equippedProgress - this.prevEquippedProgress) * partialTicks);
             AbstractClientPlayer abstractclientplayer = this.mc.thePlayer;
             float swingProgress = abstractclientplayer.getSwingProgress(partialTicks);
@@ -100,39 +101,33 @@ public class MixinItemRenderer {
                                 (VanillaAura.instance != null && VanillaAura.instance.isBlock &&
                                         InventoryUtils.getHeldItem() instanceof ItemSword)
                 ) {
-                    boolean oldAnimations = Settings.OLD_ANIMATIONS;
                     EnumAction enumaction = this.itemToRender.getItemUseAction();
-                    switch (enumaction) {
-                        case NONE:
-                            this.transformFirstPersonItem(equipProgress, 0.0F);
-                            break;
-                        case EAT:
-                        case DRINK:
-                            this.performDrinking(abstractclientplayer, partialTicks);
-                            this.transformFirstPersonItem(equipProgress, 0.0F);
-                            break;
-                        case BLOCK:
-                            float oldAnimationProgress = MathHelper.sin(MathHelper.sqrt_float(swingProgress) * 3.1415927F);
-                            this.transformFirstPersonItem(equipProgress, 0.0F);
-                            this.doBlockTransformations();
-                            if (oldAnimations) {
-                                GlStateManager.translate(-0.05F, -0.0F, 0.3F);
-                                GlStateManager.rotate(-oldAnimationProgress * 20.0F / 2.0F, -15.0F, -0.0F, 20.0F);
-                                GlStateManager.rotate(-oldAnimationProgress * 40.0F, 1.0F, -0.4F, 2.0F);
-                            }
+                    //别问我为什么不用switch
+                    if (enumaction == EnumAction.NONE) {
+                        this.transformFirstPersonItem(equipProgress, 0.0F);
+                    } else if (enumaction == EnumAction.EAT || enumaction == EnumAction.DRINK) {
+                        this.performDrinking(abstractclientplayer, partialTicks);
+                        this.transformFirstPersonItem(equipProgress, 0.0F);
+                    } else if (enumaction == EnumAction.BLOCK) {
+                        float oldAnimationProgress = MathHelper.sin(MathHelper.sqrt_float(swingProgress) * 3.1415927F);
+                        this.transformFirstPersonItem(equipProgress, 0.0F);
+                        this.doBlockTransformations();
 
-                            GL11.glRotatef(60.0F, 0.0F, 0.0F, 1.0F);
-                            GL11.glRotatef(10.0F, 1.0F, 0.0F, 0.0F);
-                            GL11.glRotatef(50.0F, 0.0F, 1.0F, 0.0F);
-                            if (this.mc.thePlayer.isSneaking()) {
-                                GL11.glTranslatef(0.1F, -0.05F, -0.05F);
-                            } else {
-                                GL11.glTranslatef(0.1F, -0.05F, 0.1F);
-                            }
-                            break;
-                        case BOW:
-                            this.transformFirstPersonItem(equipProgress, 0.0F);
-                            this.doBowTransformations(partialTicks, abstractclientplayer);
+                        GlStateManager.translate(-0.05F, -0.0F, 0.3F);
+                        GlStateManager.rotate(-oldAnimationProgress * 20.0F / 2.0F, -15.0F, -0.0F, 20.0F);
+                        GlStateManager.rotate(-oldAnimationProgress * 40.0F, 1.0F, -0.4F, 2.0F);
+
+                        GL11.glRotatef(60.0F, 0.0F, 0.0F, 1.0F);
+                        GL11.glRotatef(10.0F, 1.0F, 0.0F, 0.0F);
+                        GL11.glRotatef(50.0F, 0.0F, 1.0F, 0.0F);
+                        if (this.mc.thePlayer.isSneaking()) {
+                            GL11.glTranslatef(0.1F, -0.05F, -0.05F);
+                        } else {
+                            GL11.glTranslatef(0.1F, -0.05F, 0.1F);
+                        }
+                    } else if (enumaction == EnumAction.BOW) {
+                        this.transformFirstPersonItem(equipProgress, 0.0F);
+                        this.doBowTransformations(partialTicks, abstractclientplayer);
                     }
                 } else {
                     this.doItemUsedTransformations(swingProgress);
@@ -147,6 +142,7 @@ public class MixinItemRenderer {
             GlStateManager.popMatrix();
             GlStateManager.disableRescaleNormal();
             RenderHelper.disableStandardItemLighting();
+            return;
         }
     }
 }
