@@ -14,6 +14,7 @@ import cn.yapeteam.yolbi.utils.render.RenderUtil;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.util.MathHelper;
 
 import java.awt.*;
 import java.util.stream.Collectors;
@@ -94,7 +95,7 @@ public class ModuleButton extends AbstractComponent {
             blur.render(getX(), getY(), getWidth(), getHeight(), partialTicks, 1);
             int color = ImplScreen.getComponentColor((int) (getY() * 10));
             boolean hovering = isHovering(mouseX, mouseY) && getParent().isHovering(mouseX, mouseY);
-            RenderUtil.drawRect(getX(), getY(), getX() + getWidth(), getY() + getHeight(), new Color(0, 0, 0, (float) alphaAnimation.animate(hovering ? 0.4 : 0.1)).getRGB());
+            RenderUtil.drawRect(getX(), getY(), getX() + getWidth(), getY() + getHeight(), new Color(0, 0, 0, MathHelper.clamp_float((float) alphaAnimation.animate(hovering ? 0.4 : 0.1), 0, 1)).getRGB());
             AbstractFontRenderer font = YolBi.instance.getFontManager().getPingFang14();
             font.drawString(module.getName(), getX() + 5, getY() + (getHeight() - font.getStringHeight(module.getName())) / 2f, module.isEnabled() ? color : -1);
             if (getChildComponents().size() > 1) {

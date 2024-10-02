@@ -86,20 +86,20 @@ public class AWTFontRenderer implements AbstractFontRenderer {
 
         // 先把英文加进去
         for (char c : CharUtil.getEnglishCharArray()) {
-            fillCharacter(c, map, fontGraphics, fontMetrics);
+            fillCharacter(c, map, fontGraphics, fontMetrics, true);
         }
 
         // 如果需要加中文
         if (includeChinese) {
             for (char c : CharUtil.getChineseCharArray()) {
-                fillCharacter(c, map, fontGraphics, fontMetrics);
+                fillCharacter(c, map, fontGraphics, fontMetrics, true);
             }
         }
     }
 
     private final List<Runnable> tasks = new CopyOnWriteArrayList<>();
 
-    private void fillCharacter(char character, Map<Character, FontCharacter> map, Graphics2D fontGraphics, FontMetrics fontMetrics) {
+    private void fillCharacter(char character, Map<Character, FontCharacter> map, Graphics2D fontGraphics, FontMetrics fontMetrics, boolean sync) {
         Rectangle2D charRectangle = fontMetrics.getStringBounds(character + "", fontGraphics);
 
         BufferedImage charImage = new BufferedImage(MathHelper.ceiling_float_int((float) charRectangle.getWidth()) + 8, MathHelper.ceiling_float_int((float) charRectangle.getHeight()), 2);
@@ -115,12 +115,16 @@ public class AWTFontRenderer implements AbstractFontRenderer {
         this.preDraw(charGraphics);
         charGraphics.drawString(character + "", 4, font.getSize());
 
-        tasks.add(() -> {
+        Runnable task = () -> {
             int charTexture = GL11.glGenTextures();
             this.uploadTexture(charTexture, charImage, width, height);
 
             map.put(character, new FontCharacter(charTexture, (float) width, (float) height));
-        });
+        };
+
+        if (sync)
+            tasks.add(task);
+        else task.run();
     }
 
     @Override
@@ -364,7 +368,7 @@ public class AWTFontRenderer implements AbstractFontRenderer {
         BufferedImage fontImage = new BufferedImage(1, 1, 2);
         Graphics2D fontGraphics = (Graphics2D) fontImage.getGraphics();
         FontMetrics fontMetrics = fontGraphics.getFontMetrics(font);
-        fillCharacter(character, map, fontGraphics, fontMetrics);
+        fillCharacter(character, map, fontGraphics, fontMetrics, false);
     }
 
     public static String removeColorCodes(String text) {
