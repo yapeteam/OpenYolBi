@@ -1115,7 +1115,7 @@ public class RenderUtil {
         float f1 = 0.016666668F * f;
         GlStateManager.scale(-f1, -f1, f1);
         disableGlCap(GL_LIGHTING, GL_DEPTH_TEST, GL_ALPHA_TEST);
-        enableGlCap(GL_BLEND,GL_TEXTURE_2D);
+        enableGlCap(GL_BLEND, GL_TEXTURE_2D);
         GlStateManager.shadeModel(7425);
         GL11.glRotated(rotate, 0.0, 0.0, 1.0);
         float w = 50 * scale, h = 50 * scale;

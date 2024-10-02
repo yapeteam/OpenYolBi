@@ -4,6 +4,7 @@ import cn.yapeteam.ymixin.annotations.Mixin;
 import cn.yapeteam.ymixin.annotations.Overwrite;
 import cn.yapeteam.ymixin.annotations.Shadow;
 import cn.yapeteam.yolbi.YolBi;
+import cn.yapeteam.yolbi.managers.ReflectionManager;
 import cn.yapeteam.yolbi.module.impl.combat.VanillaAura;
 import cn.yapeteam.yolbi.utils.player.InventoryUtils;
 import net.minecraft.client.Minecraft;
@@ -13,6 +14,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemMap;
 import net.minecraft.item.ItemStack;
@@ -24,13 +26,13 @@ import org.lwjgl.opengl.GL11;
 import pisi.unitedmeows.minecraft.Settings;
 
 @Mixin(ItemRenderer.class)
-public class MixinItemRenderer extends ItemRenderer {
+public class MixinItemRenderer {
     @Shadow
     private float prevEquippedProgress;
     @Shadow
     private float equippedProgress;
     @Shadow
-    private final Minecraft mc;
+    private Minecraft mc;
     @Shadow
     private ItemStack itemToRender;
 
@@ -74,14 +76,13 @@ public class MixinItemRenderer extends ItemRenderer {
     private void doItemUsedTransformations(float swingProgress) {
     }
 
-    public MixinItemRenderer(Minecraft mcIn, Minecraft mc) {
-        super(mcIn);
-        this.mc = mc;
+    @Shadow
+    public void renderItem(EntityLivingBase entityIn, ItemStack heldStack, ItemCameraTransforms.TransformType transform) {
     }
 
     @Overwrite(method = "renderItemInFirstPerson", desc = "(F)V")
     public void renderItemInFirstPerson(float partialTicks) {
-        if (!Config.isShaders() || !Shaders.isSkipRenderHand()) {
+        if (ReflectionManager.hasOptifine && (!Config.isShaders() || !Shaders.isSkipRenderHand())) {
             float equipProgress = 1.0F - (this.prevEquippedProgress + (this.equippedProgress - this.prevEquippedProgress) * partialTicks);
             AbstractClientPlayer abstractclientplayer = this.mc.thePlayer;
             float swingProgress = abstractclientplayer.getSwingProgress(partialTicks);
@@ -109,15 +110,12 @@ public class MixinItemRenderer extends ItemRenderer {
                             break;
                         case BLOCK:
                             float oldAnimationProgress = MathHelper.sin(MathHelper.sqrt_float(swingProgress) * 3.1415927F);
+                            this.transformFirstPersonItem(equipProgress, 0.0F);
+                            this.doBlockTransformations();
                             if (oldAnimations) {
-                                this.transformFirstPersonItem(equipProgress, 0.0F);
-                                this.doBlockTransformations();
                                 GlStateManager.translate(-0.05F, -0.0F, 0.3F);
                                 GlStateManager.rotate(-oldAnimationProgress * 20.0F / 2.0F, -15.0F, -0.0F, 20.0F);
                                 GlStateManager.rotate(-oldAnimationProgress * 40.0F, 1.0F, -0.4F, 2.0F);
-                            } else {
-                                this.transformFirstPersonItem(equipProgress, 0.0F);
-                                this.doBlockTransformations();
                             }
 
                             GL11.glRotatef(60.0F, 0.0F, 0.0F, 1.0F);
@@ -147,6 +145,5 @@ public class MixinItemRenderer extends ItemRenderer {
             GlStateManager.disableRescaleNormal();
             RenderHelper.disableStandardItemLighting();
         }
-
     }
 }
