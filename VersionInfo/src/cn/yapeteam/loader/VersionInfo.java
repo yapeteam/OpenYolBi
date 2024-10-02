@@ -1,5 +1,5 @@
 package cn.yapeteam.loader;
 
 public class VersionInfo {
-    public static String version = "0.3.7";
+    public static String version = "0.3.8-Pre1";
 }
