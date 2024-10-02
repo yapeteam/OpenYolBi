@@ -40,6 +40,7 @@ public class MixinManager {
         add("MixinEntityPlayerSPForEventLook");
         add("MixinEntityLivingBaseForEventLook");
         add("MixinAbstractClientPlayerForEventLook");
+        add("MixinItemRenderer");
     }
 
     public static void destroyClient() {
