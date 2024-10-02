@@ -82,7 +82,7 @@ public class MixinItemRenderer {
 
     @Overwrite(method = "renderItemInFirstPerson", desc = "(F)V")
     public void renderItemInFirstPerson(float partialTicks) {
-        if (ReflectionManager.hasOptifine && (!Config.isShaders() || !Shaders.isSkipRenderHand())) {
+        if (!(ReflectionManager.hasOptifine && (Config.isShaders() || Shaders.isSkipRenderHand()))) {
             float equipProgress = 1.0F - (this.prevEquippedProgress + (this.equippedProgress - this.prevEquippedProgress) * partialTicks);
             AbstractClientPlayer abstractclientplayer = this.mc.thePlayer;
             float swingProgress = abstractclientplayer.getSwingProgress(partialTicks);
