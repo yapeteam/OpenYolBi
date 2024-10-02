@@ -39,11 +39,10 @@ public class MixinPlayerControllerMP {
             target = @Target("HEAD")
     )
     public void onStoppedUsingItem() {
-        if (YolBi.instance != null && YolBi.instance.getModuleManager() != null) {
-            VanillaAura vanillaAura = YolBi.instance.getModuleManager().getModule(VanillaAura.class);
-            if (vanillaAura != null && vanillaAura.isEnabled() && vanillaAura.isBlock) {
+        if (YolBi.instance != null) {
+            VanillaAura vanillaAura = VanillaAura.instance;
+            if (vanillaAura != null && vanillaAura.isEnabled() && vanillaAura.isBlock)
                 return;
-            }
         }
     }
 
@@ -52,11 +51,9 @@ public class MixinPlayerControllerMP {
             desc = "()F"
     )
     public float getBlockReachDistance() {
-        if (YolBi.instance != null && YolBi.instance.getModuleManager() != null) {
-            Reach reach = YolBi.instance.getModuleManager().getModule(Reach.class);
-            if (reach != null && reach.isEnabled() && !reach.getValues().isEmpty())
-                return ((Number) reach.getValues().get(0).getValue()).floatValue();
-        }
+        Reach reach = Reach.instance;
+        if (reach != null && reach.isEnabled() && !reach.getValues().isEmpty())
+            return ((Number) reach.getValues().get(0).getValue()).floatValue();
         return this.currentGameType.isCreative() ? 5.0F : 4.0F;
     }
 }

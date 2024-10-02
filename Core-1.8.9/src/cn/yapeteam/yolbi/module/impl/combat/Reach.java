@@ -9,10 +9,12 @@ import cn.yapeteam.yolbi.module.values.impl.NumberValue;
 public class Reach extends Module {
 
     private final NumberValue<Double> range = new NumberValue<>("Range", 3.0, 3.0, 6.0, 0.1);
+    public static Reach instance;
 
     public Reach() {
         super("Reach", ModuleCategory.COMBAT);
         addValues(range);
+        instance = this;
     }
 
     @Listener

@@ -3,7 +3,6 @@ package cn.yapeteam.yolbi.mixin.injection;
 import cn.yapeteam.ymixin.annotations.Mixin;
 import cn.yapeteam.ymixin.annotations.Overwrite;
 import cn.yapeteam.ymixin.annotations.Shadow;
-import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.managers.ReflectionManager;
 import cn.yapeteam.yolbi.module.impl.combat.VanillaAura;
 import cn.yapeteam.yolbi.utils.player.InventoryUtils;
@@ -96,7 +95,11 @@ public class MixinItemRenderer {
             if (this.itemToRender != null) {
                 if (this.itemToRender.getItem() instanceof ItemMap) {
                     this.renderItemMap(abstractclientplayer, pitch, equipProgress, swingProgress);
-                } else if (abstractclientplayer.getItemInUseCount() > 0 || (YolBi.instance.getModuleManager().getModule(VanillaAura.class) != null && YolBi.instance.getModuleManager().getModule(VanillaAura.class).isBlock && InventoryUtils.getHeldItem() instanceof ItemSword)) {
+                } else if (
+                        abstractclientplayer.getItemInUseCount() > 0 ||
+                                (VanillaAura.instance != null && VanillaAura.instance.isBlock &&
+                                        InventoryUtils.getHeldItem() instanceof ItemSword)
+                ) {
                     boolean oldAnimations = Settings.OLD_ANIMATIONS;
                     EnumAction enumaction = this.itemToRender.getItemUseAction();
                     switch (enumaction) {

@@ -51,9 +51,12 @@ public class VanillaAura extends Module {
 
     private final TimerUtil timer = new TimerUtil();
 
+    public static VanillaAura instance;
+
     public VanillaAura() {
         super("VanillaAura", ModuleCategory.COMBAT);
         addValues(maxCps, minCPS, range, rotation, smooth, rotationSpeed, autoblock, autoblockMode, blockTiming, swing);
+        instance = this;
     }
 
     @Override
