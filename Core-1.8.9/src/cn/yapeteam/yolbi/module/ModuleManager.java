@@ -17,6 +17,7 @@ import cn.yapeteam.yolbi.module.impl.player.MurdererFinder;
 import cn.yapeteam.yolbi.module.impl.player.SlotHandler;
 import cn.yapeteam.yolbi.module.impl.visual.*;
 import cn.yapeteam.yolbi.module.impl.world.FastPlace;
+import cn.yapeteam.yolbi.module.impl.world.GameSpeed;
 import cn.yapeteam.yolbi.module.impl.world.LegitScaffold;
 import cn.yapeteam.yolbi.module.impl.world.Scaffold;
 import cn.yapeteam.yolbi.notification.Notification;
@@ -51,6 +52,7 @@ public class ModuleManager {
         modules.add(new ChestStealer());
         modules.add(new ClientSpoof());
         modules.add(new NoteBot());
+        modules.add(new GameSpeed());
         modules.add(new SelfDestruct());
         modules.add(new Eagle());
         modules.add(new Sprint());

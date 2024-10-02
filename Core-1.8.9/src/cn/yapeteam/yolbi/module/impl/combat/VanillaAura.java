@@ -56,6 +56,7 @@ public class VanillaAura extends Module {
     }
 
     private final BooleanValue swing = new BooleanValue("Swing", true);
+    private final BooleanValue rayCast = new BooleanValue("RayCast", false);
     private final BooleanValue esp = new BooleanValue("ESP", true);
 
     private EntityLivingBase target;
@@ -77,7 +78,7 @@ public class VanillaAura extends Module {
         super("VanillaAura", ModuleCategory.COMBAT);
         minCPS.setCallback((oldV, newV) -> newV > maxCps.getValue() ? oldV : newV);
         maxCps.setCallback((oldV, newV) -> newV < minCPS.getValue() ? oldV : newV);
-        addValues(maxCps, minCPS, range, rotation, smooth, rotationSpeed, autoblock, autoblockMode, blockTiming, swing, esp);
+        addValues(maxCps, minCPS, range, rotation, smooth, rotationSpeed, autoblock, autoblockMode, blockTiming, swing, rayCast, esp);
         instance = this;
     }
 
@@ -123,6 +124,9 @@ public class VanillaAura extends Module {
                 if (smooth.getValue()) YolBi.instance.getRotationManager().smooth();
             }
 
+            if (rayCast.getValue() && !RotationsUtil.isMouseOver(event.getYaw(), event.getPitch(), target, range.getValue().floatValue()))
+                return;
+
             // 如果满足条件，则进行攻击
             if (Math.sin(cps) + 1 > Math.random() || timer.hasTimePassed(cps) || Math.random() > 0.5) {
                 timer.reset();
@@ -143,6 +147,9 @@ public class VanillaAura extends Module {
 
     @Listener
     private void onMotionPostUpdate(EventPostMotion event) {
+        if (rayCast.getValue() && !RotationsUtil.isMouseOver(event.getYaw(), event.getPitch(), target, range.getValue().floatValue()))
+            return;
+
         if (blockTiming.is(BlockTiming.Post)) runBlock();
     }
 
