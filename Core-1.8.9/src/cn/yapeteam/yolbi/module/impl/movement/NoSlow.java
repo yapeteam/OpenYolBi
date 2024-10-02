@@ -13,6 +13,7 @@ import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 
+@Deprecated
 public class NoSlow extends Module {
     private final ModeValue<String> mode = new ModeValue<>("Mode", "Normal", "Normal", "Grim");
     private final BooleanValue autoThrow = new BooleanValue("C08", () -> mode.is("Normal") || mode.is("Grim"), true);

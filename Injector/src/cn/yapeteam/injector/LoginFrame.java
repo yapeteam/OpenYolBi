@@ -8,6 +8,7 @@ import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+@Deprecated
 public class LoginFrame extends JFrame {
     private JPanel panel;
     private JButton loginButton;

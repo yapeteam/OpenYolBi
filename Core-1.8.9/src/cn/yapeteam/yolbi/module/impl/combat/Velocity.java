@@ -15,7 +15,6 @@ import net.minecraft.network.play.server.S32PacketConfirmTransaction;
 
 public class Velocity extends Module {
     enum Mode {
-        Normal,
         Cancel,
         Modify,
         CancelS32,
@@ -26,7 +25,7 @@ public class Velocity extends Module {
         GrimNoXZ
     }
 
-    private final ModeValue<Mode> mode = new ModeValue<>("Mode", Mode.Normal, Mode.values());
+    private final ModeValue<Mode> mode = new ModeValue<>("Mode", Mode.Cancel, Mode.values());
     private final NumberValue<Float> Horizontal = new NumberValue<>("Horizontal", () -> mode.is(Mode.Modify), 0f, -100f, 100f, 1f);
     private final NumberValue<Float> Vertical = new NumberValue<>("Vertical", () -> mode.is(Mode.Modify), 0f, -100f, 100f, 1f);
     private final NumberValue<Float>
@@ -46,11 +45,6 @@ public class Velocity extends Module {
         if (isS12) {
             S12PacketEntityVelocity s12PacketEntityVelocity = (S12PacketEntityVelocity) packet;
             switch (mode) {
-                case Normal:
-                    ReflectionManager.S12PacketEntityVelocity$setMotionX(s12PacketEntityVelocity, 0);
-                    ReflectionManager.S12PacketEntityVelocity$setMotionY(s12PacketEntityVelocity, (int) ((double) s12PacketEntityVelocity.getMotionY() * 0.99905));
-                    ReflectionManager.S12PacketEntityVelocity$setMotionZ(s12PacketEntityVelocity, 0);
-                    break;
                 case Vulcan:
                 case Cancel:
                     e.setCancelled(true);

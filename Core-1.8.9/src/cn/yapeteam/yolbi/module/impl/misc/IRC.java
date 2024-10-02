@@ -92,6 +92,7 @@ import net.minecraft.util.ChatComponentText;
 
 import java.util.List;
 
+@Deprecated
 public class IRC extends Module {
 
     private final String server = "https://27.25.142.18";
