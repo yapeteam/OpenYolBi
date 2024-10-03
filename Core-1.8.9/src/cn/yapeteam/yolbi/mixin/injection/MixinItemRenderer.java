@@ -25,6 +25,7 @@ import net.minecraft.util.MathHelper;
 import net.optifine.shaders.Shaders;
 import org.lwjgl.opengl.GL11;
 
+@Deprecated
 @Mixin(ItemRenderer.class)
 public class MixinItemRenderer {
     @Shadow

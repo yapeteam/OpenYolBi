@@ -8,7 +8,6 @@ import cn.yapeteam.yolbi.event.impl.game.EventTick;
 import cn.yapeteam.yolbi.event.impl.player.EventMotion;
 import cn.yapeteam.yolbi.event.impl.player.EventPostMotion;
 import cn.yapeteam.yolbi.event.impl.render.EventRender3D;
-import cn.yapeteam.yolbi.managers.PacketManager;
 import cn.yapeteam.yolbi.managers.ReflectionManager;
 import cn.yapeteam.yolbi.managers.TargetManager;
 import cn.yapeteam.yolbi.module.Module;
@@ -23,13 +22,10 @@ import cn.yapeteam.yolbi.utils.player.RotationsUtil;
 import cn.yapeteam.yolbi.utils.render.RenderUtil;
 import cn.yapeteam.yolbi.utils.vector.Vector2f;
 import net.minecraft.client.renderer.texture.TextureUtil;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemSword;
-import net.minecraft.network.play.client.C07PacketPlayerDigging;
-import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumFacing;
 import org.lwjgl.opengl.GL11;
 
 import javax.imageio.ImageIO;
@@ -88,7 +84,7 @@ public class VanillaAura extends Module {
         targets.clear();
         canAttack = canBlock = false;
         if (isBlock) {
-            PacketManager.sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
+            KeyBinding.setKeyBindState(mc.gameSettings.keyBindUseItem.getKeyCode(), false);
         }
         isBlock = false;
         cps = 0;
@@ -195,20 +191,19 @@ public class VanillaAura extends Module {
     private void runBlock() {
         if (canBlock) {
             if (autoblockMode.is("Always")) {
-                PacketManager.sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
+                KeyBinding.setKeyBindState(mc.gameSettings.keyBindUseItem.getKeyCode(), true);
                 isBlock = true;
             } else if (autoblockMode.is("Packet")) {
                 if (isBlock) {
-                    PacketManager.sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
+                    KeyBinding.setKeyBindState(mc.gameSettings.keyBindUseItem.getKeyCode(), false);
                     isBlock = false;
                 } else {
-                    PacketManager.sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
+                    KeyBinding.setKeyBindState(mc.gameSettings.keyBindUseItem.getKeyCode(), true);
                     isBlock = true;
                 }
             }
         } else if (isBlock && autoblockMode.is("Always")) {
-            PacketManager.sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.
-                    Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
+            KeyBinding.setKeyBindState(mc.gameSettings.keyBindUseItem.getKeyCode(), false);
             isBlock = false;
         }
     }
