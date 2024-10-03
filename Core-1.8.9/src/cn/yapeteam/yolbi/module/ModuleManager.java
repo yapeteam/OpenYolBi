@@ -8,7 +8,6 @@ import cn.yapeteam.yolbi.module.impl.misc.AntiInvisible;
 import cn.yapeteam.yolbi.module.impl.misc.ClientSpoof;
 import cn.yapeteam.yolbi.module.impl.misc.NoteBot;
 import cn.yapeteam.yolbi.module.impl.misc.SelfDestruct;
-import cn.yapeteam.yolbi.module.impl.movement.Eagle;
 import cn.yapeteam.yolbi.module.impl.movement.Sprint;
 import cn.yapeteam.yolbi.module.impl.movement.StrafeFix;
 import cn.yapeteam.yolbi.module.impl.player.AutoArmor;
@@ -54,7 +53,6 @@ public class ModuleManager {
         modules.add(new NoteBot());
         modules.add(new GameSpeed());
         modules.add(new SelfDestruct());
-        modules.add(new Eagle());
         modules.add(new Sprint());
         modules.add(new StrafeFix());
         modules.add(new ClickUI());
