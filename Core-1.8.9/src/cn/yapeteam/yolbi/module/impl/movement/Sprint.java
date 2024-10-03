@@ -21,7 +21,6 @@ public class Sprint extends Module {
 
     @Listener
     public void onTick(EventTick eventTick) {
-
         KeyBinding.setKeyBindState(mc.gameSettings.keyBindSprint.getKeyCode(), true);
     }
 }

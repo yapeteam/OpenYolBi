@@ -2,10 +2,7 @@ package cn.yapeteam.yolbi.mixin.injection;
 
 import cn.yapeteam.ymixin.annotations.*;
 import cn.yapeteam.yolbi.YolBi;
-import cn.yapeteam.yolbi.event.impl.player.EventChat;
-import cn.yapeteam.yolbi.event.impl.player.EventMotion;
-import cn.yapeteam.yolbi.event.impl.player.EventPostMotion;
-import cn.yapeteam.yolbi.event.impl.player.EventUpdate;
+import cn.yapeteam.yolbi.event.impl.player.*;
 import cn.yapeteam.yolbi.managers.RotationManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -96,6 +93,12 @@ public class MixinEntityPlayerSP extends EntityPlayerSP {
     @Shadow
     public boolean isSneaking() {
         return false;
+    }
+
+    @Inject(method = "onLivingUpdate", desc = "()V", target = @Target(value = "HEAD"))
+    public void onLivingUpdate() {
+        EventLivingUpdate eventLivingUpdate = new EventLivingUpdate();
+        YolBi.instance.getEventManager().post(eventLivingUpdate);
     }
 
     @Overwrite(method = "onUpdateWalkingPlayer", desc = "()V")

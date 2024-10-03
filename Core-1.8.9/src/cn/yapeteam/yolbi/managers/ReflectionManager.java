@@ -36,6 +36,7 @@ public class ReflectionManager {
     public static Field Minecraft$rightClickDelayTimer;
     private static Field EntityPlayerSP$lastReportedYaw;
     private static Field EntityPlayerSP$lastReportedPitch;
+    private static Field EntityPlayerSP$serverSprintState;
     private static Field Entity$motionX;
     private static Field Entity$motionY;
     private static Field Entity$motionZ;
@@ -129,6 +130,12 @@ public class ReflectionManager {
         try {
             EntityPlayerSP$lastReportedPitch = EntityPlayerSP.class.getDeclaredField(Mapper.map("net/minecraft/client/entity/EntityPlayerSP", "lastReportedPitch", null, Mapper.Type.Field));
             EntityPlayerSP$lastReportedPitch.setAccessible(true);
+        } catch (NoSuchFieldException e) {
+            Logger.exception(e);
+        }
+        try {
+            EntityPlayerSP$serverSprintState = EntityPlayerSP.class.getDeclaredField(Mapper.map("net/minecraft/client/entity/EntityPlayerSP", "serverSprintState", null, Mapper.Type.Field));
+            EntityPlayerSP$serverSprintState.setAccessible(true);
         } catch (NoSuchFieldException e) {
             Logger.exception(e);
         }
@@ -635,6 +642,15 @@ public class ReflectionManager {
         } catch (Exception e) {
             Logger.exception(e);
         }
+    }
+
+    public static boolean getEntityPlayerSP$serverSprintState(EntityPlayerSP player) {
+        try {
+            return EntityPlayerSP$serverSprintState.getBoolean(player);
+        } catch (Exception e) {
+            Logger.exception(e);
+        }
+        return false;
     }
 
     public static final boolean hasOptifine = Arrays.stream(GameSettings.class.getFields()).anyMatch(f -> f.getName().equals("ofFastRender"));

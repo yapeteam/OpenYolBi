@@ -101,7 +101,7 @@ public class PlayerUtil implements IMinecraft {
     }
 
     public static double PitchFromEntity(Entity en, float f) {
-        return (double) (mc.thePlayer.rotationPitch - pitchToEntity(en, f));
+        return mc.thePlayer.rotationPitch - pitchToEntity(en, f);
     }
 
     public static float pitchToEntity(Entity ent, float f) {
@@ -487,4 +487,12 @@ public class PlayerUtil implements IMinecraft {
         return block.getMaterial() == Material.lava || block.getMaterial() == Material.water;
     }
 
+    public float getClosestDistanceToEntity(Entity entityIn) {
+        Vec3 eyes = mc.thePlayer.getPositionEyes(1F);
+        Vec3 pos = RotationsUtil.getClosestPoint(eyes, entityIn.getEntityBoundingBox());
+        double xDist = Math.abs(pos.xCoord - eyes.xCoord);
+        double yDist = Math.abs(pos.yCoord - eyes.yCoord);
+        double zDist = Math.abs(pos.zCoord - eyes.zCoord);
+        return (float) Math.sqrt(xDist * xDist + yDist * yDist + zDist * zDist);
+    }
 }

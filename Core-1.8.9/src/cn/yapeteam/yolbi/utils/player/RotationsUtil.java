@@ -54,8 +54,7 @@ public class RotationsUtil implements IMinecraft {
     }
 
     public static double getRotationDifference(Vector2f curRotations, Vector2f targetRotations) {
-        if (curRotations == null || targetRotations == null)
-            return 0.0;
+        if (curRotations == null || targetRotations == null) return 0.0;
 
         return Math.hypot(getAngleDifference(curRotations.x, targetRotations.x), (curRotations.y - targetRotations.y));
     }
@@ -163,5 +162,19 @@ public class RotationsUtil implements IMinecraft {
         }
 
         return false;
+    }
+
+    /**
+     * Get the closest point on a boundingBox from start
+     *
+     * @param start       Src
+     * @param boundingBox boundingBox to calculate closest point from start
+     * @return The closest point on boundingBox as a hit vec
+     */
+    public static Vec3 getClosestPoint(final Vec3 start, final AxisAlignedBB boundingBox) {
+        final double closestX = start.xCoord >= boundingBox.maxX ? boundingBox.maxX : start.xCoord <= boundingBox.minX ? boundingBox.minX : boundingBox.minX + (start.xCoord - boundingBox.minX);
+        final double closestY = start.yCoord >= boundingBox.maxY ? boundingBox.maxY : start.yCoord <= boundingBox.minY ? boundingBox.minY : boundingBox.minY + (start.yCoord - boundingBox.minY);
+        final double closestZ = start.zCoord >= boundingBox.maxZ ? boundingBox.maxZ : start.zCoord <= boundingBox.minZ ? boundingBox.minZ : boundingBox.minZ + (start.zCoord - boundingBox.minZ);
+        return new Vec3(closestX, closestY, closestZ);
     }
 }
