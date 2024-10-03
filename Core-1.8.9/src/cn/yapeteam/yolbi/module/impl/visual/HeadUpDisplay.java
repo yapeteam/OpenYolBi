@@ -61,7 +61,7 @@ public class HeadUpDisplay extends Module {
 
             if (modules.isEmpty()) return;
 
-            modules.sort((o1, o2) -> (int) (getFontRenderer().getStringWidth(o2.getName() + o2.getSuffix()) - getFontRenderer().getStringWidth(o1.getName() + o1.getSuffix())));
+            modules.sort((o1, o2) -> (int) (getFontRenderer().getStringWidth(o2.getName() + (o2.getSuffix() != null ? o2.getSuffix() : "")) - getFontRenderer().getStringWidth(o1.getName() + (o1.getSuffix() != null ? o1.getSuffix() : ""))));
 
             float x;
             float y = 2;
@@ -71,8 +71,9 @@ public class HeadUpDisplay extends Module {
                 final String name = modules.get(i).getName();
                 x = sr.getScaledWidth() - (getFontRenderer().getStringWidth(name + suffix)) - 2;
 
-                if (backgroundValue.getValue())
+                if (backgroundValue.getValue()) {
                     RenderUtil.drawRect(x - 2f, y - 3, x + getFontRenderer().getStringWidth(name + suffix) + 3, y + 8f, new Color(0, 0, 0, 150).getRGB());
+                }
 
                 getFontRenderer().drawString(name + EnumChatFormatting.GRAY + suffix, x, y, color, true);
 
