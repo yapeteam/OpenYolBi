@@ -11,7 +11,7 @@ import cn.yapeteam.yolbi.utils.animation.Easing;
 
 public class SelfDestruct extends Module {
     public SelfDestruct() {
-        super("自毁", ModuleCategory.MISC);
+        super("SelfDestruct", ModuleCategory.MISC);
     }
 
     public void onEnable() {
