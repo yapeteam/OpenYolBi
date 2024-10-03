@@ -6,11 +6,10 @@ import cn.yapeteam.yolbi.event.impl.player.EventUpdate;
 import cn.yapeteam.yolbi.module.Module;
 import cn.yapeteam.yolbi.module.ModuleCategory;
 import cn.yapeteam.yolbi.module.values.impl.BooleanValue;
-import cn.yapeteam.yolbi.utils.misc.VirtualKeyBoard;
+import cn.yapeteam.yolbi.utils.misc.KeyCodeMapper;
 import cn.yapeteam.yolbi.utils.player.PlayerUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
-import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.item.ItemBlock;
 
 public class Eagle extends Module {
@@ -44,19 +43,20 @@ public class Eagle extends Module {
         }
         if ((mc.thePlayer.onGround || !onlyground.getValue()) &&
                 (getBlockUnderPlayer() instanceof BlockAir) &&
-                (mc.gameSettings.keyBindBack.isKeyDown() || !onlybackwards.getValue())
+                (Natives.IsKeyDown(KeyCodeMapper.mapLWJGLKeyCode(mc.gameSettings.keyBindBack.getKeyCode())) || !onlybackwards.getValue())
         ) {
             setSneak(true);
-        } else if ((mc.gameSettings.keyBindBack.isKeyDown() || !onlybackwards.getValue())) reset();
-        else if (mc.gameSettings.keyBindForward.isKeyDown()) reset();
+        } else if ((Natives.IsKeyDown(KeyCodeMapper.mapLWJGLKeyCode(mc.gameSettings.keyBindBack.getKeyCode())) || !onlybackwards.getValue()))
+            reset();
+        else if (Natives.IsKeyDown(KeyCodeMapper.mapLWJGLKeyCode(mc.gameSettings.keyBindForward.getKeyCode()))) reset();
     }
 
     private void setSneak(boolean sneak) {
-        KeyBinding.setKeyBindState(mc.gameSettings.keyBindSneak.getKeyCode(), sneak);
+        Natives.SetKeyBoard(KeyCodeMapper.mapLWJGLKeyCode(mc.gameSettings.keyBindSneak.getKeyCode()), sneak);
     }
 
     private void reset() {
-        if (!Natives.IsKeyDown(VirtualKeyBoard.VK_LSHIFT))
+        if (!Natives.IsKeyDown(KeyCodeMapper.mapLWJGLKeyCode(mc.gameSettings.keyBindSneak.getKeyCode())))
             setSneak(false);
     }
 

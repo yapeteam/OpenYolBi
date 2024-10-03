@@ -12,7 +12,7 @@ import net.minecraft.network.play.client.C03PacketPlayer;
 
 public class Criticals extends Module {
     private final ModeValue<String> mode = new ModeValue<>("Mode", "Packet", "Packet", "LessPacket", "HvH", "LowHop", "Jump");
-    private final ModeValue<hvhModeE> hvhMode = new ModeValue<>("HvH Mode", hvhModeE.SmartHop, hvhModeE.values());
+    private final ModeValue<hvhModeE> hvhMode = new ModeValue<>("HvH Mode", () -> mode.is("HvH"), hvhModeE.SmartHop, hvhModeE.values());
 
     private enum hvhModeE {
         SmartHop, SmartHop2
@@ -20,7 +20,7 @@ public class Criticals extends Module {
 
     public Criticals() {
         super("Criticals", ModuleCategory.COMBAT);
-        addValues(mode);
+        addValues(mode, hvhMode);
     }
 
     private boolean canCritical() {
