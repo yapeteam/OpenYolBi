@@ -5,6 +5,7 @@ import cn.yapeteam.yolbi.event.Listener;
 import cn.yapeteam.yolbi.event.impl.network.EventPacket;
 import cn.yapeteam.yolbi.event.impl.player.EventAttack;
 import cn.yapeteam.yolbi.event.impl.player.EventLivingUpdate;
+import cn.yapeteam.yolbi.event.impl.player.EventUpdate;
 import cn.yapeteam.yolbi.managers.PacketManager;
 import cn.yapeteam.yolbi.managers.ReflectionManager;
 import cn.yapeteam.yolbi.module.Module;
@@ -13,6 +14,7 @@ import cn.yapeteam.yolbi.module.values.impl.ModeValue;
 import cn.yapeteam.yolbi.module.values.impl.NumberValue;
 import cn.yapeteam.yolbi.utils.player.PlayerUtil;
 import cn.yapeteam.yolbi.utils.vector.Vector2d;
+import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.network.Packet;
@@ -32,21 +34,22 @@ public class Velocity extends Module {
         Matrix,
         Vulcan,
         Hypixel,
-        GrimNoXZ,
-        GrimC02
+        GrimC02,
+        BetterJump,
+        JumpReset
     }
+
+    int needToUse = 0;
+    int start = 0;
 
     private final ModeValue<Mode> mode = new ModeValue<>("Mode", Mode.Cancel, Mode.values());
     private final NumberValue<Float> Horizontal = new NumberValue<>("Horizontal", () -> mode.is(Mode.Modify), 0f, -100f, 100f, 1f);
     private final NumberValue<Float> Vertical = new NumberValue<>("Vertical", () -> mode.is(Mode.Modify), 0f, -100f, 100f, 1f);
-    private final NumberValue<Float>
-            yawLegitModify = new NumberValue<>("Legit Yaw Modify", () -> mode.is(Mode.GrimNoXZ), 1f, 0f, 2f, 0.1f),
-            offset = new NumberValue<>("Angle Offset", () -> mode.is(Mode.GrimNoXZ), 0f, 180f, -180f, 5f);
     private final NumberValue<Integer> attackCountValue = new NumberValue<>("Packets", () -> mode.is(Mode.GrimC02), 6, 0, 16, 1);
 
     public Velocity() {
         super("Velocity", ModuleCategory.COMBAT);
-        addValues(mode, Horizontal, Vertical, yawLegitModify, offset, attackCountValue);
+        addValues(mode, Horizontal, Vertical, attackCountValue);
     }
 
     @Listener
@@ -105,16 +108,6 @@ public class Velocity extends Module {
                     } else e.setCancelled(true);
                 }
                 break;
-            case GrimNoXZ:
-                float yaw;
-                if (isS12) {
-                    S12PacketEntityVelocity s12PacketEntityVelocity = (S12PacketEntityVelocity) packet;
-                    yaw = -(mc.thePlayer.rotationYaw + offset.getValue() + 180);
-                    double velocity = Math.sqrt(s12PacketEntityVelocity.getMotionX() * s12PacketEntityVelocity.getMotionX() + s12PacketEntityVelocity.getMotionZ() * s12PacketEntityVelocity.getMotionZ()) * yawLegitModify.getValue();
-                    ReflectionManager.S12PacketEntityVelocity$setMotionX(s12PacketEntityVelocity, (int) (velocity * Math.sin(yaw / 180 * Math.PI)));
-                    ReflectionManager.S12PacketEntityVelocity$setMotionZ(s12PacketEntityVelocity, (int) (velocity * Math.cos(yaw / 180 * Math.PI)));
-                }
-                break;
             case GrimC02:
                 if (!isS12) return;
 
@@ -159,6 +152,47 @@ public class Velocity extends Module {
             if (mc.thePlayer.hurtTime > 0 && mc.thePlayer.onGround) {
                 mc.thePlayer.addVelocity(-1.3E-10, -1.3E-10, -1.3E-10);
                 mc.thePlayer.setSprinting(false);
+            }
+        }
+    }
+
+    @Listener
+    private void onUpdate(EventUpdate event) {
+        if (event.isPre()) {
+            if (needToUse == 1) {
+                while (mc.thePlayer.hurtTime >= 8) {
+                    ReflectionManager.SetPressed(mc.gameSettings.keyBindJump, true);
+                    break;
+                }
+                while (mc.thePlayer.hurtTime >= 7 && !mc.gameSettings.keyBindForward.isPressed()) {
+                    ReflectionManager.SetPressed(mc.gameSettings.keyBindForward, true);
+                    start = 1;
+                    break;
+                }
+                if (mc.thePlayer.hurtTime < 7 && mc.thePlayer.hurtTime > 0) {
+                    ReflectionManager.SetPressed(mc.gameSettings.keyBindJump, false);
+                    if (start == 1) {
+                        ReflectionManager.SetPressed(mc.gameSettings.keyBindForward, false);
+                        start = 0;
+                    }
+                }
+            }
+
+            if (mode.is(Mode.JumpReset)) {
+                if (mc.thePlayer.hurtTime >= 8) {
+                    ReflectionManager.SetPressed(mc.gameSettings.keyBindJump, true);
+                }
+                if (mc.thePlayer.hurtTime >= 7) {
+                    ReflectionManager.SetPressed(mc.gameSettings.keyBindForward, true);
+                } else if (mc.thePlayer.hurtTime >= 4) {
+                    ReflectionManager.SetPressed(mc.gameSettings.keyBindJump, false);
+                    ReflectionManager.SetPressed(mc.gameSettings.keyBindForward, false);
+                } else if (mc.thePlayer.hurtTime > 1) {
+                    ReflectionManager.SetPressed(mc.gameSettings.keyBindForward, GameSettings.isKeyDown(mc.gameSettings.keyBindForward));
+                    ReflectionManager.SetPressed(mc.gameSettings.keyBindJump, GameSettings.isKeyDown(mc.gameSettings.keyBindJump));
+                }
+            } else if (mode.is(Mode.BetterJump)) {
+                needToUse = 1;
             }
         }
     }
