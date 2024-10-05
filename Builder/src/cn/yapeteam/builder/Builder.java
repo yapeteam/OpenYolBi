@@ -228,30 +228,30 @@ public class Builder {
                 String version = args[1];
                 switch (version) {
                     case "deps":
-                        buildModule(new String[]{"VersionInfo/src"}, new String[]{}, "out/production/VersionInfo");
-                        buildModule(new String[]{"YMixin/src"}, new String[]{"libs", "deps"}, "out/production/YMixin");
-                        buildModule(new String[]{"Injector/src"}, new String[]{"libs", "deps", "out/production/VersionInfo:"}, "out/production/Injector");
-                        buildModule(new String[]{"Agent/src"}, new String[]{"deps"}, "out/production/Agent");
+                        buildModule(new String[]{"VersionInfo/src"}, new String[]{}, "out/production/VersionInfo", "8");
+                        buildModule(new String[]{"YMixin/src"}, new String[]{"libs", "deps"}, "out/production/YMixin", "8");
+                        buildModule(new String[]{"Injector/src"}, new String[]{"libs", "deps", "out/production/VersionInfo:"}, "out/production/Injector", "8");
+                        buildModule(new String[]{"Agent/src"}, new String[]{"deps"}, "out/production/Agent", "8");
                         break;
                     case "1.8.9":
                         buildModule(
                                 new String[]{"Core-1.8.9/src"},
                                 new String[]{"libs", "libs-low", "deps", "minecraft-lib/minecraft-1.8.9.jar", "out/production/VersionInfo:", "out/production/YMixin:"},
-                                "out/production/Core-1.8.9"
+                                "out/production/Core-1.8.9", "8"
                         );
                         break;
                     case "1.12.2":
                         buildModule(
                                 new String[]{"Core-1.12.2/src"},
                                 new String[]{"libs", "libs-low", "deps", "minecraft-lib/minecraft-1.12.2.jar", "out/production/VersionInfo:", "out/production/YMixin:"},
-                                "out/production/Core-1.12.2"
+                                "out/production/Core-1.12.2", "8"
                         );
                         break;
                     case "1.18.1":
                         buildModule(
                                 new String[]{"Core-1.18.1/src"},
                                 new String[]{"libs", "Core-1.18.1/libs", "deps", "minecraft-lib/minecraft-1.18.1.jar", "out/production/VersionInfo:", "out/production/YMixin:"},
-                                "out/production/Core-1.18.1"
+                                "out/production/Core-1.18.1", "17"
                         );
                         break;
                 }

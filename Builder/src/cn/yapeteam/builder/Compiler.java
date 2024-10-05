@@ -7,14 +7,17 @@ import java.util.List;
 public class Compiler {
 
 
-    public static void buildModule(String[] sourcePath, String[] libraryPath, String buildDir) throws Exception {
+    public static void buildModule(String[] sourcePath, String[] libraryPath, String buildDir, String target) throws Exception {
         boolean ignored = new File(buildDir).mkdirs();
         List<String> command = new ArrayList<>();
 
-        command.add(new File(System.getProperty("java.home").replace("/jre", ""), "bin/javac").getAbsolutePath()); // 指定 javac 命令
+        command.add(new File(System.getProperty("java.home").replace("\\", "/").replace("/jre", ""), "bin/javac").getAbsolutePath()); // 指定 javac 命令
 
         command.add("-encoding");
         command.add("UTF-8");
+
+        command.add("-target");
+        command.add(target);
 
         command.add("-cp");
 
