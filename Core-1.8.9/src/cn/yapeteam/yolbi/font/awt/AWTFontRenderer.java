@@ -113,8 +113,9 @@ public class AWTFontRenderer implements AbstractFontRenderer {
         charGraphics.setFont(font);
 
         this.preDraw(charGraphics);
-        charGraphics.drawString(character + "", 4, font.getSize());
-
+        charGraphics.setPaint(Color.WHITE);
+        for (int i = 0; i < 3; i++)
+            charGraphics.drawString(character + "", 4, font.getSize());//多绘制几次覆盖黑边
         Runnable task = () -> {
             int charTexture = GL11.glGenTextures();
             this.uploadTexture(charTexture, charImage, width, height);
@@ -136,8 +137,6 @@ public class AWTFontRenderer implements AbstractFontRenderer {
     }
 
     private void preDraw(Graphics2D graphics) {
-        graphics.setColor(Color.WHITE);
-
         graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         graphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_DEFAULT);
@@ -269,7 +268,6 @@ public class AWTFontRenderer implements AbstractFontRenderer {
 
         if (shadowMode) {
             color = (color & 16579836) >> 2 | color & -16777216;
-            ;
         }
 
         float red = (float) (color >> 16 & 255) / 255.0F;

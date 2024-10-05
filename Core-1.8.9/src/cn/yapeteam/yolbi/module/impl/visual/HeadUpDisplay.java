@@ -8,6 +8,8 @@ import cn.yapeteam.yolbi.module.Module;
 import cn.yapeteam.yolbi.module.ModuleCategory;
 import cn.yapeteam.yolbi.module.values.impl.BooleanValue;
 import cn.yapeteam.yolbi.module.values.impl.ModeValue;
+import cn.yapeteam.yolbi.utils.animation.Animation;
+import cn.yapeteam.yolbi.utils.animation.Easing;
 import cn.yapeteam.yolbi.utils.render.RenderUtil;
 import lombok.Getter;
 import lombok.val;
@@ -15,8 +17,9 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.util.EnumChatFormatting;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class HeadUpDisplay extends Module {
     private ClientTheme theme = null;
@@ -27,11 +30,64 @@ public class HeadUpDisplay extends Module {
     private final BooleanValue notification = new BooleanValue("Notification", true);
     private final ModeValue<String> font = new ModeValue<>("Font", "PingFang", "Jello", "PingFang", "default");
 
-    public static HeadUpDisplay instance = new HeadUpDisplay();
+    public static HeadUpDisplay instance;
 
     public HeadUpDisplay() {
         super("HUD", ModuleCategory.VISUAL);
         addValues(waterMark, moduleList, backgroundValue, notification, font);
+        instance = this;
+    }
+
+    private class ModuleNode {
+        private final Module module;
+
+        private ModuleNode(Module module) {
+            this.module = module;
+        }
+
+        private final Animation animationY = new Animation(Easing.EASE_OUT_EXPO, 500);
+        private final Animation animationX = new Animation(Easing.EASE_IN_OUT_QUAD, 500);
+        private float deltaX, y, width, height;
+        private int color;
+
+        public void update(ClientTheme theme, float y, int index) {
+            double[] rect = getRect(getText(module), index);
+            deltaX = -(float) animationX.animate(module.isEnabled() ? rect[0] : 0);
+            this.y = (float) animationY.animate(y);
+            width = (float) rect[2];
+            height = (float) rect[3];
+            color = theme.getColor((int) (this.y * 10));
+        }
+
+        private double[] getRect(String text, int index) {
+            val font = getFontRenderer();
+            double width = font.getStringWidth(text) + 4;
+            float height = 12;
+            double y = index * height;
+            return new double[]{width, y, width, height};
+        }
+
+        public void render(ScaledResolution sr) {
+            AbstractFontRenderer font = getFontRenderer();
+            float x = sr.getScaledWidth() + deltaX;
+            if (backgroundValue.getValue())
+                RenderUtil.drawRect(x, y, x + width, y + height, new Color(0, 0, 0, 66).getRGB());
+            final String suffix = module.getSuffix() != null ? " " + module.getSuffix() : "";
+            final String name = module.getName();
+            font.drawString(getText(module), x + 2.5f, y + (height - font.getStringHeight()) / 2f + 0.5f, new Color(0, 0, 0).getRGB());
+            font.drawString(name + EnumChatFormatting.GRAY + suffix, x + 2, y + (height - font.getStringHeight()) / 2f, color, false);
+        }
+    }
+
+    private final List<ModuleNode> moduleNodes = new ArrayList<>();
+
+    @Override
+    protected void onEnable() {
+        moduleNodes.clear();
+        for (Module module : YolBi.instance.getModuleManager().getModules()) {
+            ModuleNode node = new ModuleNode(module);
+            moduleNodes.add(node);
+        }
     }
 
     @Listener
@@ -51,35 +107,22 @@ public class HeadUpDisplay extends Module {
             font.drawString(YolBi.name + " " + YolBi.version, 2, 2, -1);
 
         if (moduleList.getValue()) {
-            final List<Module> modules = new CopyOnWriteArrayList<>();
-
-            for (Module module : YolBi.instance.getModuleManager().getModules()) {
-                if (module.isEnabled()) {
-                    modules.add(module);
-                }
+            moduleNodes.sort(Comparator.comparingInt(n -> (int) -font.getStringWidth(getText(n.module))));
+            float y = 0;
+            for (int i = 0; i < moduleNodes.size(); i++) {
+                ModuleNode node = moduleNodes.get(i);
+                node.update(theme, y, i);
+                if (node.module.isEnabled() || !node.animationX.isFinished())
+                    y += node.height;
             }
-
-            if (modules.isEmpty()) return;
-
-            modules.sort((o1, o2) -> (int) (getFontRenderer().getStringWidth(o2.getName() + (o2.getSuffix() != null ? o2.getSuffix() : "")) - getFontRenderer().getStringWidth(o1.getName() + (o1.getSuffix() != null ? o1.getSuffix() : ""))));
-
-            float x;
-            float y = 2;
-            for (int i = 0; i < modules.size(); ++i) {
-                int color = ClientTheme.instance.getColor(i * 10);
-                final String suffix = modules.get(i).getSuffix() != null ? " " + modules.get(i).getSuffix() : "";
-                final String name = modules.get(i).getName();
-                x = sr.getScaledWidth() - (getFontRenderer().getStringWidth(name + suffix)) - 2;
-
-                if (backgroundValue.getValue()) {
-                    RenderUtil.drawRect(x - 2f, y - 3, x + getFontRenderer().getStringWidth(name + suffix) + 3, y + 8f, new Color(0, 0, 0, 150).getRGB());
-                }
-
-                getFontRenderer().drawString(name + EnumChatFormatting.GRAY + suffix, x, y, color, true);
-
-                y += 11;
-            }
+            moduleNodes.forEach(node -> node.render(sr));
         }
+    }
+
+    private String getText(Module module) {
+        final String suffix = module.getSuffix() != null ? " " + module.getSuffix() : "";
+        final String name = module.getName();
+        return name + suffix;
     }
 
     private AbstractFontRenderer getFontRenderer() {
