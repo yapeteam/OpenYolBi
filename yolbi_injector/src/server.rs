@@ -74,7 +74,6 @@ fn handle_client(mut stream: TcpStream) -> io::Result<()> {
                     "LOG" => {
                         if let Ok(value) = values[1].parse::<String>() {
                             print!("\x1b[2K\r{}\n", value.trim_end_matches('\n'));
-                            io::stdout().flush()?;
                             progress_bar.set_position(next)
                         }
                     }
