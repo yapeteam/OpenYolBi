@@ -1,7 +1,7 @@
-use std::io::{self, Read, Write};
+use indicatif::{ProgressBar, ProgressStyle};
+use std::io::{self, Read};
 use std::net::{Shutdown, TcpListener, TcpStream};
 use std::str;
-use indicatif::{ProgressBar, ProgressStyle};
 
 pub(crate) fn start() -> Result<(), Box<dyn std::error::Error>> {
     let listener = TcpListener::bind("127.0.0.1:20181")?;
@@ -29,7 +29,7 @@ fn handle_client(mut stream: TcpStream) -> io::Result<()> {
     let mut buffer = [0u8; 1024];
     let progress_bar = ProgressBar::new(100);
     progress_bar.set_style(ProgressStyle::default_bar()
-        .template("{spinner:.green} [{elapsed_precise}] [{wide_bar:.cyan/blue}] {pos:>7}/{len:7} {percent:>7}%").unwrap()
+        .template("{spinner:.green} [{elapsed_precise}] [{wide_bar:.white}] {pos:>7}/{len:7} {percent:>7}%").unwrap()
     );
 
     let mut next: u64 = 0;
@@ -86,9 +86,7 @@ fn handle_client(mut stream: TcpStream) -> io::Result<()> {
                         }
                         break;
                     }
-                    _ => {
-                        eprintln!("{:?}", values[0]);
-                    }
+                    _ => {}
                 }
             }
         }
