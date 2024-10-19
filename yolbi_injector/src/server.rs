@@ -1,5 +1,5 @@
 use indicatif::{ProgressBar, ProgressStyle};
-use std::io::{self, Read};
+use std::io::{self, Read, Write};
 use std::net::{Shutdown, TcpListener, TcpStream};
 use std::str;
 
@@ -56,13 +56,11 @@ fn handle_client(mut stream: TcpStream) -> io::Result<()> {
                     "P1" => {
                         if let Ok(value) = values[1].parse::<f32>() {
                             next = value as u64;
-                            // progress_bar.set_position(value as u64);
                         }
                     }
                     "P2" => {
                         if let Ok(value) = values[1].parse::<f32>() {
                             next = value as u64;
-                            // progress_bar.set_position(value as u64);
                         }
                     }
                     "E1" => {
@@ -79,17 +77,18 @@ fn handle_client(mut stream: TcpStream) -> io::Result<()> {
                     }
                     "CLOSE" => {
                         println!("INJECT SUCCESSFULLY");
-                        println!("input any key to exit");
-                        let mut input = String::new();
-                        if io::stdin().read_line(&mut input).is_err() {
-                            println!("unexpected error");
-                        }
                         break;
                     }
                     _ => {}
                 }
             }
         }
+    }
+    println!("Press any key to exit...");
+    io::stdout().flush()?;
+    let mut input = [0u8; 1];
+    if let Ok(_) = io::stdin().read(&mut input) {
+        println!("Exiting...");
     }
 
     stream.shutdown(Shutdown::Both)?;
