@@ -1,7 +1,7 @@
 package cn.yapeteam.yolbi.mixin;
 
+import cn.yapeteam.loader.InjectorBridge;
 import cn.yapeteam.loader.JVMTIWrapper;
-import cn.yapeteam.loader.SocketSender;
 import cn.yapeteam.loader.logger.Logger;
 import cn.yapeteam.loader.utils.ClassUtils;
 import cn.yapeteam.ymixin.ASMTransformer;
@@ -62,7 +62,7 @@ public class MixinManager {
     public static void transform() throws Throwable {
         boolean ignored = dir.mkdirs();
         Map<String, byte[]> map = mixinTransformer.transform();
-        SocketSender.send("S2");
+        InjectorBridge.send("S2");
         int total = mixins.size() + transformers.size();
         ArrayList<String> failed = new ArrayList<>();
         ArrayList<Class<?>> redefined = new ArrayList<>();
@@ -77,7 +77,7 @@ public class MixinManager {
                 }
                 Files.write(new File(dir, targetClass.getName()).toPath(), bytes);
                 int code = JVMTIWrapper.instance.redefineClass(targetClass, bytes);
-                SocketSender.send("P2" + " " + (float) (i + 1) / total * 100f);
+                InjectorBridge.send("P2" + "=>" + (float) (i + 1) / total * 100f);
                 if (code != 0)
                     failed.add(mixin.name.replace('/', '.'));
                 Logger.success("Redefined {}, Return Code {}.", targetClass, code);
@@ -96,7 +96,7 @@ public class MixinManager {
             Files.write(new File(dir, targetClass.getName()).toPath(), bytes);
             if (redefined.contains(targetClass)) continue;
             int code = JVMTIWrapper.instance.redefineClass(targetClass, bytes);
-            SocketSender.send("P2" + " " + (float) (i + mixins.size() + 1) / total * 100f);
+            InjectorBridge.send("P2" + "=>" + (float) (i + mixins.size() + 1) / total * 100f);
             if (code != 0)
                 failed.add(asmTransformer.getClass().getName());
             Logger.success("Redefined {}, Return Code {}.", targetClass, code);
@@ -105,7 +105,7 @@ public class MixinManager {
         }
         for (String s : failed)
             Logger.error("Failed to apply patch: {}", s);
-        SocketSender.send("E2");
+        InjectorBridge.send("E2");
     }
 
     private static void addMixin(String name) throws Throwable {

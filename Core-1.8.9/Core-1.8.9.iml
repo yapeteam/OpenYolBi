@@ -29,5 +29,6 @@
     <orderEntry type="module" module-name="VersionInfo" />
     <orderEntry type="library" name="obf" level="project" />
     <orderEntry type="library" name="yapeteam" level="project" />
+    <orderEntry type="module" module-name="Loader" />
   </component>
 </module>

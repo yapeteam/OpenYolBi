@@ -1,0 +1,10 @@
+[package]
+name = "yolbi_injector"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+libc = "0.2.159"
+libloading = "0.8.5"
+zip = "0.6.6"
+indicatif = "0.17.8"

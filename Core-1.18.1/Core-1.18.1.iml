@@ -28,5 +28,6 @@
     <orderEntry type="library" name="darwin" level="project" />
     <orderEntry type="module" module-name="VersionInfo" />
     <orderEntry type="library" name="yapeteam" level="project" />
+    <orderEntry type="module" module-name="Loader" />
   </component>
 </module>

@@ -16,7 +16,7 @@ public class Loader {
                 JVMTIWrapper.instance = new NativeWrapper();
             if (BootStrap.getVersion().first != Version.V1_8_9) {
                 Logger.error("Unsupported Minecraft version: {}", BootStrap.getVersion().first.getVersion());
-                SocketSender.send("CLOSE");
+                InjectorBridge.send("CLOSE");
                 return;
             }
             Logger.info("Start Loading!");
@@ -25,8 +25,8 @@ public class Loader {
             Logger.warn("Start transforming!");
             MixinManager.transform();
             Logger.success("Welcome {} ver {}", YolBi.name, YolBi.version);
-            SocketSender.send("CLOSE");
-            SocketSender.close();
+            InjectorBridge.send("CLOSE");
+            InjectorBridge.close();
             System.setProperty("skija.library.path", new File(YolBi.YOLBI_DIR,"resources/natives").getAbsolutePath());
             YolBi.initialize();
         } catch (InvocationTargetException e) {

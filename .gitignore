@@ -38,3 +38,6 @@ bin/
 /Loader/dll/build/
 /Loader/dll/cmake-build-debug/
 /Loader/dll/.idea/
+/yolbi_injector/.idea/
+/yolbi_injector/target/
+/yolbi_injector/src/injection.zip

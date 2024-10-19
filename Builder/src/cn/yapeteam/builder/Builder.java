@@ -339,6 +339,15 @@ public class Builder {
                         copyStream(outputStream, Files.newInputStream(new File(build_dir, artifact_name + "-obf.jar").toPath()));
                         outputStream.close();
                     }
+                } else if (element.getTagName().equals("injector")) {
+                    try (OutputStream outputStream = Files.newOutputStream(Paths.get("yolbi_injector/src/injection.zip"))) {
+                        copyStream(outputStream, Files.newInputStream(new File(output_dir, "injection.zip").toPath()));
+                    }
+                    Terminal terminal = new Terminal(new File("yolbi_injector"), null);
+                    terminal.execute(new String[]{"cargo", "build", "-r"});
+                    try (OutputStream outputStream = Files.newOutputStream(new File(output_dir, "injector.exe").toPath())) {
+                        copyStream(outputStream, Files.newInputStream(Paths.get("yolbi_injector/target/release/yolbi_injector.exe")));
+                    }
                 }
             }
         }

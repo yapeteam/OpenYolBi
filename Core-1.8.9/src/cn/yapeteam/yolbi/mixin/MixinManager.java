@@ -1,7 +1,7 @@
 package cn.yapeteam.yolbi.mixin;
 
+import cn.yapeteam.loader.InjectorBridge;
 import cn.yapeteam.loader.JVMTIWrapper;
-import cn.yapeteam.loader.SocketSender;
 import cn.yapeteam.loader.logger.Logger;
 import cn.yapeteam.loader.utils.ClassUtils;
 import cn.yapeteam.ymixin.MixinTransformer;
@@ -61,7 +61,7 @@ public class MixinManager {
     public static void transform() throws Throwable {
         boolean ignored = dir.mkdirs();
         Map<String, byte[]> map = mixinTransformer.transform();
-        SocketSender.send("S2");
+        InjectorBridge.send("S2");
         ArrayList<String> failed = new ArrayList<>();
         for (int i = 0; i < mixins.size(); i++) {
             ClassNode mixin = mixins.get(i);
@@ -74,14 +74,14 @@ public class MixinManager {
                 }
                 Files.write(new File(dir, targetClass.getName()).toPath(), bytes);
                 int code = JVMTIWrapper.instance.redefineClass(targetClass, bytes);
-                SocketSender.send("P2" + " " + (float) (i + 1) / mixins.size() * 100f);
+                InjectorBridge.send("P2" + "=>" + (float) (i + 1) / mixins.size() * 100f);
                 if (code != 0)
                     failed.add(mixin.name.replace('/', '.'));
                 Logger.success("Redefined {}, Return Code {}.", targetClass, code);
                 Thread.sleep(200);
             }
         }
-        SocketSender.send("E2");
+        InjectorBridge.send("E2");
         if (!failed.isEmpty()) {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("Failed to transform").append(' ').append(failed.size() == 1 ? "class" : "classes").append(' ').append('\n');
