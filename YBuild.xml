@@ -52,7 +52,7 @@
             <file>build/loader.jar</file>
             <file>deps/yapeteam/hooker.jar</file>
             <files platform="windows">deps/yapeteam/dll</files>
-            <files platform="windows">yolbi_injector/api/libapi.dll</files>
+            <file platform="windows">yolbi_injector/api/libapi.dll</file>
             <file>build/ymixin.jar</file>
             <!--agent 注入尚未完善-->
             <!--<file>build/agent.jar</file>-->

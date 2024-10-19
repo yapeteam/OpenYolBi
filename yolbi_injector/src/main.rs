@@ -8,7 +8,6 @@ use std::io::{Cursor, Write};
 use std::os::windows::ffi::OsStrExt;
 use std::path::{Path, PathBuf};
 use std::{env, io};
-use std::fs::File;
 use zip::result::ZipError;
 use zip::ZipArchive;
 
@@ -17,24 +16,9 @@ fn release_resources(yolbi_path: PathBuf) -> Result<(), ZipError> {
     std::fs::create_dir_all(&yolbi_path)?;
 
     let mut zip = ZipArchive::new(Cursor::new(included_zip))?;
-    let total_files = zip.len();
+    zip.extract(&yolbi_path)?;
 
-    for i in 0..total_files {
-        let mut file = zip.by_index(i)?;
-        let file_name = file.name().to_owned();
-        let out_path = yolbi_path.join(&file_name);
-
-        println!("Extract: {}", out_path.display());
-
-        if file_name.ends_with('/') {
-            std::fs::create_dir_all(&out_path)?;
-        } else {
-            let mut out_file = File::create(&out_path)?;
-            io::copy(&mut file, &mut out_file)?;
-        }
-    }
-
-    println!("Done extracting files.");
+    println!("resources released at: {}", yolbi_path.display());
     Ok(())
 }
 
