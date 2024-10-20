@@ -3,6 +3,9 @@
   <img src="https://avatars.githubusercontent.com/u/159465859?s=64&v=4" alt="YolBi Lite" img>
 </p>
 
+> [!NOTE]
+> 曹源再搬运我端你妈死了我说的
+
 为支持Minecraft开源社区 ~~(打死妖猫的圈钱梦想)~~ ，我决定开放YolBi Lite Legacy分支
 
 为防止二次特征，loader模块不予公开
