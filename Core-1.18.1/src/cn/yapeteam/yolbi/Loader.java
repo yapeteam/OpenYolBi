@@ -16,7 +16,7 @@ public class Loader {
                 JVMTIWrapper.instance = new NativeWrapper();
             if (BootStrap.getVersion().first != Version.V1_18_1) {
                 Logger.error("Unsupported Minecraft version: {}", BootStrap.getVersion().first.getVersion());
-                InjectorBridge.send("CLOSE");
+                InjectorBridge.send("ED");
                 return;
             }
             Logger.info("Start Loading!");
@@ -25,7 +25,7 @@ public class Loader {
             Logger.warn("Start transforming!");
             MixinManager.transform();
             Logger.success("Welcome {} v{}", YolBi.name, YolBi.version);
-            InjectorBridge.send("CLOSE");
+            InjectorBridge.send("ED");
             InjectorBridge.close();
             YolBi.initialize();
             Minecraft.getInstance().getWindow().setTitle(YolBi.name + " v" + YolBi.version);

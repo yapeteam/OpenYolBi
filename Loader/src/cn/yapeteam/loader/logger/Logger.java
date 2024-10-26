@@ -73,7 +73,7 @@ public class Logger {
                 str = replaceFirst(str, "{}", o1.toString());
             else str = replaceFirst(str, "{}", "null");
         str = "[" + dateFormat.format(new Date()) + "]" + " " + color + str + ConsoleColors.RESET;
-        InjectorBridge.send("LOG=>" + str);
+        InjectorBridge.send("LG=>" + str);
         if (debug)
             System.out.println(str);
         cache.add(str);

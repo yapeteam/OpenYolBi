@@ -5,7 +5,6 @@ import cn.yapeteam.loader.logger.Logger;
 import cn.yapeteam.yolbi.mixin.MixinManager;
 
 import java.awt.*;
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 
 @SuppressWarnings("unused")
@@ -16,7 +15,7 @@ public class Loader {
                 JVMTIWrapper.instance = new NativeWrapper();
             if (BootStrap.getVersion().first != Version.V1_8_9) {
                 Logger.error("Unsupported Minecraft version: {}", BootStrap.getVersion().first.getVersion());
-                InjectorBridge.send("CLOSE");
+                InjectorBridge.send("ED");
                 return;
             }
             Logger.info("Start Loading!");
@@ -25,9 +24,8 @@ public class Loader {
             Logger.warn("Start transforming!");
             MixinManager.transform();
             Logger.success("Welcome {} ver {}", YolBi.name, YolBi.version);
-            InjectorBridge.send("CLOSE");
+            InjectorBridge.send("ED");
             InjectorBridge.close();
-            System.setProperty("skija.library.path", new File(YolBi.YOLBI_DIR,"resources/natives").getAbsolutePath());
             YolBi.initialize();
         } catch (InvocationTargetException e) {
             Logger.exception(e);

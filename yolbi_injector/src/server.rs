@@ -40,11 +40,11 @@ fn handle_client(mut stream: TcpStream) -> io::Result<()> {
                 break;
             }
             prediction_size => {
-                let message = str::from_utf8(&buffer[..prediction_size]).unwrap();
-                let mut values: Vec<&str> = message.split("=>").collect();
-                values[0] = values[0].trim_end_matches("\r\n");
-                if values.len() > 1 { values[1] = values[1].trim_end_matches("\r\n"); }
-                match values[0] {
+                let mut message = str::from_utf8(&buffer[..prediction_size]).unwrap().trim_end_matches("\r\n");
+                let head = if (message.len() > 3) { &message[0..2] } else { message };
+                let body = if (message.contains("=>")) { &message[4..] } else { message };
+
+                match head {
                     "S1" => {
                         progress_bar.reset();
                         progress_bar.set_message("mapping");
@@ -54,12 +54,12 @@ fn handle_client(mut stream: TcpStream) -> io::Result<()> {
                         progress_bar.set_message("transformation");
                     }
                     "P1" => {
-                        if let Ok(value) = values[1].parse::<f32>() {
+                        if let Ok(value) = body.parse::<f32>() {
                             next = value as u64;
                         }
                     }
                     "P2" => {
-                        if let Ok(value) = values[1].parse::<f32>() {
+                        if let Ok(value) = body.parse::<f32>() {
                             next = value as u64;
                         }
                     }
@@ -69,13 +69,13 @@ fn handle_client(mut stream: TcpStream) -> io::Result<()> {
                     "E2" => {
                         progress_bar.finish_and_clear();
                     }
-                    "LOG" => {
-                        if let Ok(value) = values[1].parse::<String>() {
+                    "LG" => {
+                        if let Ok(value) = body.parse::<String>() {
                             print!("\x1b[2K\r{}\n", value.trim_end_matches('\n'));
                             progress_bar.set_position(next)
                         }
                     }
-                    "CLOSE" => {
+                    "ED" => {
                         println!("INJECT SUCCESSFULLY");
                         break;
                     }
