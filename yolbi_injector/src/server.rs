@@ -40,7 +40,7 @@ fn handle_client(mut stream: TcpStream) -> io::Result<()> {
                 break;
             }
             prediction_size => {
-                let mut message = str::from_utf8(&buffer[..prediction_size]).unwrap().trim_end_matches("\r\n");
+                let message = str::from_utf8(&buffer[..prediction_size]).unwrap().trim_end_matches("\r\n");
                 let head = if (message.len() > 3) { &message[0..2] } else { message };
                 let body = if (message.contains("=>")) { &message[4..] } else { message };
 
