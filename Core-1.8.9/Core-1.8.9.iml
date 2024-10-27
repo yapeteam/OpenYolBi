@@ -30,5 +30,6 @@
     <orderEntry type="library" name="obf" level="project" />
     <orderEntry type="library" name="yapeteam" level="project" />
     <orderEntry type="module" module-name="Loader" />
+    <orderEntry type="module" module-name="mcef" />
   </component>
 </module>

@@ -18,6 +18,21 @@
             <file>YOLBI_LICENSE.md</file>
             <file>GPL3_LICENSE.md</file>
         </artifact>
+        <artifact name="definer.jar">
+            <files>out/production/JarLoader</files>
+            <file>YOLBI_LICENSE.md</file>
+            <file>GPL3_LICENSE.md</file>
+        </artifact>
+        <artifact name="hooker.jar">
+            <files>out/production/Hooker</files>
+            <file>YOLBI_LICENSE.md</file>
+            <file>GPL3_LICENSE.md</file>
+        </artifact>
+        <artifact name="mcef.jar">
+            <files>out/production/mcef</files>
+            <file>YOLBI_LICENSE.md</file>
+            <file>GPL3_LICENSE.md</file>
+        </artifact>
         <artifact name="injection-1.8.9.jar" proguard-config="injection-1.8.9.pro">
             <files>out/production/Core-1.8.9</files>
             <files>out/production/VersionInfo</files>
@@ -45,15 +60,15 @@
             </dir>
             <dir name="dependencies">
                 <file>deps/shared/asm-all-9.2.jar</file>
+                <file>build/mcef.jar</file>
             </dir>
-            <!--为防止特征，对loader部分进行闭源-->
-            <files>deps/yapeteam/natives</files>
-            <file>deps/yapeteam/definer.jar</file>
+            <!--为防止特征，对底层loader进行闭源-->
             <file>build/loader.jar</file>
-            <file>deps/yapeteam/hooker.jar</file>
-            <files platform="windows">deps/yapeteam/dll</files>
-            <file platform="windows">yolbi_injector/api/libapi.dll</file>
+            <file>build/definer.jar</file>
+            <file>build/hooker.jar</file>
             <file>build/ymixin.jar</file>
+            <file platform="windows">deps/yapeteam/libinjection.dll</file>
+            <file platform="windows">yolbi_injector/api/libapi.dll</file>
             <!--agent 注入尚未完善-->
             <!--<file>build/agent.jar</file>-->
             <!--<file platform="windows">Loader/dll/build/libagent.dll</file>-->

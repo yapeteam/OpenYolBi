@@ -10,6 +10,7 @@ import cn.yapeteam.yolbi.font.FontManager;
 import cn.yapeteam.yolbi.managers.BotManager;
 import cn.yapeteam.yolbi.managers.RotationManager;
 import cn.yapeteam.yolbi.managers.TargetManager;
+import cn.yapeteam.yolbi.mcef.MCEFInitializer;
 import cn.yapeteam.yolbi.module.ModuleManager;
 import cn.yapeteam.yolbi.notification.Notification;
 import cn.yapeteam.yolbi.notification.NotificationManager;
@@ -81,6 +82,7 @@ public class YolBi {
         instance.eventManager.register(FontManager.class);
         instance.eventManager.register(Shader.class);
         instance.eventManager.register(ESPUtil.class);
+        instance.eventManager.register(MCEFInitializer.class);
         instance.moduleManager.load();
         try {
             instance.getConfigManager().load();

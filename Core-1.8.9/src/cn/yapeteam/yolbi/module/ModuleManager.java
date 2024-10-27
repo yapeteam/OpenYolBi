@@ -56,6 +56,7 @@ public class ModuleManager {
         modules.add(new Sprint());
         modules.add(new StrafeFix());
         modules.add(new ClickUI());
+        modules.add(new WebBrowser());
         modules.add(new ClientTheme());
 //        modules.add(new OldAnimation());
         modules.add(new ESP());
