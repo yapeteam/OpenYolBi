@@ -92,6 +92,7 @@ body {
     display: flex;
     flex-direction: column;
     margin-bottom: 5px;
+    overflow: hidden;
 }
 
 .moduleName {
@@ -102,7 +103,6 @@ body {
 }
 
 .value {
-    
     width: 100%;
     height: 20px;
     font-size: 10px;

@@ -54,6 +54,16 @@
       this.index = index;
       this.enabled = false;
       this.key = 0;
+      this.element.addEventListener("mouseup", this.expand.bind(this));
+      this.expanded = false;
+      this.element.style.height = this.expanded ? "" : "40px";
+    }
+
+    expand(event) {
+      if (event.button === 1) {
+        this.expanded = !this.expanded;
+        this.element.style.height = this.expanded ? "" : "40px";
+      }
     }
 
     convert(v) {
@@ -87,7 +97,7 @@
           panelDiv.id = val;
           panelDiv.classList.add("panel");
           panelDiv.classList.add("content");
-          panelDiv.innerHTML = `<a>${val}</a>`;
+          panelDiv.innerHTML = `<a>${val}🤗</a>`;
           panelDiv.style.zIndex = String(i);
           panelDiv.style.left = 20 + (50 + 200) * i + "px";
           panelDiv.style.top = "80px";
