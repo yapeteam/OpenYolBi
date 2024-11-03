@@ -58,6 +58,7 @@ public class ModuleManager {
         modules.add(new ClickUI());
         modules.add(new WebBrowser());
         modules.add(new ClientTheme());
+        modules.add(new BAHalo());
 //        modules.add(new OldAnimation());
         modules.add(new ESP());
         modules.add(new HeadUpDisplay());

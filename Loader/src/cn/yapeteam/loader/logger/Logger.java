@@ -24,6 +24,7 @@ public class Logger {
         try {
             log = new File(new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss").format(new Date()) + ".log");
             boolean ignored = log.createNewFile();
+            info("log created at {}", log.getAbsolutePath());
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 try {
                     writeCache();

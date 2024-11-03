@@ -29,23 +29,19 @@ pub(crate) fn start() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 static NEXT_PROCESS: AtomicU64 = AtomicU64::new(0);
-static VEC_LOGS: Mutex<Vec<String>> = Mutex::new(Vec::new());
 static RUNNING: AtomicBool = AtomicBool::new(true);
 static PROGRESS_BAR: Lazy<Mutex<ProgressBar>> = Lazy::new(|| {
     let pb = ProgressBar::new(100);
     pb.set_style(ProgressStyle::default_bar()
-        .template("{spinner:.green} [{elapsed_precise}] [{wide_bar:.white}] {pos:>7}/{len:7} {percent:>7}%").unwrap());
+        .template("{spinner:.green} {msg} [{elapsed_precise}] [{wide_bar:.white}] {pos:>7}/{len:7} {percent:>7}%").unwrap()
+        .progress_chars("#-"));
     Mutex::new(pb)
 });
 
 fn handle_client(mut stream: TcpStream) -> io::Result<()> {
     let mut buffer = [0u8; 1024];
-
-    let handle = thread::spawn(move || {
+    thread::spawn(move || {
         while RUNNING.load(Ordering::SeqCst) {
-            let mut logs = VEC_LOGS.lock().unwrap();
-            while let Some(log) = logs.pop() { print!("{}", log); }
-            drop(logs); // 显式释放锁
             let pb = PROGRESS_BAR.lock().unwrap();
             let position = NEXT_PROCESS.load(Ordering::SeqCst);
             pb.set_position(position);
@@ -54,10 +50,13 @@ fn handle_client(mut stream: TcpStream) -> io::Result<()> {
         }
         println!("Output thread exiting");
     });
-
+    let mut logs: Vec<String> = Vec::new();
     while RUNNING.load(Ordering::SeqCst) {
         match stream.read(&mut buffer)? {
             0 => {
+                logs.iter().for_each(|l| {
+                    print!("{}", l);
+                });
                 println!("Connection closed by the client.");
                 break;
             }
@@ -66,7 +65,6 @@ fn handle_client(mut stream: TcpStream) -> io::Result<()> {
                 let head = if message.len() > 3 { &message[0..2] } else { message };
                 let body = if message.contains("=>") { &message[4..] } else { message };
                 let pb = PROGRESS_BAR.lock().unwrap();
-                let mut logs = VEC_LOGS.lock().unwrap();
                 match head {
                     "S1" => {
                         pb.reset();
@@ -86,23 +84,26 @@ fn handle_client(mut stream: TcpStream) -> io::Result<()> {
                     }
                     "LG" => {
                         if let Ok(value) = body.parse::<String>() {
-                            logs.push(format!("\x1b[2K\r{}\n", value.trim_end_matches('\n')));
+                            let line = format!("\x1b[2K\r{}\n", value.trim_end_matches('\n'));
+                            if !(line.contains("=>") || line.len() <= 2) {
+                                logs.push(line);
+                            }
                         }
                     }
                     "ED" => {
-                        println!("INJECT SUCCESSFULLY");
+                        logs.iter().for_each(|l| {
+                            print!("{}", l);
+                        });
+                        pb.finish_with_message("completed");
                         RUNNING.store(false, Ordering::SeqCst);
                         break;
                     }
                     _ => {}
                 }
                 drop(pb);
-                drop(logs);
             }
         }
     }
-
-    handle.join().unwrap(); // 确保输出线程完成
     println!("Press Enter to exit...");
     let mut input = String::new();
     io::stdin().read_line(&mut input).expect("Failed to read line");

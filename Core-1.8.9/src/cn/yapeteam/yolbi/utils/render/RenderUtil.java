@@ -706,7 +706,7 @@ public class RenderUtil {
         }
     }
 
-    private static double getRenderPos(Field field, Object obj) {
+    public static double getRenderPos(Field field, Object obj) {
         try {
             return (double) field.get(obj);
         } catch (IllegalAccessException e) {
