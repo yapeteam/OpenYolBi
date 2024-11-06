@@ -84,7 +84,7 @@ fn handle_client(mut stream: TcpStream) -> io::Result<()> {
                     }
                     "LG" => {
                         if let Ok(value) = body.parse::<String>() {
-                            let line = format!("\x1b[2K\r{}\n", value.trim_end_matches('\n'));
+                            let line = format!("{}\n", value.trim_end_matches('\n'));
                             if !(line.contains("=>") || line.len() <= 2) {
                                 logs.push(line);
                             }

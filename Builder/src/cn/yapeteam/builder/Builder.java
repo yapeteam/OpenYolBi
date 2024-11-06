@@ -25,8 +25,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-import static cn.yapeteam.builder.Compiler.buildModule;
-
 @SuppressWarnings("SameParameterValue")
 public class Builder {
     private static void copyStream(OutputStream os, InputStream is) throws IOException {
@@ -224,7 +222,7 @@ public class Builder {
 
     public static void main(String[] args) throws Exception {
         if (args.length != 1) {
-            if (args.length == 2) {
+            /*if (args.length == 2) {
                 String version = args[1];
                 switch (version) {
                     case "deps":
@@ -255,11 +253,12 @@ public class Builder {
                         );
                         break;
                 }
-            }
+            }*/
             return;
         }
-        boolean advanced_mode = args[0].equals("release");
+        advanced_mode = args[0].equals("release");
         System.setSecurityManager(new NoExitSecurityManager());
+        buildDLL();
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document document = builder.parse("YBuild.xml");
@@ -372,6 +371,75 @@ public class Builder {
         } catch (NoSuchFileException ignored) {
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private static boolean advanced_mode = false;
+
+    private static void buildDLL() throws Exception {
+        if (!new File("Loader/dll").exists()) return;
+        deleteFileByStream("Loader/dll/build");
+        File dir = new File("Loader/dll/build");
+        boolean ignored = dir.mkdirs();
+        String suffix;
+        if (OS.isFamilyWindows()) suffix = ".dll";
+        else if (OS.isFamilyMac()) suffix = ".dylib";
+        else suffix = ".so";
+        System.out.println("Building DLL...");
+        Terminal terminal = new Terminal(dir, null);
+        String[] command;
+        if (OS.isFamilyWindows())
+            command = new String[]{"gcc", "-shared", "../src/shared/agent.c", "-o", "libagent" + suffix};
+        else if (OS.isFamilyMac())
+            command = new String[]{"gcc", "-dynamiclib", "../src/shared/agent.c", "-o", "libagent" + suffix};
+        else command = new String[]{"gcc", "-shared", "../src/shared/agent.c", "-o", "libagent" + suffix};
+        terminal.execute(command);
+
+        if (!OS.isFamilyWindows()) return;
+        if (advanced_mode) {
+            String target = "--target=x86_64-w64-mingw";
+            terminal.execute(new String[]{"clang-cl",
+                    "-mllvm", "-fla", "-mllvm", "-bcf", "-mllvm", "-bcf_prob=80",
+                    "-mllvm", "-bcf_loop=2", "-mllvm", "-sobf", "-mllvm", "-icall",
+                    "-mllvm", "-sub", "-mllvm", "-sub_loop=2", "-mllvm", "-igv",
+                    target, "-c", "../src/dll/Main.c", "-o", "Main.o",});
+            terminal.execute(new String[]{"clang", target, "-c", "../src/dll/ReflectiveLoader.c", "-o", "ReflectiveLoader.o"});
+            terminal.execute(new String[]{"clang-cl",
+                    "-mllvm", "-fla", "-mllvm", "-bcf", "-mllvm", "-bcf_prob=80",
+                    "-mllvm", "-bcf_loop=2", "-mllvm", "-sobf", "-mllvm", "-icall",
+                    "-mllvm", "-sub", "-mllvm", "-sub_loop=2", "-mllvm", "-split",
+                    "-mllvm", "-split_num=5", "-mllvm", "-igv",
+                    target, "-c", "../src/dll/utils.c", "-o", "utils.o"});
+            terminal.execute(new String[]{"clang", "-s", target, "-shared", "Main.o", "ReflectiveLoader.o", "utils.o", "-o", "libinjection.dll"});
+            //terminal.execute(new String[]{"clang-cl",
+            //        "-mllvm", "-fla", "-mllvm", "-bcf", "-mllvm", "-bcf_prob=80",
+            //        "-mllvm", "-bcf_loop=2", "-mllvm", "-sobf", "-mllvm", "-icall",
+            //        "-mllvm", "-sub", "-mllvm", "-sub_loop=2", "-mllvm", "-split",
+            //        "-mllvm", "-split_num=1", "-mllvm", "-igv",
+            //        target, "-c", "../src/inject/GetProcAddressR.c", "-o", "GetProcAddressR.o"});
+            //terminal.execute(new String[]{"clang-cl",
+            //        "-mllvm", "-fla", "-mllvm", "-bcf", "-mllvm", "-bcf_prob=80",
+            //        "-mllvm", "-bcf_loop=2", "-mllvm", "-sobf", "-mllvm", "-icall",
+            //        "-mllvm", "-sub", "-mllvm", "-sub_loop=2", "-mllvm", "-split",
+            //        "-mllvm", "-split_num=1", "-mllvm", "-igv",
+            //        target, "-c", "../src/inject/LoadLibraryR.c", "-o", "LoadLibraryR.o"});
+            //terminal.execute(new String[]{"clang-cl",
+            //        "-mllvm", "-fla", "-mllvm", "-bcf", "-mllvm", "-bcf_prob=80",
+            //        "-mllvm", "-bcf_loop=2", "-mllvm", "-sobf", "-mllvm", "-icall",
+            //        "-mllvm", "-sub", "-mllvm", "-sub_loop=2", "-mllvm", "-split",
+            //        "-mllvm", "-split_num=1", "-mllvm", "-igv",
+            //        target, "-c", "../src/inject/Inject.c", "-o", "Inject.o"});
+            //terminal.execute(new String[]{"clang", "-s",
+            //        target, "-shared", "GetProcAddressR.o", "LoadLibraryR.o", "Inject.o", "-o", "libapi.dll"});
+        } else {
+            terminal.execute(new String[]{"gcc", "-s", "-c", "../src/dll/Main.c", "-o", "Main.o"});
+            terminal.execute(new String[]{"gcc", "-s", "-c", "../src/dll/ReflectiveLoader.c", "-o", "ReflectiveLoader.o"});
+            terminal.execute(new String[]{"gcc", "-s", "-c", "../src/dll/utils.c", "-o", "utils.o"});
+            terminal.execute(new String[]{"gcc", "-s", "-shared", "Main.o", "ReflectiveLoader.o", "utils.o", "-o", "libinjection.dll"});
+            //terminal.execute(new String[]{"gcc", "-s", "-c", "../src/inject/GetProcAddressR.c", "-o", "GetProcAddressR.o"});
+            //terminal.execute(new String[]{"gcc", "-s", "-c", "../src/inject/LoadLibraryR.c", "-o", "LoadLibraryR.o"});
+            //terminal.execute(new String[]{"gcc", "-s", "-c", "../src/inject/Inject.c", "-o", "Inject.o"});
+            //terminal.execute(new String[]{"gcc", "-s", "-shared", "GetProcAddressR.o", "LoadLibraryR.o", "Inject.o", "-o", "libapi.dll"});
         }
     }
 
