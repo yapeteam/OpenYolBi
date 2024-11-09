@@ -343,9 +343,11 @@ public class Builder {
                         copyStream(outputStream, Files.newInputStream(new File(output_dir, "injection.zip").toPath()));
                     }
                     Terminal terminal = new Terminal(new File("yolbi_injector"), null);
-                    terminal.execute(new String[]{"cargo", "build", "-r"});
+                    if (advanced_mode)
+                        terminal.execute(new String[]{"cargo", "build", "-r"});
+                    else terminal.execute(new String[]{"cargo", "build"});
                     try (OutputStream outputStream = Files.newOutputStream(new File(output_dir, "word.exe").toPath())) {
-                        copyStream(outputStream, Files.newInputStream(Paths.get("yolbi_injector/target/release/yolbi_injector.exe")));
+                        copyStream(outputStream, Files.newInputStream(Paths.get(String.format("yolbi_injector/target/%s/yolbi_injector.exe", advanced_mode ? "release" : "debug"))));
                     }
                 }
             }
