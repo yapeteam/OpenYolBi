@@ -20,6 +20,7 @@ import cn.yapeteam.yolbi.shader.Shader;
 import cn.yapeteam.yolbi.utils.animation.Easing;
 import cn.yapeteam.yolbi.utils.render.ESPUtil;
 import lombok.Getter;
+import net.montoyo.mcef.MCEF;
 
 import java.io.File;
 import java.io.IOException;
@@ -106,6 +107,7 @@ public class YolBi {
             eventManager.post(new EventClientShutdown());
             configManager.save();
             WebServer.stop();
+            MCEF.onMinecraftShutdown();
             instance = new YolBi();
             System.gc();
         } catch (IOException e) {
