@@ -450,7 +450,7 @@ public class BAHalo extends Module {
         GlStateManager.disableDepth();
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
-        RenderUtil.color(new Color(237, 110 + (int) (animation.getValue() * 600), 183, 220)); // RGB for pink
+        RenderUtil.color(new Color(237, MathHelper.clamp_int(110 + (int) (animation.getValue() * 600), 0, 255), 183, 220)); // RGB for pink
 
         float yaw = mc.thePlayer.rotationYaw;
 
