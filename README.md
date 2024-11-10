@@ -3,6 +3,10 @@
   <img src="https://avatars.githubusercontent.com/u/159465859?s=64&v=4" alt="YolBi Lite" img>
 </p>
 
+[![License](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+
+[![GitHub Activity](https://img.shields.io/badge/GitHub-Active-brightgreen)](https://github.com/yapeteam)
+
 为支持Minecraft开源社区 ~~(打死妖猫的圈钱梦想)~~ ，我决定开放YolBi Lite Legacy分支
 
 为防止二次特征，loader模块不予公开
@@ -18,6 +22,12 @@
 # Join Us
 
 QQ Group: 699481681
+
+# Support Us 支持我们的工作
+
+[![Afdian](https://img.shields.io/badge/爱发电-TIMER__err-8A2BE2)](https://afdian.com/a/TIMER_err)
+
+赞助分配实行按劳分配
 
 ## TODO List
 
