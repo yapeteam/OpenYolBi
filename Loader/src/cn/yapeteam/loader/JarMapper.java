@@ -8,7 +8,6 @@ import cn.yapeteam.ymixin.annotations.Mixin;
 import cn.yapeteam.ymixin.annotations.Shadow;
 import cn.yapeteam.ymixin.utils.ASMUtils;
 import lombok.val;
-import lombok.var;
 import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm_9_2.ClassWriter;
 import org.objectweb.asm_9_2.tree.ClassNode;
@@ -66,13 +65,13 @@ public class JarMapper {
     public static void dispose(File file, String jarName, ClassMapper.MapMode mode) throws Throwable {
         InjectorBridge.send("S1");
         var all = 0;
-        try (val zis = new ZipInputStream(Files.newInputStream(file.toPath()))) {
+        try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(file.toPath()))) {
             while (zis.getNextEntry() != null) all++;
         }
-        val zos = new ZipOutputStream(Files.newOutputStream(Paths.get(Loader.YOLBI_DIR + "/" + jarName)));
+        ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(Paths.get(Loader.YOLBI_DIR + "/" + jarName)));
         zos.setMethod(ZipOutputStream.DEFLATED);
         zos.setLevel(Deflater.BEST_COMPRESSION);
-        try (val zis = new ZipInputStream(Files.newInputStream(file.toPath()))) {
+        try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(file.toPath()))) {
             ZipEntry se;
             int count = 0;
             while ((se = zis.getNextEntry()) != null) {

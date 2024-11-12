@@ -12,7 +12,6 @@ import cn.yapeteam.yolbi.module.values.impl.NumberValue;
 import cn.yapeteam.yolbi.utils.misc.TimerUtil;
 import cn.yapeteam.yolbi.utils.network.PacketUtil;
 import cn.yapeteam.yolbi.utils.render.RenderUtil;
-import lombok.var;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;

@@ -10,7 +10,6 @@ public class BooleanValue extends Value<Boolean> {
         super(name);
         this.value = value;
     }
-
     public BooleanValue(String name, Visibility visibility, boolean value) {
         this(name, value);
         setVisibility(visibility);
