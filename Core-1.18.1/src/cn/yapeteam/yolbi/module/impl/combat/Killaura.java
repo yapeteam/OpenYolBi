@@ -6,13 +6,19 @@ import cn.yapeteam.yolbi.module.Module;
 import cn.yapeteam.yolbi.module.ModuleCategory;
 import cn.yapeteam.yolbi.module.values.impl.BooleanValue;
 import cn.yapeteam.yolbi.module.values.impl.NumberValue;
+import cn.yapeteam.yolbi.utils.misc.EntityUtils;
 import cn.yapeteam.yolbi.utils.player.RotationUtils;
+import cn.yapeteam.yolbi.utils.player.RotationsUtil;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.event.entity.living.LivingEvent;
+import cn.yapeteam.yolbi.utils.*;
 
+import java.security.PrivilegedAction;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -21,99 +27,57 @@ public class Killaura extends Module {
 
     public Killaura() {
         super("Killaura",ModuleCategory.COMBAT,InputConstants.KEY_R);
-        addValues(cps, range, aimrange,team,padaren);
+        addValues(cpsValue, rangeValue);
     }
-    public NumberValue<Double> range = new NumberValue<Double>("range",3.4d,2.5,6.1d,0.1d);
-    public NumberValue<Double> aimrange = new NumberValue<Double>("preaim",4.5d,2.5d,10.2d,0.1d);
-    public NumberValue<Integer> cps = new NumberValue<Integer>("cps",7,1,20,1);
-    public BooleanValue team = new BooleanValue("Team",false);
-    public BooleanValue padaren = new BooleanValue("发包打人",true);
-    public LivingEntity findtarget(){
-        List<LivingEntity> targets = null;
-        for (Entity entity : mc.level.entitiesForRendering()) {
-            mc.gui.getChat().addMessage(new TextComponent("at"));
-            if (entity instanceof LivingEntity) {
-                mc.gui.getChat().addMessage(new TextComponent("it1"));
-                LivingEntity livingEntity = (LivingEntity)entity;
-                if (true) {
-                    mc.gui.getChat().addMessage(new TextComponent("it2"));
-                    targets.add(livingEntity);
-                }
-            }
-        }
-       if(targets!=null){
-           mc.gui.getChat().addMessage(new TextComponent("5at"));
-           return targets.get(0);
-       }
-       else{
-           mc.gui.getChat().addMessage(new TextComponent("a4t"));
-           return null;
-       }
-    }
-    public LivingEntity target;
+    private  NumberValue<Integer> cpsValue = new NumberValue<Integer>("CPS", 11, 1, 20, 1);
+    private  NumberValue<Double> rangeValue = new NumberValue<Double>("Range", 2.65, 2.0, 6.0, 0.01);
+    private  NumberValue<Integer> player = new NumberValue<Integer>("Player",1,0,1,1);
+    private static LivingEntity target;
+    private final List<LivingEntity> targets = new ArrayList<>();
+
     @Override
     protected void onEnable() {
-        target = findtarget();
+        this.targets.clear();
+        target = null;
     }
 
     @Override
     protected void onDisable() {
+        this.targets.clear();
+        target = null;
     }
+
     @Listener
-    private void onUpdate(EventRender2D event) {
-        try {
-            if(mc.player==null)return;
-            target = findtarget();
-            mc.gui.getChat().addMessage(new TextComponent("a3"));
-            if(targetrange(target)<=aimrange.getValue()||target.isDeadOrDying()){
-                target = findtarget();
-                mc.gui.getChat().addMessage(new TextComponent("a4"));
-            }
-            if (target != null) {
-                mc.gui.getChat().addMessage(new TextComponent("A"));
-                float[] rotations = RotationUtils.getSimpleRotations(target);
-                mc.player.setYRot(rotations[0]);
-                mc.player.setXRot(rotations[1]);
-            }else{
-                mc.gui.getChat().addMessage(new TextComponent("目标为空"));
-            }
-            mc.gui.getChat().addMessage(new TextComponent("A"));
-        }catch (Exception e){
-            mc.gui.getChat().addMessage(new TextComponent("a2"));
-        }
-
-    }
-    public boolean targetcheak(LivingEntity target){
-        return target.isDeadOrDying() || target.isInvisible();
-    }
-    public double targetrange(LivingEntity target){
-        if(mc.player==null)return -1;
-        return Math.abs(mc.player.getX() - target.getX())+Math.abs(mc.player.getY() - target.getY())+Math.abs(mc.player.getZ() - target.getZ());
-    }
-    public long delay = (long) (1000 / generate(cps.getValue(), range.getValue()));
-    public void gjtar(LivingEntity target){
-        if(target!=null&&mc.player!=null){
-            try{
-                if(targetrange(target)<=range.getValue()&&padaren.getValue()){
-                    mc.player.attack(target);
-                }else if(targetrange(target)<=range.getValue()&&!padaren.getValue()){
-
+    public void oner(EventRender2D event) {
+        List<LivingEntity> targets = new ArrayList<>();
+        mc.gui.getChat().addMessage(new TextComponent("AAA3A"));
+        for (Entity entity : mc.level.entitiesForRendering()) {
+            if (entity instanceof LivingEntity) {
+                LivingEntity livingEntity = (LivingEntity)entity;
+                if (true) {
+                    targets.add(livingEntity);
                 }
-                TimeUnit.MILLISECONDS.sleep(delay);
-            }catch (Exception e){
-                mc.gui.getChat().addMessage(new TextComponent(e.getMessage()));
             }
         }
-    }
-    private static final Random random = new Random();
 
-    public static double generate(double cps, double range) {
-        double mean = 1000.0 / cps;
-        double stddev = mean * range / cps;
-        double noise;
-        do {
-            noise = mean + random.nextGaussian() * stddev;
-        } while (noise <= 0);
-        return Math.max(noise, 1);
+        target = null;
+        if (!targets.isEmpty()) {
+            mc.gui.getChat().addMessage(new TextComponent("AA32A"));
+            target = targets.get(0);
+        }
+
+        if (target != null) {
+            mc.gui.getChat().addMessage(new TextComponent("AAA2A"));
+            float[] rotations = RotationUtils.getSimpleRotations(target);
+            mc.gui.getChat().addMessage(new TextComponent(String.valueOf(rotations[0])));
+            mc.gui.getChat().addMessage(new TextComponent(String.valueOf(rotations[1])));
+            mc.gui.getChat().addMessage(new TextComponent("AAA2A"));
+            mc.player.setYRot(rotations[0]);
+            mc.player.setXRot(rotations[1]);
+        }
     }
+
+           // mc.getConnection().send(ServerboundInteractPacket.createAttackPacket(target, mc.player.isShiftKeyDown()));
+          //  mc.player.swing(InteractionHand.MAIN_HAND);
+
 }

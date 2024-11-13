@@ -30,5 +30,7 @@
     <orderEntry type="library" name="yapeteam" level="project" />
     <orderEntry type="module" module-name="Loader" />
     <orderEntry type="library" name="forge-1.12.2" level="project" />
+    <orderEntry type="library" name="minecraft-1.8.9" level="project" />
+    <orderEntry type="module" module-name="Core-1.8.9" />
   </component>
 </module>

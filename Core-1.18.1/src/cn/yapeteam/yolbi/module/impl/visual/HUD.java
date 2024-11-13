@@ -24,7 +24,7 @@ public class HUD extends Module {
         AbstractFontRenderer font = YolBi.instance.getFontManager().getPingFang14();
 
         float y = 2, height = 8;
-        font.drawStringWithShadow(poseStack, "Oxycontin v" + VersionInfo.version, 2, 2, -1);
+        font.drawStringWithShadow(poseStack, "YolBi " + VersionInfo.version, 2, 2, -1);
         y += height;
         for (Module module : YolBi.instance.getModuleManager().getModules().stream().filter(Module::isEnabled).collect(Collectors.toList())) {
             font.drawStringWithShadow(poseStack, module.getName() + (module.getSuffix() != null ? (" " + ChatFormatting.GRAY + module.getSuffix()) : ""), 2, y, -1);
