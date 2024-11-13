@@ -46,7 +46,9 @@ public class Killaura extends Module {
         this.targets.clear();
         target = null;
     }
-
+    public final boolean cheak(LivingEntity a){
+        return !a.isDeadOrDying()&&!a.isInvisible()&&a!=mc.player;
+    }
     @Listener
     public void oner(EventRender2D event) {
         List<LivingEntity> targets = new ArrayList<>();
@@ -54,7 +56,7 @@ public class Killaura extends Module {
         for (Entity entity : mc.level.entitiesForRendering()) {
             if (entity instanceof LivingEntity) {
                 LivingEntity livingEntity = (LivingEntity)entity;
-                if (true) {
+                if (cheak(livingEntity)) {
                     targets.add(livingEntity);
                 }
             }
@@ -72,6 +74,7 @@ public class Killaura extends Module {
             mc.gui.getChat().addMessage(new TextComponent(String.valueOf(rotations[0])));
             mc.gui.getChat().addMessage(new TextComponent(String.valueOf(rotations[1])));
             mc.gui.getChat().addMessage(new TextComponent("AAA2A"));
+            mc.gui.getChat().addMessage(new TextComponent(target.getName().toString()));
             mc.player.setYRot(rotations[0]);
             mc.player.setXRot(rotations[1]);
         }

@@ -1,11 +1,12 @@
 package cn.yapeteam.yolbi.utils.player;
 
+import cn.yapeteam.yolbi.utils.player.Wrapper;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import cn.yapeteam.yolbi.utils.player.Vector3d;
-import cn.yapeteam.yolbi.utils.player.Wrapper;
+
 
 public class RotationUtils implements Wrapper {
    public static double getDistanceToEntityBox(Entity target) {
