@@ -68,12 +68,12 @@ public class Killaura extends Module {
 
 
         target = null;
-        if(targets.isEmpty()||target==null||target!=null&&unjztargetrange(target)>=rangeValue.getValue()){
+
             target = findtarget();
             if(target==null){
                 return;
             }
-        }
+
         if (!targets.isEmpty()) {
             //mc.gui.getChat().addMessage(new TextComponent("AA32A"));
             target = targets.get(0);
