@@ -31,7 +31,8 @@ QQ Group: 699481681
 
 ## TODO List
 
-- [ ] 1.18.1 bypass for `布吉岛`
+- [X] 1.18.1 bypass for `布吉岛`
+- [ ] 1.18.1 more bypass for `宝马岛`
 - [ ] 更加美丽的视觉
 - [X] 注入器重构
 - [ ] 能打HVH😡
