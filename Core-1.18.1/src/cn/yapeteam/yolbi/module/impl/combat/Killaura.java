@@ -4,23 +4,14 @@ import cn.yapeteam.yolbi.event.Listener;
 import cn.yapeteam.yolbi.event.impl.render.EventRender2D;
 import cn.yapeteam.yolbi.module.Module;
 import cn.yapeteam.yolbi.module.ModuleCategory;
-import cn.yapeteam.yolbi.module.values.impl.BooleanValue;
 import cn.yapeteam.yolbi.module.values.impl.NumberValue;
-import cn.yapeteam.yolbi.utils.misc.EntityUtils;
 import cn.yapeteam.yolbi.utils.player.RotationUtils;
-import cn.yapeteam.yolbi.utils.player.RotationsUtil;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraftforge.event.entity.living.LivingEvent;
-import cn.yapeteam.yolbi.utils.*;
-
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 public class Killaura extends Module {
@@ -34,12 +25,12 @@ public class Killaura extends Module {
     private  NumberValue<Double> rangeValue = new NumberValue<Double>("Range", 2.65, 2.0, 6.0, 0.01);
     private  NumberValue<Integer> player = new NumberValue<Integer>("Player",1,0,1,1);
     private static LivingEntity target;
-    List<LivingEntity> targets = new ArrayList<>();
+    private List<LivingEntity> targets = new ArrayList<>();
 
     @Override
     protected void onEnable() {
         this.targets.clear();
-        target = null;
+        target = findtarget();
     }
 
     @Override
@@ -50,49 +41,64 @@ public class Killaura extends Module {
     public final boolean cheak(LivingEntity a){
         return !a.isDeadOrDying()&&!a.isInvisible()&&a!=mc.player;
     }
-    public final LivingEntity findtarget(){
+    public  LivingEntity findtarget(){
        targets.clear();
-        //  mc.gui.getChat().addMessage(new TextComponent("AAA3A"));
         for (Entity entity : mc.level.entitiesForRendering()) {
             if (entity instanceof LivingEntity) {
                 LivingEntity livingEntity = (LivingEntity)entity;
-                if (cheak(livingEntity)) {
-                    return livingEntity;
+                if(target==null){
+                    if(livingEntity!=mc.player&&!livingEntity.isInvisible()){
+                        mc.gui.getChat().addMessage(new TextComponent(livingEntity.getName().toString()));
+                        return livingEntity;
+                    }
+                }
+                if(unjztargetrange(livingEntity)<=aimrange.getValue()){
+                    if(target!=null){
+                        if (cheak(livingEntity)&&unjztargetrange(livingEntity)<unjztargetrange(target)) {
+                            mc.gui.getChat().addMessage(new TextComponent("A3"));
+                            return livingEntity;
+                        }
+                    }else{
+                        if (cheak(livingEntity)) {
+                            mc.gui.getChat().addMessage(new TextComponent("A4"));
+                            return livingEntity;
+                        }
+                    }
+
                 }
             }
         }
         return null;
     }
+    public LivingEntity ta;
     @Listener
     public void oner(EventRender2D event) {
-
-
-        target = null;
-
-            target = findtarget();
-            if(target==null){
-                return;
-            }
-
-        if (!targets.isEmpty()) {
-            //mc.gui.getChat().addMessage(new TextComponent("AA32A"));
-            target = targets.get(0);
-        }
-
+        ta = findtarget();
+        target = ta;
         if (target != null) {
-          // mc.gui.getChat().addMessage(new TextComponent("AAA2A"));
-            float[] rotations = RotationUtils.getSimpleRotations(target);
-        //    mc.gui.getChat().addMessage(new TextComponent(String.valueOf(rotations[0])));
-         //   mc.gui.getChat().addMessage(new TextComponent(String.valueOf(rotations[1])));
-          //  mc.gui.getChat().addMessage(new TextComponent("AAA2A"));
-         //   mc.gui.getChat().addMessage(new TextComponent(target.getName().toString()));
-            mc.player.setYRot(rotations[0]);
-            mc.player.setXRot(rotations[1]);
+            if(unjztargetrange(target)<=aimrange.getValue()){
+                float[] rotations = RotationUtils.getSimpleRotations(target);
+                mc.player.setYRot(rotations[0]);
+                mc.player.setXRot(rotations[1]);
+                mc.gui.getChat().addMessage(new TextComponent(target.getName().toString()));
+            }
+            mc.gui.getChat().addMessage(new TextComponent(target.getName().toString()+" SP"));
+        }else{
+            mc.gui.getChat().addMessage(new TextComponent("A"));
         }
     }
-
            // mc.getConnection().send(ServerboundInteractPacket.createAttackPacket(target, mc.player.isShiftKeyDown()));
           //  mc.player.swing(InteractionHand.MAIN_HAND);
-public final double jztargetrange(LivingEntity a){return Math.abs(a.getX()-mc.player.getX()) + Math.abs(a.getZ()-mc.player.getZ()) + Math.abs(a.getY()-mc.player.getY());}
-public final double unjztargetrange(LivingEntity a){return Math.abs(a.getX()-mc.player.getX()) + Math.abs(a.getZ()-mc.player.getZ()) ;}
+public final double jztargetrange(LivingEntity a){
+    if (mc.player != null) {
+        return Math.abs(a.getX()-mc.player.getX()) + Math.abs(a.getZ()-mc.player.getZ()) + Math.abs(a.getY()-mc.player.getY());
+    }
+    return -1;
+}
+public final double unjztargetrange(LivingEntity a){
+    if (mc.player != null) {
+        return Math.abs(a.getX()-mc.player.getX()) + Math.abs(a.getZ()-mc.player.getZ()) ;
+    }
+    return -1;
+}
 }
