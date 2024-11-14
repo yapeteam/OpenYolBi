@@ -48,19 +48,19 @@ public class Killaura extends Module {
                 LivingEntity livingEntity = (LivingEntity)entity;
                 if(target==null){
                     if(livingEntity!=mc.player&&!livingEntity.isInvisible()){
-                        mc.gui.getChat().addMessage(new TextComponent(livingEntity.getName().toString()));
+                      //  mc.gui.getChat().addMessage(new TextComponent(livingEntity.getName().toString()));
                         return livingEntity;
                     }
                 }
                 if(unjztargetrange(livingEntity)<=aimrange.getValue()){
                     if(target!=null){
                         if (cheak(livingEntity)&&unjztargetrange(livingEntity)<unjztargetrange(target)) {
-                            mc.gui.getChat().addMessage(new TextComponent("A3"));
+                           // mc.gui.getChat().addMessage(new TextComponent("A3"));
                             return livingEntity;
                         }
                     }else{
                         if (cheak(livingEntity)) {
-                            mc.gui.getChat().addMessage(new TextComponent("A4"));
+                          //  mc.gui.getChat().addMessage(new TextComponent("A4"));
                             return livingEntity;
                         }
                     }
@@ -78,13 +78,13 @@ public class Killaura extends Module {
         if (target != null) {
             if(unjztargetrange(target)<=aimrange.getValue()){
                 float[] rotations = RotationUtils.getSimpleRotations(target);
-                mc.player.setYRot(rotations[0]);
-                mc.player.setXRot(rotations[1]);
+                mc.player.setYRot((float) (rotations[0] + (Math.random()*0.7) + -0.7));
+                mc.player.setXRot((float) (rotations[1]+(Math.random()*0.7) + -0.7));
                 mc.gui.getChat().addMessage(new TextComponent(target.getName().toString()));
             }
-            mc.gui.getChat().addMessage(new TextComponent(target.getName().toString()+" SP"));
+         //   mc.gui.getChat().addMessage(new TextComponent(target.getName().toString()+" SP"));
         }else{
-            mc.gui.getChat().addMessage(new TextComponent("A"));
+          //  mc.gui.getChat().addMessage(new TextComponent("A"));
         }
     }
            // mc.getConnection().send(ServerboundInteractPacket.createAttackPacket(target, mc.player.isShiftKeyDown()));
