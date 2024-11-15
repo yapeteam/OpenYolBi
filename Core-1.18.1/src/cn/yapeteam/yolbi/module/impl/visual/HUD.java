@@ -20,7 +20,7 @@ public class HUD extends Module {
     public ConfigManager cm = YolBi.instance.getcfgmanager();
     public AbstractFontRenderer bt = YolBi.instance.getFontManager().getJelloRegular18();
     public AbstractFontRenderer ERor = YolBi.instance.getFontManager().getMINE18();
-    public AbstractFontRenderer font = YolBi.instance.getFontManager().getJelloRegular14();
+    public AbstractFontRenderer font = YolBi.instance.getFontManager().getMINE14();
     public String text = "";
     public int x = 2,y=10,c = -1;
 
@@ -34,7 +34,7 @@ public class HUD extends Module {
             ERor.drawStringWithShadow(poseStack,"致命错误:CFG读取失败",mc.screen.width/2,mc.screen.height/2,4);
         }
         c+=1;
-        if(c>5){
+        if(c>114514){
             c=-1;
         }
         text ="";

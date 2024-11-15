@@ -2,6 +2,7 @@ package cn.yapeteam.yolbi.module;
 
 import cn.yapeteam.yolbi.event.Listener;
 import cn.yapeteam.yolbi.event.impl.game.EventKey;
+import cn.yapeteam.yolbi.module.impl.combat.AntiKb;
 import cn.yapeteam.yolbi.module.impl.combat.AutoClicker;
 import cn.yapeteam.yolbi.module.impl.combat.Killaura;
 import cn.yapeteam.yolbi.module.impl.misc.SelfDestruct;
@@ -26,6 +27,7 @@ public class ModuleManager {
         modules.add(new Eagle());
         modules.add(new HUD());
         modules.add(new Killaura());
+        modules.add(new AntiKb());
         modules.sort((m1, m2) -> -Integer.compare(m2.getName().charAt(0), m1.getName().charAt(0)));
     }
 
