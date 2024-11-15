@@ -42,7 +42,7 @@ fn main() {
                          "   ╚═╝    ╚═════╝ ╚══════╝╚═════╝ ╚═╝    ╚══════╝╚═╝   ╚═╝   ╚══════╝"
                  )
         );
-        println!("爱来自Yolbi Team \n您使用此工具学习期间您做的任何事都与我们Yolbi Team无关\n此工具禁止注入网易进行学习，如违反您自己承担所有责任")
+        println!("爱来自Yolbi Team \n您使用此工具学习期间您做的任何事都与我们Yolbi Team无关\n此工具禁止注入网易进行学习，如违反您自己承担所有责任");
         if print.is_ok() {
             let symbol: Symbol<fn()> = print.unwrap();
             symbol();
