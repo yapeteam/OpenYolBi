@@ -10,6 +10,7 @@ import cn.yapeteam.yolbi.managers.RotationManager;
 import cn.yapeteam.yolbi.module.ModuleManager;
 import cn.yapeteam.yolbi.server.WebServer;
 import lombok.Getter;
+import net.minecraft.world.entity.PlayerRideable;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,13 +28,17 @@ public class YolBi {
     private RotationManager rotationManager;
     private CommandManager commandManager;
     private FontManager fontManager;
-
+    private ConfigManager cfgmanager;
     public EventManager getEventManager() {
         if (eventManager == null)
             eventManager = new EventManager();
         return eventManager;
     }
-
+    public ConfigManager getcfgmanager(){
+        if (cfgmanager == null)
+            cfgmanager = new ConfigManager();
+        return cfgmanager;
+    }
     public RotationManager getRotationManager() {
         if (rotationManager == null)
             rotationManager = new RotationManager();

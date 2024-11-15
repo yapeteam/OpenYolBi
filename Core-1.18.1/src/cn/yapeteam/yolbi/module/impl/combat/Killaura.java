@@ -7,12 +7,10 @@ import cn.yapeteam.yolbi.module.ModuleCategory;
 import cn.yapeteam.yolbi.module.values.impl.NumberValue;
 import cn.yapeteam.yolbi.utils.player.RotationUtils;
 import com.mojang.blaze3d.platform.InputConstants;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public class Killaura extends Module {
 
@@ -52,7 +50,7 @@ public class Killaura extends Module {
                         return livingEntity;
                     }
                 }
-                if(unjztargetrange(livingEntity)<=aimrange.getValue()){
+                if(unjztargetrange(livingEntity)<aimrange.getValue()){
                     if(target!=null){
                         if (cheak(livingEntity)&&unjztargetrange(livingEntity)<unjztargetrange(target)) {
                            // mc.gui.getChat().addMessage(new TextComponent("A3"));
@@ -78,9 +76,21 @@ public class Killaura extends Module {
         if (target != null) {
             if(unjztargetrange(target)<=aimrange.getValue()){
                 float[] rotations = RotationUtils.getSimpleRotations(target);
-                mc.player.setYRot((float) (rotations[0] + (Math.random()*0.7) + -0.7));
-                mc.player.setXRot((float) (rotations[1]+(Math.random()*0.7) + -0.7));
-                mc.gui.getChat().addMessage(new TextComponent(target.getName().toString()));
+                float tr = (float) jztargetrange(target);
+                if(tr>=16){
+                    tr = 12.9f;
+                }
+                if(Math.abs(rotations[0]-mc.player.getYRot())<=16f-tr){
+                    rotations[0] = mc.player.getYRot();
+                }if(Math.abs(rotations[0]-mc.player.getYRot())<=16f-tr){
+                    rotations[1] = mc.player.getXRot();
+                }
+                if((int)((Math.random()*4) + -3)==1){
+                    rotations[0]+= (float) ((Math.random()*0.7) + -0.7);
+                }
+                mc.player.setYRot(rotations[0]);
+                mc.player.setXRot(rotations[1]);
+                //mc.gui.getChat().addMessage(new TextComponent(target.getName().toString()));
             }
          //   mc.gui.getChat().addMessage(new TextComponent(target.getName().toString()+" SP"));
         }else{

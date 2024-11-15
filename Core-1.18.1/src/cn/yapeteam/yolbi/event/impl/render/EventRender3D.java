@@ -10,4 +10,8 @@ import lombok.Getter;
 public class EventRender3D extends Event {
     private PoseStack poseStack;
     private float partialTicks;
+
+    public PoseStack poseStack() {
+        return poseStack;
+    }
 }
