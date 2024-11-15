@@ -16,7 +16,7 @@ public class Killaura extends Module {
 
     public Killaura() {
         super("Killaura",ModuleCategory.COMBAT,InputConstants.KEY_R);
-        addValues(cpsValue, rangeValue);
+        addValues(cpsValue, rangeValue,aimrange);
     }
     private  NumberValue<Double> aimrange = new NumberValue<Double>("aIMRANGE",4.5,3.1,7.1,0.1);
     private  NumberValue<Integer> cpsValue = new NumberValue<Integer>("CPS", 11, 1, 20, 1);
