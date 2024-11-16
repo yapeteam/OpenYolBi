@@ -24,7 +24,6 @@ public class Killaura extends Module {
     private  NumberValue<Integer> player = new NumberValue<Integer>("Player",1,0,1,1);
     private static LivingEntity target;
     private List<LivingEntity> targets = new ArrayList<>();
-
     @Override
     protected void onEnable() {
         this.targets.clear();

@@ -1,18 +1,12 @@
 package cn.yapeteam.yolbi.module.impl.combat;
 
 import cn.yapeteam.loader.Natives;
-import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.event.Listener;
-import cn.yapeteam.yolbi.event.impl.network.EventPacket;
 import cn.yapeteam.yolbi.event.impl.render.EventRender2D;
 import cn.yapeteam.yolbi.module.Module;
 import cn.yapeteam.yolbi.module.ModuleCategory;
-import cn.yapeteam.yolbi.utils.math.MathUtils;
 import cn.yapeteam.yolbi.utils.misc.VirtualKeyBoard;
 import com.mojang.blaze3d.platform.InputConstants;
-import net.minecraft.network.play.server.S14PacketEntity;
-import net.minecraft.network.play.server.SPacketEntityVelocity;
-import net.minecraft.util.profiling.jfr.event.PacketEvent;
 import net.minecraft.world.entity.MoverType;
 
 
@@ -21,7 +15,6 @@ public class AntiKb extends Module {
     public AntiKb (){
         super("AntiKB", ModuleCategory.COMBAT, InputConstants.KEY_R);
     }
-    public Killaura ka = YolBi.instance.getka();
     public float h ;
     @Override
     protected void onEnable() {
@@ -37,7 +30,7 @@ public class AntiKb extends Module {
     public void onPacket(EventRender2D event) {
         double x = mc.player.getX(),z = mc.player.getZ();
         if (mc.player != null) return;
-        if (ka.findtarget().canAttack(mc.player) || mc.player.getHealth()<h) {
+        if (mc.player.getHealth()<h) {
             Natives.SetKeyBoard(VirtualKeyBoard.VK_SPACE, true);
             mc.player.move(MoverType.PLAYER,mc.player.position().add(0.01,0,0.01));
             mc.player.moveTo(x,mc.player.getY(),z);
@@ -45,7 +38,6 @@ public class AntiKb extends Module {
             //Natives.SetKeyBoard(VirtualKeyBoard.VK_SPACE,false);
             h = mc.player.getHealth();
         }
-        mc.player.setJumping(false);
     }
 }
 
