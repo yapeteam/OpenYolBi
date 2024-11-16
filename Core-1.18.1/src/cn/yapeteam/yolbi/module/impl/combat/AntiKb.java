@@ -41,9 +41,11 @@ public class AntiKb extends Module {
             Natives.SetKeyBoard(VirtualKeyBoard.VK_SPACE, true);
             mc.player.move(MoverType.PLAYER,mc.player.position().add(0.01,0,0.01));
             mc.player.moveTo(x,mc.player.getY(),z);
-            Natives.SetKeyBoard(VirtualKeyBoard.VK_SPACE,false);
+            mc.player.setJumping(true);
+            //Natives.SetKeyBoard(VirtualKeyBoard.VK_SPACE,false);
             h = mc.player.getHealth();
         }
+        mc.player.setJumping(false);
     }
 }
 

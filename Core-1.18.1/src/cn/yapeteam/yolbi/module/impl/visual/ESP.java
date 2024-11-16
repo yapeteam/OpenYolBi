@@ -1,6 +1,7 @@
 package cn.yapeteam.yolbi.module.impl.visual;
 
 import cn.yapeteam.yolbi.event.Listener;
+import cn.yapeteam.yolbi.event.impl.render.EventRender2D;
 import cn.yapeteam.yolbi.event.impl.render.EventRender3D;
 import cn.yapeteam.yolbi.module.Module;
 import cn.yapeteam.yolbi.module.ModuleCategory;
@@ -19,7 +20,7 @@ public class ESP extends Module {
         super("ESP",ModuleCategory.VISUAL, InputConstants.KEY_L);
     }
     @Listener
-    public void onRender3D(EventRender3D event) {
+    public void onRender2D(EventRender2D event) {
         if (mc.player != null && mc.level != null) {
             PoseStack poseStack = event.poseStack();
             for (Entity entity : mc.level.entitiesForRendering()) {
