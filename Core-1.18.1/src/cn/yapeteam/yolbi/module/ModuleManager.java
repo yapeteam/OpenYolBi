@@ -8,6 +8,7 @@ import cn.yapeteam.yolbi.module.impl.combat.Killaura;
 import cn.yapeteam.yolbi.module.impl.misc.SelfDestruct;
 import cn.yapeteam.yolbi.module.impl.movement.Eagle;
 import cn.yapeteam.yolbi.module.impl.visual.ClientTheme;
+import cn.yapeteam.yolbi.module.impl.visual.ESP;
 import cn.yapeteam.yolbi.module.impl.visual.HUD;
 import lombok.Getter;
 
@@ -28,6 +29,7 @@ public class ModuleManager {
         modules.add(new HUD());
         modules.add(new Killaura());
         modules.add(new AntiKb());
+        modules.add(new ESP());
         modules.sort((m1, m2) -> -Integer.compare(m2.getName().charAt(0), m1.getName().charAt(0)));
     }
 
