@@ -12,8 +12,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 
-import static cn.yapeteam.yolbi.utils.IMinecraft.mc;
-
 public class ESP extends Module {
 
 
