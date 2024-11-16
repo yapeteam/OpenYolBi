@@ -12,6 +12,7 @@ import cn.yapeteam.yolbi.module.values.impl.NumberValue;
 import cn.yapeteam.yolbi.utils.misc.TimerUtil;
 import cn.yapeteam.yolbi.utils.network.PacketUtil;
 import cn.yapeteam.yolbi.utils.render.RenderUtil;
+import lombok.var;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
@@ -45,8 +46,7 @@ public class Backtrack extends Module {
             s12 = new BooleanValue("S12", true),
             s27 = new BooleanValue("S27", true),
             s32 = new BooleanValue("S32", true),
-            activity = new BooleanValue("Activity", true),
-            updateOnAttacking = new BooleanValue("Update On Attacking", true);
+            activity = new BooleanValue("Activity", true);
 
     private final NumberValue<Float>
             hitRange = new NumberValue<>("Hit Range", 5.4f, 2f, 6f, 0.1f),
@@ -80,7 +80,6 @@ public class Backtrack extends Module {
                 backTrackDelay,
                 processS12Mode,
                 processS27Mode,
-                updateOnAttacking,
                 updateOnAttackingDelay
         );
     }
@@ -153,9 +152,6 @@ public class Backtrack extends Module {
                 SPacketEntityTeleport p1 = (SPacketEntityTeleport) p;
                 var entity = mc.world.getEntityByID(p1.getEntityId());
                 if (entity != null) {
-                    // entity.serverPosX = p1.getX();
-                    // entity.serverPosY = p1.getY();
-                    // entity.serverPosZ = p1.getZ();
                     entity.serverPosX = (long) p1.getX();
                     entity.serverPosY = (long) p1.getY();
                     entity.serverPosZ = (long) p1.getZ();

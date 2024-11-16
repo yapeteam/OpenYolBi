@@ -1,13 +1,12 @@
 package cn.yapeteam.yolbi.utils.animation;
 
-import cn.yapeteam.yolbi.utils.player.animation.Easing;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
 public class EasingAnimation {
-    private cn.yapeteam.yolbi.utils.player.animation.Easing easing;
+    private Easing easing;
     private long beginTime;
     private long duration;
     private double startValue, currentValue, lastTarget = Double.NaN;
