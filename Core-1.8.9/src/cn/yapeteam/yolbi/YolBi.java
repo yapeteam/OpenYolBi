@@ -17,7 +17,7 @@ import cn.yapeteam.yolbi.notification.NotificationManager;
 import cn.yapeteam.yolbi.notification.NotificationType;
 import cn.yapeteam.yolbi.server.WebServer;
 import cn.yapeteam.yolbi.shader.Shader;
-import cn.yapeteam.yolbi.utils.animation.Easing;
+import cn.yapeteam.yolbi.utils.player.animation.Easing;
 import cn.yapeteam.yolbi.utils.render.ESPUtil;
 import lombok.Getter;
 import net.montoyo.mcef.MCEF;
@@ -47,7 +47,6 @@ public class YolBi {
             eventManager = new EventManager();
         return eventManager;
     }
-
     public FontManager getFontManager() {
         if (fontManager == null)
             fontManager = new FontManager();

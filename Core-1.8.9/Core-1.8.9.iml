@@ -31,5 +31,6 @@
     <orderEntry type="library" name="yapeteam" level="project" />
     <orderEntry type="module" module-name="Loader" />
     <orderEntry type="module" module-name="mcef" />
+    <orderEntry type="library" name="minecraft-1.18.1" level="project" />
   </component>
 </module>

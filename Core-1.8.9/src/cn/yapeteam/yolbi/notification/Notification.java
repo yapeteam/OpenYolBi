@@ -1,8 +1,8 @@
 package cn.yapeteam.yolbi.notification;
 
 import cn.yapeteam.yolbi.YolBi;
-import cn.yapeteam.yolbi.utils.animation.Animation;
-import cn.yapeteam.yolbi.utils.animation.Easing;
+import cn.yapeteam.yolbi.utils.player.animation.Animation;
+import cn.yapeteam.yolbi.utils.player.animation.Easing;
 import cn.yapeteam.yolbi.utils.render.ColorUtil;
 import cn.yapeteam.yolbi.utils.render.GradientBlur;
 import cn.yapeteam.yolbi.utils.render.RenderUtil;

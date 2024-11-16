@@ -21,7 +21,7 @@ import cn.yapeteam.yolbi.module.impl.world.LegitScaffold;
 import cn.yapeteam.yolbi.module.impl.world.Scaffold;
 import cn.yapeteam.yolbi.notification.Notification;
 import cn.yapeteam.yolbi.notification.NotificationType;
-import cn.yapeteam.yolbi.utils.animation.Easing;
+import cn.yapeteam.yolbi.utils.player.animation.Easing;
 import lombok.Getter;
 
 import java.util.List;

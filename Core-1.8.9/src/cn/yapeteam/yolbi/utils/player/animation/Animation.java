@@ -1,4 +1,4 @@
-package cn.yapeteam.yolbi.utils.animation;
+package cn.yapeteam.yolbi.utils.player.animation;
 
 import lombok.Getter;
 import lombok.Setter;
