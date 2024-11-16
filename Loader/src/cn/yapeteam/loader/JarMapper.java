@@ -7,7 +7,7 @@ import cn.yapeteam.ymixin.annotations.DontMap;
 import cn.yapeteam.ymixin.annotations.Mixin;
 import cn.yapeteam.ymixin.annotations.Shadow;
 import cn.yapeteam.ymixin.utils.ASMUtils;
-import lombok.val;
+import lombok.var;
 import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm_9_2.ClassWriter;
 import org.objectweb.asm_9_2.tree.ClassNode;
