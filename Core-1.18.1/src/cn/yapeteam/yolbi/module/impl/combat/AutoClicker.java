@@ -18,8 +18,14 @@ public class AutoClicker extends Module {
     private final BooleanValue leftClick = new BooleanValue("leftClick", true),
             rightClick = new BooleanValue("rightClick", false);
     private final ModeValue<String> clickprio = new ModeValue<>("Click Priority", "Left", "Left", "Right");
-    private double delay = 1;
-
+    private double delay = -1;
+    public double getDelay(){
+        if(delay>0){
+            return delay;
+        }else{
+            return -1.1;
+        }
+    }
     @Override
     public void onEnable() {
         delay = 1000 / generate(cps.getValue(), range.getValue());

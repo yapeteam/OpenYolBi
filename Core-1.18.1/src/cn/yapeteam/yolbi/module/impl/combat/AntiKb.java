@@ -27,7 +27,7 @@ public class AntiKb extends Module {
     }
 
     @Listener
-    public void onPacket(EventRender2D event) {
+    public void onEv(EventRender2D event) {
         double x = mc.player.getX(),z = mc.player.getZ();
         if (mc.player != null) return;
         if (mc.player.getHealth()<h) {
@@ -35,6 +35,7 @@ public class AntiKb extends Module {
             mc.player.move(MoverType.PLAYER,mc.player.position().add(0.01,0,0.01));
             mc.player.moveTo(x,mc.player.getY(),z);
             mc.player.setJumping(true);
+
             //Natives.SetKeyBoard(VirtualKeyBoard.VK_SPACE,false);
             h = mc.player.getHealth();
         }

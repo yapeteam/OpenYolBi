@@ -7,10 +7,14 @@ import cn.yapeteam.yolbi.module.ModuleCategory;
 import cn.yapeteam.yolbi.module.values.impl.NumberValue;
 import cn.yapeteam.yolbi.utils.player.RotationUtils;
 import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 public class Killaura extends Module {
 
@@ -20,20 +24,79 @@ public class Killaura extends Module {
     }
     private  NumberValue<Double> aimrange = new NumberValue<Double>("aIMRANGE",4.5,3.1,7.1,0.1);
     private  NumberValue<Integer> cpsValue = new NumberValue<Integer>("CPS", 11, 1, 20, 1);
-    private  NumberValue<Double> rangeValue = new NumberValue<Double>("Range", 2.65, 2.0, 6.0, 0.01);
+    private  NumberValue<Double> rangeValue = new NumberValue<Double>("Range", 3.1d, 2.0, 6.0, 0.01);
     private  NumberValue<Integer> player = new NumberValue<Integer>("Player",1,0,1,1);
     private static LivingEntity target;
+    private AutoClicker ac = new AutoClicker();
     private List<LivingEntity> targets = new ArrayList<>();
+    private boolean nowta;
+    private double dealya = -1;
     @Override
     protected void onEnable() {
+        dealya = 1000 / generate(13, 5);
         this.targets.clear();
         target = findtarget();
     }
+    private static final Random random = new Random();
+    public static double generate(double cps, double range) {
+        double mean = 1000.0 / cps;
+        double stddev = mean * range / cps;
+        double noise;
+        do {
+            noise = mean + random.nextGaussian() * stddev;
+        } while (noise <= 0);
+        return Math.max(noise, 1);
+    }
+    @Listener
+    public boolean startauc(EventRender2D e){
+        float[] rotations;
+        float pressPercentageValue = 17 / 100f;
+        if(target!=null&&nowta&&mc.player!=null){
+            rotations = RotationUtils.getSimpleRotations(target);
+            if(rattarget(rotations[0],rotations[1])&&mc.player.canAttack(target)&&dealya!=-1.1){
+                //mc.getConnection().send(ServerboundInteractPacket.createAttackPacket(target, mc.player.isShiftKeyDown()));
+                mc.player.attack(target);
+                mc.player.swing(InteractionHand.MAIN_HAND);
+                try{
+                    TimeUnit.MILLISECONDS.sleep((long) (1000 / dealya * pressPercentageValue));
+                    return true;
+                }catch (Exception ev){
+                    return false;
+                }
 
+            }
+
+        }
+
+    return false;
+    }
     @Override
     protected void onDisable() {
         this.targets.clear();
         target = null;
+    }
+    public boolean rattarget(double roY,double roX){
+       if(jztargetrange(target)<=rangeValue.getValue()&&target!=null){
+           mc.gui.getChat().addMessage(new TextComponent("Rat t"));
+           if(mc.player==null){
+               mc.gui.getChat().addMessage(new TextComponent("Rat PL f"));
+               return false;
+           }
+           float tr = (float) jztargetrange(target);
+           if(tr>=16){
+               tr = 12.9f;
+               mc.gui.getChat().addMessage(new TextComponent("Rat tr"));
+           }
+           if(Math.abs(roY-mc.player.getYRot())<=16f-tr&&Math.abs(roX-mc.player.getYRot())<=16f-tr){
+               mc.gui.getChat().addMessage(new TextComponent("Rat ok"));
+               return true;
+           }
+
+       }else{
+           mc.gui.getChat().addMessage(new TextComponent("Rat f"));
+       }
+        mc.gui.getChat().addMessage(new TextComponent("Rat exit"));
+       return false;
     }
     public final boolean cheak(LivingEntity a){
         return !a.isDeadOrDying()&&!a.isInvisible()&&a!=mc.player;
@@ -72,6 +135,7 @@ public class Killaura extends Module {
     public void oner(EventRender2D event) {
         ta = findtarget();
         target = ta;
+        nowta = false;
         if (target != null) {
             if(unjztargetrange(target)<=aimrange.getValue()){
                 float[] rotations = RotationUtils.getSimpleRotations(target);
@@ -89,6 +153,7 @@ public class Killaura extends Module {
                 }
                 mc.player.setYRot(rotations[0]);
                 mc.player.setXRot(rotations[1]);
+                nowta = true;
                 //mc.gui.getChat().addMessage(new TextComponent(target.getName().toString()));
             }
          //   mc.gui.getChat().addMessage(new TextComponent(target.getName().toString()+" SP"));
