@@ -61,7 +61,7 @@ public class Killaura extends Module {
         float pressPercentageValue = 17 / 100f;
         if(target!=null&&nowta&&mc.player!=null){
             //rattarget(rotations[0],rotations[1])
-            if(true){
+            if(rattarget(rotations[0],rotations[1])&&mc.player.canAttack(target)&&jztargetrange(target)<=rangeValue.getValue()){
                 mc.getConnection().send(ServerboundInteractPacket.createAttackPacket(target, true));
                // mc.player.attack(target);
                 mc.player.swing(InteractionHand.MAIN_HAND);
