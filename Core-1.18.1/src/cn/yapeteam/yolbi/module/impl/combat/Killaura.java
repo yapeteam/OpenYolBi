@@ -2,7 +2,6 @@ package cn.yapeteam.yolbi.module.impl.combat;
 
 import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.event.Listener;
-import cn.yapeteam.yolbi.event.impl.player.Render2DEvent;
 import cn.yapeteam.yolbi.event.impl.render.EventRender2D;
 import cn.yapeteam.yolbi.font.AbstractFontRenderer;
 import cn.yapeteam.yolbi.module.Module;
@@ -57,9 +56,9 @@ public class Killaura extends Module {
     @Listener
     public boolean startauc(EventRender2D e){
         float[] rotations;
-        rotations = RotationUtils.getSimpleRotations(target);
         float pressPercentageValue = 17 / 100f;
         if(target!=null&&nowta&&mc.player!=null){
+            rotations = RotationUtils.getSimpleRotations(target);
             //rattarget(rotations[0],rotations[1])
             if(rattarget(rotations[1])&&jztargetrange(target)<=rangeValue.getValue()){
                 mc.getConnection().send(ServerboundInteractPacket.createAttackPacket(target, true));
