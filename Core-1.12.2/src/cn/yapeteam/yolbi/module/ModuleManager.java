@@ -35,7 +35,6 @@ public class ModuleManager {
         modules.add(new AimAssist());
         modules.add(new AntiBot());
         modules.add(new AutoClicker());
-        modules.add(new Backtrack());
         modules.add(new FakeLag());
         modules.add(new KillAura());
         modules.add(new Target());
