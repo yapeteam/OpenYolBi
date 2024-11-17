@@ -9,18 +9,13 @@ import cn.yapeteam.yolbi.utils.player.RotationUtils;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientboundAddPlayerPacket;
 import net.minecraft.network.protocol.game.ServerboundInteractPacket;
-import net.minecraft.network.status.client.C01PacketPing;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import static cn.yapeteam.yolbi.module.impl.combat.AutoClicker.generate;
