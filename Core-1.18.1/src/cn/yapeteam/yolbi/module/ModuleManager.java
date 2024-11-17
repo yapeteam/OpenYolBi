@@ -1,5 +1,6 @@
 package cn.yapeteam.yolbi.module;
 
+import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.event.Listener;
 import cn.yapeteam.yolbi.event.impl.game.EventKey;
 import cn.yapeteam.yolbi.module.impl.combat.AntiKb;
@@ -10,8 +11,11 @@ import cn.yapeteam.yolbi.module.impl.movement.Eagle;
 import cn.yapeteam.yolbi.module.impl.visual.ClientTheme;
 import cn.yapeteam.yolbi.module.impl.visual.ESP;
 import cn.yapeteam.yolbi.module.impl.visual.HUD;
+import cn.yapeteam.yolbi.module.impl.visual.cgui;
+import cn.yapeteam.yolbi.module.values.impl.NumberValue;
 import lombok.Getter;
 
+import javax.imageio.stream.ImageOutputStream;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
@@ -19,8 +23,8 @@ import java.util.stream.Collectors;
 @Getter
 @SuppressWarnings({"unchecked", "unused"})
 public class ModuleManager {
+    Killaura ka = YolBi.instance.getka();
     private final List<Module> modules = new CopyOnWriteArrayList<>();
-
     public void load() {
         modules.add(new SelfDestruct());
         modules.add(new ClientTheme());
@@ -30,9 +34,9 @@ public class ModuleManager {
         modules.add(new Killaura());
         modules.add(new AntiKb());
         modules.add(new ESP());
+        modules.add(new cgui());
         modules.sort((m1, m2) -> -Integer.compare(m2.getName().charAt(0), m1.getName().charAt(0)));
     }
-
     @Listener
     private void onKey(EventKey e) {
         modules.stream().filter(m -> m.getKey() == e.getKey()).collect(Collectors.toList()).forEach(Module::toggle);

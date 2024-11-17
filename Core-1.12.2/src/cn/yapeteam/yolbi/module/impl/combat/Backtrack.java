@@ -12,6 +12,8 @@ import cn.yapeteam.yolbi.module.values.impl.NumberValue;
 import cn.yapeteam.yolbi.utils.misc.TimerUtil;
 import cn.yapeteam.yolbi.utils.network.PacketUtil;
 import cn.yapeteam.yolbi.utils.render.RenderUtil;
+import lombok.var;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
@@ -19,6 +21,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
+import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.network.play.client.CPacketConfirmTransaction;
 import net.minecraft.network.play.client.CPacketKeepAlive;
 import net.minecraft.network.play.client.CPacketPlayer;
@@ -126,21 +129,21 @@ public class Backtrack extends Module {
             return;
         }
         if (savePackets.isEmpty()) return;
-        var p = savePackets.remove(0);
+        Packet<?> p = savePackets.remove(0);
         String type = "";
         try {
             // SPacketEntity
             if (p instanceof SPacketEntity) {
                 SPacketEntity p1 = (SPacketEntity) p;
-                var entity = p1.getEntity(mc.world);
+                Entity entity = p1.getEntity(mc.world);
                 entity.serverPosX += p1.getX();
                 entity.serverPosY += p1.getY();
                 entity.serverPosZ += p1.getZ();
-                var d0 = entity.serverPosX / 32.0;
-                var d1 = entity.serverPosY / 32.0;
-                var d2 = entity.serverPosZ / 32.0;
-                var f = p1.isRotating() ? (p1.getYaw() * 360) / 256f : entity.rotationYaw;
-                var f1 = p1.isRotating() ? (p1.getPitch() * 360) / 256f : entity.rotationPitch;
+                double d0 = entity.serverPosX / 32.0;
+                double d1 = entity.serverPosY / 32.0;
+                double d2 = entity.serverPosZ / 32.0;
+                float f = p1.isRotating() ? (p1.getYaw() * 360) / 256f : entity.rotationYaw;
+                float f1 = p1.isRotating() ? (p1.getPitch() * 360) / 256f : entity.rotationPitch;
                 if (entity instanceof EntityLivingBase) {
                     entity.setPositionAndRotationDirect(d0, d1, d2, f, f1, 3, false);
                     //  entity.setPositionAndRotation2(d0, d1, d2, f, f1, 3, false);
@@ -151,7 +154,7 @@ public class Backtrack extends Module {
             // SPacketEntityTeleport
             if (p instanceof SPacketEntityTeleport) {
                 SPacketEntityTeleport p1 = (SPacketEntityTeleport) p;
-                var entity = mc.world.getEntityByID(p1.getEntityId());
+                Entity entity = mc.world.getEntityByID(p1.getEntityId());
                 if (entity != null) {
                     // entity.serverPosX = p1.getX();
                     // entity.serverPosY = p1.getY();
@@ -159,11 +162,11 @@ public class Backtrack extends Module {
                     entity.serverPosX = (long) p1.getX();
                     entity.serverPosY = (long) p1.getY();
                     entity.serverPosZ = (long) p1.getZ();
-                    var d0 = entity.serverPosX / 32.0;
-                    var d1 = entity.serverPosY / 32.0;
-                    var d2 = entity.serverPosZ / 32.0;
-                    var f = (p1.getYaw() * 360) / 256f;
-                    var f1 = (p1.getPitch() * 360) / 256f;
+                    double d0 = entity.serverPosX / 32.0;
+                    double d1 = entity.serverPosY / 32.0;
+                    double d2 = entity.serverPosZ / 32.0;
+                    float f = (p1.getYaw() * 360) / 256f;
+                    float f1 = (p1.getPitch() * 360) / 256f;
                     if (entity instanceof EntityLivingBase) {
                         if (Math.abs(entity.posX - d0) < 0.03125 && Math.abs(entity.posY - d1) < 0.015625
                                 && Math.abs(entity.posZ - d2) < 0.03125) {
@@ -195,7 +198,7 @@ public class Backtrack extends Module {
             if (p instanceof SPacketEntityVelocity) {
                 SPacketEntityVelocity p1 = (SPacketEntityVelocity) p;
                 if (processS12Mode.is("InPut")) {
-                    var entity = mc.world.getEntityByID(p1.getEntityID());
+                    Entity entity = mc.world.getEntityByID(p1.getEntityID());
                     if (entity != null) {
                         if (p1.getEntityID() == mc.player.getEntityId()) {
                             mc.player.setVelocity(
@@ -216,7 +219,7 @@ public class Backtrack extends Module {
             if (p instanceof SPacketExplosion) {
                 SPacketExplosion p1 = (SPacketExplosion) p;
                 if (processS27Mode.is("InPut")) {
-                    var explosion = new Explosion(mc.world, target, p1.getX(),
+                    Explosion explosion = new Explosion(mc.world, target, p1.getX(),
                             p1.getY(), p1.getZ(), p1.getStrength(), p1.getAffectedBlockPositions());
                     explosion.doExplosionB(true);
                     mc.player.setVelocity(
@@ -244,7 +247,7 @@ public class Backtrack extends Module {
             // SPacketConfirmTransaction
             if (p instanceof SPacketConfirmTransaction) {
                 SPacketConfirmTransaction p1 = (SPacketConfirmTransaction) p;
-                var entityplayer = mc.player;
+                EntityPlayerSP entityplayer = mc.player;
                 Container container = null;
                 if (p1.getWindowId() == 0) {
                     container = entityplayer.inventoryContainer;
@@ -261,17 +264,17 @@ public class Backtrack extends Module {
             // SPacketEntityHeadLook
             if (p instanceof SPacketEntityHeadLook) {
                 SPacketEntityHeadLook p1 = (SPacketEntityHeadLook) p;
-                var entity = p1.getEntity(mc.world);
+                Entity entity = p1.getEntity(mc.world);
                 entity.setRotationYawHead((p1.getYaw() * 360) / 256f);
                 type = "s19";
             }
             //SPacketPlayerPosLook
             if (p instanceof SPacketPlayerPosLook) {
                 SPacketPlayerPosLook p1 = (SPacketPlayerPosLook) p;
-                var entityplayer = mc.player;
-                var d0 = p1.getX();
-                var d1 = p1.getY();
-                var d2 = p1.getZ();
+                EntityPlayerSP entityplayer = mc.player;
+                double d0 = p1.getX();
+                double d1 = p1.getY();
+                double d2 = p1.getZ();
                 entityplayer.setPositionAndRotation(d0, d1, d2, mc.player.rotationYaw, mc.player.rotationPitch);
                 CPacketPlayer.PositionRotation packet = new CPacketPlayer.PositionRotation(
                         entityplayer.posX, entityplayer.getEntityBoundingBox().minY,
@@ -289,20 +292,20 @@ public class Backtrack extends Module {
             // SPacketSpawnMob
             if (p instanceof SPacketSpawnMob) {
                 SPacketSpawnMob p1 = (SPacketSpawnMob) p;
-                var d0 = p1.getX() / 32.0;
-                var d1 = p1.getY() / 32.0;
-                var d2 = p1.getZ() / 32.0;
-                var f = (p1.getYaw() * 360) / 256f;
-                var f1 = (p1.getPitch() * 360) / 256f;
-                var entitylivingbase = (EntityLivingBase) EntityList.createEntityByID(p1.getEntityType(), mc.world);
+                double d0 = p1.getX() / 32.0;
+                double d1 = p1.getY() / 32.0;
+                double d2 = p1.getZ() / 32.0;
+                float f = (p1.getYaw() * 360) / 256f;
+                float f1 = (p1.getPitch() * 360) / 256f;
+                EntityLivingBase entitylivingbase = (EntityLivingBase) EntityList.createEntityByID(p1.getEntityType(), mc.world);
                 if (entitylivingbase != null) {
                     entitylivingbase.serverPosX = (long) p1.getX();
                     entitylivingbase.serverPosY = (long) p1.getY();
                     entitylivingbase.serverPosZ = (long) p1.getZ();
                     entitylivingbase.renderYawOffset = entitylivingbase.rotationYawHead = (p1.getHeadPitch() * 360) / 256f;
-                    var aentity = entitylivingbase.getParts();
+                    Entity[] aentity = entitylivingbase.getParts();
                     if (aentity != null) {
-                        var i = p1.getEntityID() - entitylivingbase.getEntityId();
+                        int i = p1.getEntityID() - entitylivingbase.getEntityId();
                         for (Entity entity : aentity) {
                             entity.setEntityId(entity.getEntityId() + i);
                         }
@@ -313,7 +316,7 @@ public class Backtrack extends Module {
                     entitylivingbase.motionY = (p1.getVelocityY() / 8000.0);
                     entitylivingbase.motionZ = (p1.getVelocityZ() / 8000.0);
                     mc.world.addEntityToWorld(p1.getEntityID(), entitylivingbase);
-                    var list = p1.getDataManagerEntries();
+                    List<EntityDataManager.DataEntry<?>> list = p1.getDataManagerEntries();
                     if (list != null) {
                         // entitylivingbase.getDataWatcher().updateWatchedObjectsFromList(list);
                         entitylivingbase.getDataManager().setEntryValues(list);
@@ -329,10 +332,10 @@ public class Backtrack extends Module {
 
     double getPacketsDistance(Entity target) {
         if (!savePackets.isEmpty()) {
-            var p = savePackets.get(savePackets.size() - 1);
+            Packet<?> p = savePackets.get(savePackets.size() - 1);
             if (p instanceof SPacketEntity) {
                 SPacketEntity p1 = (SPacketEntity) p;
-                var entity = p1.getEntity(mc.world);
+                Entity entity = p1.getEntity(mc.world);
                 if (entity == target) {
                     if (target instanceof EntityLivingBase) {
                         distanceToPacket = mc.player.getDistance(target.posX + (p1.getX() / 32.0),
@@ -342,7 +345,7 @@ public class Backtrack extends Module {
             }
             if (p instanceof SPacketEntityTeleport) {
                 SPacketEntityTeleport p1 = (SPacketEntityTeleport) p;
-                var entity = mc.world.getEntityByID(p1.getEntityId());
+                Entity entity = mc.world.getEntityByID(p1.getEntityId());
                 if (entity == target) {
                     if (target instanceof EntityLivingBase) {
                         distanceToPacket = mc.player.getDistance(p1.getX() / 32.0, p1.getY() / 32.0, p1.getZ() / 32.0);
@@ -437,7 +440,7 @@ public class Backtrack extends Module {
             }
             if (packet instanceof SPacketEntity) {
                 SPacketEntity packet1 = (SPacketEntity) packet;
-                var entity = packet1.getEntity(mc.world);
+                Entity entity = packet1.getEntity(mc.world);
                 if (entity == target) {
                     x += packet1.getX() / 32.0;
                     y += packet1.getY() / 32.0;
@@ -446,7 +449,7 @@ public class Backtrack extends Module {
             }
             if (packet instanceof SPacketEntityTeleport) {
                 SPacketEntityTeleport packet1 = (SPacketEntityTeleport) packet;
-                var entity = mc.world.getEntityByID(packet1.getEntityId());
+                Entity entity = mc.world.getEntityByID(packet1.getEntityId());
                 if (entity == target) {
                     x = packet1.getX() / 32.0;
                     y = packet1.getY() / 32.0;

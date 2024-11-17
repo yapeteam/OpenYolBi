@@ -8,6 +8,7 @@ import cn.yapeteam.ymixin.annotations.Mixin;
 import cn.yapeteam.ymixin.annotations.Shadow;
 import cn.yapeteam.ymixin.utils.ASMUtils;
 import lombok.val;
+import lombok.var;
 import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm_9_2.ClassWriter;
 import org.objectweb.asm_9_2.tree.ClassNode;
@@ -64,7 +65,7 @@ public class JarMapper {
 
     public static void dispose(File file, String jarName, ClassMapper.MapMode mode) throws Throwable {
         InjectorBridge.send("S1");
-        var all = 0;
+        int all = 0;
         try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(file.toPath()))) {
             while (zis.getNextEntry() != null) all++;
         }
@@ -79,9 +80,9 @@ public class JarMapper {
                 int finalCount = count;
                 int finalAll = all;
                 new Thread(() -> InjectorBridge.send("P1" + "=>" + (float) finalCount / finalAll * 100f)).start();
-                var bytes = StreamUtils.readStream(zis);
+                byte[] bytes = StreamUtils.readStream(zis);
                 if (!se.isDirectory() && se.getName().endsWith(".class")) {
-                    var node = ASMUtils.node(bytes);
+                    ClassNode node = ASMUtils.node(bytes);
                     if (DontMap.Helper.hasAnnotation(node)) {
                         write(se.getName(), bytes, zos);
                         Logger.info("Skipping class: {}", se.getName());

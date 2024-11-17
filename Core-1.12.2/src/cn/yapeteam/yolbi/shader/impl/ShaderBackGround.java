@@ -48,7 +48,7 @@ public class ShaderBackGround extends Shader {
 
     @Override
     public int dispose(int relativeX, int relativeY, float screenWidth, float screenHeight) {
-        var t = (System.currentTimeMillis() - st) / 10000f;
+        float t = (System.currentTimeMillis() - st) / 10000f;
         float time = (float) (t * 1.25);
         vec2 uv = vec2(relativeX / width, relativeY / height);
         vec2 p = vec2((relativeX * 2 - width) / Math.max(width, height), (relativeY * 2 - height) / Math.max(width, height));

@@ -1,12 +1,18 @@
 package cn.yapeteam.yolbi.module.impl.combat;
 
+import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.event.Listener;
+import cn.yapeteam.yolbi.event.impl.player.Render2DEvent;
 import cn.yapeteam.yolbi.event.impl.render.EventRender2D;
+import cn.yapeteam.yolbi.font.AbstractFontRenderer;
 import cn.yapeteam.yolbi.module.Module;
 import cn.yapeteam.yolbi.module.ModuleCategory;
+import cn.yapeteam.yolbi.module.ModuleManager;
 import cn.yapeteam.yolbi.module.values.impl.NumberValue;
 import cn.yapeteam.yolbi.utils.player.RotationUtils;
+import cn.yapeteam.yolbi.utils.render.ColorUtils;
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.protocol.game.ServerboundInteractPacket;
 import net.minecraft.world.InteractionHand;
@@ -14,17 +20,21 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import static cn.yapeteam.yolbi.module.impl.combat.AutoClicker.generate;
 
 public class Killaura extends Module {
+  //  PoseStack ps;
+    //AbstractFontRenderer font = YolBi.instance.getFontManager().getMINE14();
+    ModuleManager mm = YolBi.instance.getModuleManager();
 
     public Killaura() {
         super("Killaura",ModuleCategory.COMBAT,InputConstants.KEY_R);
         addValues(cpsValue, rangeValue,aimrange);
     }
+
     private  NumberValue<Double> aimrange = new NumberValue<Double>("aIMRANGE",4.5,3.1,7.1,0.1);
     private  NumberValue<Integer> cpsValue = new NumberValue<Integer>("CPS", 11, 1, 20, 1);
     private  NumberValue<Double> rangeValue = new NumberValue<Double>("Range", 3.1d, 2.0, 6.0, 0.01);
@@ -39,29 +49,19 @@ public class Killaura extends Module {
         this.targets.clear();
         target = findtarget();
     }
-    private static final Random random = new Random();
     @Override
     protected void onDisable() {
         this.targets.clear();
         target = null;
     }
-  /*  public static double generate(double cps, double range) {
-        double mean = 1000.0 / cps;
-        double stddev = mean * range / cps;
-        double noise;
-        do {
-            noise = mean + random.nextGaussian() * stddev;
-        } while (noise <= 0);
-        return Math.max(noise, 1);
-    }
-   */ @Listener
+    @Listener
     public boolean startauc(EventRender2D e){
         float[] rotations;
         rotations = RotationUtils.getSimpleRotations(target);
         float pressPercentageValue = 17 / 100f;
         if(target!=null&&nowta&&mc.player!=null){
             //rattarget(rotations[0],rotations[1])
-            if(rattarget(rotations[0],rotations[1])&&mc.player.canAttack(target)&&jztargetrange(target)<=rangeValue.getValue()){
+            if(rattarget(rotations[1])&&jztargetrange(target)<=rangeValue.getValue()){
                 mc.getConnection().send(ServerboundInteractPacket.createAttackPacket(target, true));
                // mc.player.attack(target);
                 mc.player.swing(InteractionHand.MAIN_HAND);
@@ -79,27 +79,23 @@ public class Killaura extends Module {
     return false;
     }
 
-    public boolean rattarget(double roY,double roX){
+    public boolean rattarget(double roX){
        if(jztargetrange(target)<=rangeValue.getValue()&&target!=null){
-           mc.gui.getChat().addMessage(new TextComponent("Rat t"));
+         //  mc.gui.getChat().addMessage(new TextComponent("Rat t"));
            if(mc.player==null){
-               mc.gui.getChat().addMessage(new TextComponent("Rat PL f"));
+           //    mc.gui.getChat().addMessage(new TextComponent("Rat PL f"));
                return false;
            }
            float tr = (float) jztargetrange(target);
-           if(tr>=16){
-               tr = 12.9f;
-               mc.gui.getChat().addMessage(new TextComponent("Rat tr"));
-           }
-           if(Math.abs(roY-mc.player.getYRot())<=16f-tr&&Math.abs(roX-mc.player.getYRot())<=16f-tr){
-               mc.gui.getChat().addMessage(new TextComponent("Rat ok"));
+           if(Math.abs(roX-mc.player.getXRot())<=12f){
+             //  mc.gui.getChat().addMessage(new TextComponent("Rat ok"));
                return true;
            }
 
        }else{
-           mc.gui.getChat().addMessage(new TextComponent("Rat f"));
+           //mc.gui.getChat().addMessage(new TextComponent("Rat f"));
        }
-        mc.gui.getChat().addMessage(new TextComponent("Rat exit"));
+        //mc.gui.getChat().addMessage(new TextComponent("Rat exit"));
        return false;
     }
     public final boolean cheak(LivingEntity a){
