@@ -34,7 +34,6 @@ public class MixinAbstractClientPlayerForEventLook {
         YolBi.instance.getEventManager().post(lookEvent);
         yaw = lookEvent.getRotation().x;
         pitch = lookEvent.getRotation().y;
-
         return this.getVectorForRotation(pitch, yaw);
     }
 }
