@@ -7,11 +7,17 @@ import cn.yapeteam.yolbi.module.ModuleCategory;
 import cn.yapeteam.yolbi.module.values.impl.NumberValue;
 import cn.yapeteam.yolbi.utils.player.RotationUtils;
 import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientboundAddPlayerPacket;
 import net.minecraft.network.protocol.game.ServerboundInteractPacket;
+import net.minecraft.network.status.client.C01PacketPing;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -33,11 +39,15 @@ public class Killaura extends Module {
     private List<LivingEntity> targets = new ArrayList<>();
     private boolean nowta;
     private double dealya = -1;
+    GameRenderer gr = mc.gameRenderer;
+    private float x=90,y=58;
     @Override
     protected void onEnable() {
         dealya = 1000 / generate(13, 5);
         this.targets.clear();
         target = findtarget();
+        x = mc.player.getXRot();
+        y = mc.player.getYRot();
     }
    // private static final Random random = new Random();
     @Override
@@ -155,10 +165,24 @@ public class Killaura extends Module {
                 if((int)((Math.random()*4) + -3)==1){
                     rotations[0]+= (float) ((Math.random()*0.7) + -0.7);
                 }
+              //  mc.player.setYHeadRot(rotations[0]);
+                mc.player.setYBodyRot(rotations[0]);
                 mc.player.setYRot(rotations[0]);
                 mc.player.setXRot(rotations[1]);
+              //  mc.player.setXRot();
+                gr.getMainCamera().setAnglesInternal(x,y);
                 nowta = true;
                 //mc.gui.getChat().addMessage(new TextComponent(target.getName().toString()));
+            }else if(!mc.player.isOnGround()){
+             //   mc.player.setOnGround(true);
+            //    mc.player.setSprinting(true);
+                if(mc.player.getYHeadRot()!=0){
+                    mc.player.setYBodyRot(-mc.player.getYHeadRot());
+                }else{
+                    mc.player.setYBodyRot(-90);
+                }
+            }else if(mc.player.isOnGround()){
+                return;
             }
          //   mc.gui.getChat().addMessage(new TextComponent(target.getName().toString()+" SP"));
         }else{
