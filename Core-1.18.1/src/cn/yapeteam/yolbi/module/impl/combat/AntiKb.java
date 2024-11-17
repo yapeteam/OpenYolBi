@@ -10,12 +10,13 @@ import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.world.entity.MoverType;
 
 
-
 public class AntiKb extends Module {
-    public AntiKb (){
+    public AntiKb() {
         super("AntiKB", ModuleCategory.COMBAT, InputConstants.KEY_R);
     }
-    public float h ;
+
+    public float h;
+
     @Override
     protected void onEnable() {
         h = mc.player.getHealth();
@@ -23,17 +24,17 @@ public class AntiKb extends Module {
 
     @Override
     protected void onDisable() {
-        h= -100;
+        h = -100;
     }
 
     @Listener
     public void onEv(EventRender2D event) {
-        double x = mc.player.getX(),z = mc.player.getZ();
+        double x = mc.player.getX(), z = mc.player.getZ();
         if (mc.player != null) return;
-        if (mc.player.getHealth()<h) {
+        if (mc.player.getHealth() < h) {
             Natives.SetKeyBoard(VirtualKeyBoard.VK_SPACE, true);
-            mc.player.move(MoverType.PLAYER,mc.player.position().add(0.01,0,0.01));
-            mc.player.moveTo(x,mc.player.getY(),z);
+            mc.player.move(MoverType.PLAYER, mc.player.position().add(0.01, 0, 0.01));
+            mc.player.moveTo(x, mc.player.getY(), z);
             mc.player.setJumping(true);
 
             //Natives.SetKeyBoard(VirtualKeyBoard.VK_SPACE,false);
