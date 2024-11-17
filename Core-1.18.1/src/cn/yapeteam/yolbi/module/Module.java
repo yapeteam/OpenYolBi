@@ -49,9 +49,7 @@ public abstract class Module {
     protected void onDisable() {
         //invoke on disabled
     }
-    protected void Cgui(){
-        //显示clickgui
-    }
+
     public final void setEnabled(boolean enabled) {
         if (this.enabled != enabled) {
             this.enabled = enabled;
