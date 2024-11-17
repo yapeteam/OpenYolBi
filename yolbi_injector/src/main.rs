@@ -42,7 +42,13 @@ fn main() {
                          "   ╚═╝    ╚═════╝ ╚══════╝╚═════╝ ╚═╝    ╚══════╝╚═╝   ╚═╝   ╚══════╝"
                  )
         );
-        println!("爱来自Yolbi Team \n您使用此工具学习期间您做的任何事都与我们Yolbi Team无关\n此工具禁止注入网易进行学习，如违反您自己承担所有责任");
+        println!("©2024 YapeTeam, 保留所有权利。");
+        println!("作者：TIMER_err及YolBi Lite项目的所有贡献者");
+        println!("项目仓库：github.com/yapeteam/OpenYolBi");
+        println!("使用本软件即表示您已阅读并同意遵守Minecraft最终用户许可协议:");
+        println!("https://www.minecraft.net/zh-hans/eula");
+        println!("YapeTeam对于因违反许可协议而产生的任何后果不承担责任。");
+        println!("本软件承诺永久免费，请您确保从合法的免费渠道获得。");
         if print.is_ok() {
             let symbol: Symbol<fn()> = print.unwrap();
             symbol();
