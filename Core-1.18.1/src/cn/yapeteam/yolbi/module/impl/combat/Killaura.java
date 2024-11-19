@@ -68,6 +68,7 @@ public class Killaura extends Module {
      */
     @Listener
     public boolean startauc(EventRender2D e) {
+        if (target == null) return false;
         float[] rotations;
         rotations = RotationUtils.getSimpleRotations(target);
         float pressPercentageValue = 17 / 100f;
