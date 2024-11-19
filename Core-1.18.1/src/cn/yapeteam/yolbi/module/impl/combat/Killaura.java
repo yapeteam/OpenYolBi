@@ -7,26 +7,20 @@ import cn.yapeteam.yolbi.module.ModuleCategory;
 import cn.yapeteam.yolbi.module.values.impl.NumberValue;
 import cn.yapeteam.yolbi.utils.player.RotationUtils;
 import com.mojang.blaze3d.platform.InputConstants;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientboundAddPlayerPacket;
 import net.minecraft.network.protocol.game.ServerboundInteractPacket;
-import net.minecraft.network.status.client.C01PacketPing;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
-
+import net.minecraft.world.phys.Vec3;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import static cn.yapeteam.yolbi.module.impl.combat.AutoClicker.generate;
 
 public class Killaura extends Module {
-
+    private Boolean open = false;
     public Killaura() {
         super("Killaura",ModuleCategory.COMBAT,InputConstants.KEY_R);
         addValues(cpsValue, rangeValue,aimrange);
@@ -39,19 +33,20 @@ public class Killaura extends Module {
     private List<LivingEntity> targets = new ArrayList<>();
     private boolean nowta;
     private double dealya = -1;
-    GameRenderer gr = mc.gameRenderer;
+  //  GameRenderer gr = mc.gameRenderer;
     private float x=90,y=58;
     @Override
     protected void onEnable() {
+        open = true;
         dealya = 1000 / generate(13, 5);
         this.targets.clear();
         target = findtarget();
         x = mc.player.getXRot();
         y = mc.player.getYRot();
     }
-   // private static final Random random = new Random();
     @Override
     protected void onDisable() {
+        open = false;
         this.targets.clear();
         target = null;
     }
@@ -96,12 +91,7 @@ public class Killaura extends Module {
                mc.gui.getChat().addMessage(new TextComponent("Rat PL f"));
                return false;
            }
-           float tr = (float) jztargetrange(target);
-           if(tr>=16){
-               tr = 12.9f;
-               mc.gui.getChat().addMessage(new TextComponent("Rat tr"));
-           }
-           if(Math.abs(roY-mc.player.getYRot())<=16f-tr&&Math.abs(roX-mc.player.getYRot())<=16f-tr){
+           if(Math.abs(roY-mc.player.getYRot())<=20f){
                mc.gui.getChat().addMessage(new TextComponent("Rat ok"));
                return true;
            }
@@ -112,9 +102,12 @@ public class Killaura extends Module {
         mc.gui.getChat().addMessage(new TextComponent("Rat exit"));
        return false;
     }
-    public final boolean cheak(LivingEntity a){
+
+    public final boolean check(LivingEntity a){
         return !a.isDeadOrDying()&&!a.isInvisible()&&a!=mc.player;
     }
+
+
     public  LivingEntity findtarget(){
        targets.clear();
         for (Entity entity : mc.level.entitiesForRendering()) {
@@ -128,12 +121,12 @@ public class Killaura extends Module {
                 }
                 if(unjztargetrange(livingEntity)<aimrange.getValue()){
                     if(target!=null){
-                        if (cheak(livingEntity)&&unjztargetrange(livingEntity)<unjztargetrange(target)) {
+                        if (check(livingEntity)&&unjztargetrange(livingEntity)<unjztargetrange(target)) {
                            // mc.gui.getChat().addMessage(new TextComponent("A3"));
                             return livingEntity;
                         }
                     }else{
-                        if (cheak(livingEntity)) {
+                        if (check(livingEntity)) {
                           //  mc.gui.getChat().addMessage(new TextComponent("A4"));
                             return livingEntity;
                         }
@@ -145,9 +138,9 @@ public class Killaura extends Module {
         return null;
     }
     public LivingEntity ta;
+
     @Listener
     public void oner(EventRender2D event) {
-        ta = findtarget();
         target = ta;
         nowta = false;
         if (target != null) {
@@ -165,17 +158,26 @@ public class Killaura extends Module {
                 if((int)((Math.random()*4) + -3)==1){
                     rotations[0]+= (float) ((Math.random()*0.7) + -0.7);
                 }
+                if((int)((Math.random()*2) + -1)==1&&jztargetrange(target)<=0.2){
+                    mc.player.setOnGround(false);
+                    mc.player.setSprinting(true);
+                    Vec3 a = target.position();
+                    Vec3 ab = new Vec3(0,0,0);
+                    ab.add(a.x,mc.player.getY(),a.z);
+                    mc.player.moveTo(ab);
+                    mc.player.setSprinting(false);
+                }
               //  mc.player.setYHeadRot(rotations[0]);
-                mc.player.setYBodyRot(rotations[0]);
+                mc.player.setYBodyRot(-rotations[0]);
                 mc.player.setYRot(rotations[0]);
                 mc.player.setXRot(rotations[1]);
               //  mc.player.setXRot();
-                gr.getMainCamera().setAnglesInternal(x,y);
                 nowta = true;
                 //mc.gui.getChat().addMessage(new TextComponent(target.getName().toString()));
             }else if(!mc.player.isOnGround()){
              //   mc.player.setOnGround(true);
             //    mc.player.setSprinting(true);
+
                 if(mc.player.getYHeadRot()!=0){
                     mc.player.setYBodyRot(-mc.player.getYHeadRot());
                 }else{

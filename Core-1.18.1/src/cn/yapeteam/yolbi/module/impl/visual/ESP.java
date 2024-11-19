@@ -19,7 +19,7 @@ public class ESP extends Module {
         super("ESP",ModuleCategory.VISUAL, InputConstants.KEY_L);
     }
     @Listener
-    public void onRender2D(EventRender3D event) {
+    public void onRender3D(EventRender3D event) {
         if (mc.player != null && mc.level != null) {
             PoseStack poseStack = event.poseStack();
             for (Entity entity : mc.level.entitiesForRendering()) {
