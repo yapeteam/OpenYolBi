@@ -23,10 +23,9 @@ public class ESP extends Module {
         if (mc.player != null && mc.level != null) {
             PoseStack poseStack = event.poseStack();
             for (Entity entity : mc.level.entitiesForRendering()) {
-                if (entity instanceof LivingEntity) {
-                    LivingEntity livingEntity = (LivingEntity) entity;
+                if (entity instanceof LivingEntity livingEntity) {
                     if (EntityUtils.isSelected(entity, true, true, true, false, true, true)) {
-                        RenderUtils.renderEntityBoundingBox(poseStack, 0, livingEntity, ColorUtils.rainbow(10, 1).getRGB(), true);
+                        RenderUtils.renderEntityBoundingBox(poseStack,  livingEntity, ColorUtils.rainbow(10, 1).getRGB(), true);
                     }
                 }
             }
