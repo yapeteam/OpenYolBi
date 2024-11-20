@@ -1,5 +1,6 @@
 package cn.yapeteam.yolbi.module.impl.movement;
 
+import cn.yapeteam.loader.Natives;
 import cn.yapeteam.yolbi.event.Listener;
 import cn.yapeteam.yolbi.event.impl.render.EventRender2D;
 import cn.yapeteam.yolbi.module.Module;
@@ -14,6 +15,12 @@ public class YolBiTelly extends Module {
         super("YolBiTelly",ModuleCategory.COMBAT,InputConstants.KEY_R);
         addValues();
     }
+    private float y;
+    @Override
+    protected void onEnable() {
+        y = MathYaw();
+    }
+
     public static int findBlock() {
         if (mc.player != null) {
             for (int i = 0; i < mc.player.getInventory().items.size(); i++) {
@@ -28,11 +35,11 @@ public class YolBiTelly extends Module {
     public static boolean selectBlock() {
         int slot = findBlock();
         if (slot != -1) {
-            mc.player.getInventory().selected = slot; // 设置当前选中槽位
+            mc.player.getInventory().selected = slot;
             return true;
         }
 
-        return false; // 未找到任何方块
+        return false;
     }
     public float MathYaw(){
         if (mc.player == null) {
@@ -52,16 +59,25 @@ public class YolBiTelly extends Module {
     }
     @Listener
     public void aim(EventRender2D e){
+        boolean b=false;
         if(mc.player==null){
             return;
         }
         PoseStack ps = e.poseStack();
         Boolean Block = selectBlock();
-        float y = MathYaw();
+
         if(y==-1111111){
             return;
         }
         mc.player.setYRot(y);
-        mc.player.setXRot(38);
+        mc.player.setXRot(89);
+        if(!mc.player.isOnGround()){
+            Natives.SendRight(true);
+            b=true;
+        }else if(b){
+            Natives.SendRight(false);
+            b=false;
+        }
+
     }
 }

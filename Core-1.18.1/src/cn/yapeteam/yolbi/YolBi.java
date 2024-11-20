@@ -28,11 +28,18 @@ public class YolBi {
     private RotationManager rotationManager;
     private CommandManager commandManager;
     private FontManager fontManager;
+    private Killaura ka;
 
     public EventManager getEventManager() {
         if (eventManager == null)
             eventManager = new EventManager();
         return eventManager;
+    }
+    public Killaura getka(){
+        if(ka==null){
+            ka = new Killaura();
+        }
+        return ka;
     }
     public RotationManager getRotationManager() {
         if (rotationManager == null)
