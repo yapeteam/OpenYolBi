@@ -19,6 +19,7 @@ public class YolBiTelly extends Module {
     @Override
     protected void onEnable() {
         y = MathYaw();
+        selectBlock();
     }
 
     public static int findBlock() {
@@ -64,13 +65,12 @@ public class YolBiTelly extends Module {
             return;
         }
         PoseStack ps = e.poseStack();
-        Boolean Block = selectBlock();
 
         if(y==-1111111){
             return;
         }
         mc.player.setYRot(y);
-        mc.player.setXRot(89);
+        mc.player.setXRot(83);
         if(!mc.player.isOnGround()){
             Natives.SendRight(true);
             b=true;
