@@ -11,7 +11,6 @@ import cn.yapeteam.yolbi.module.impl.movement.YolBiTelly;
 import cn.yapeteam.yolbi.module.impl.visual.ClientTheme;
 import cn.yapeteam.yolbi.module.impl.visual.ESP;
 import cn.yapeteam.yolbi.module.impl.visual.HUD;
-import cn.yapeteam.yolbi.module.impl.visual.TargetHud;
 import lombok.Getter;
 
 import java.util.List;
@@ -33,7 +32,6 @@ public class ModuleManager {
         modules.add(new AntiKb());
         modules.add(new ESP());
         modules.add(new YolBiTelly());
-        modules.add(new TargetHud());
         modules.sort((m1, m2) -> -Integer.compare(m2.getName().charAt(0), m1.getName().charAt(0)));
     }
 
