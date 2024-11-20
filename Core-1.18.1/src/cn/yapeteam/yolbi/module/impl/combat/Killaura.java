@@ -1,11 +1,14 @@
 package cn.yapeteam.yolbi.module.impl.combat;
 
+import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.event.Listener;
 import cn.yapeteam.yolbi.event.impl.render.EventRender2D;
+import cn.yapeteam.yolbi.font.AbstractFontRenderer;
 import cn.yapeteam.yolbi.module.Module;
 import cn.yapeteam.yolbi.module.ModuleCategory;
 import cn.yapeteam.yolbi.module.values.impl.NumberValue;
 import cn.yapeteam.yolbi.utils.player.RotationUtils;
+import cn.yapeteam.yolbi.utils.render.ColorUtils;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.protocol.game.ServerboundInteractPacket;
@@ -22,7 +25,6 @@ import static cn.yapeteam.yolbi.module.impl.combat.AutoClicker.generate;
 
 public class Killaura extends Module {
     private Boolean open = false;
-
     public Killaura() {
         super("Killaura", ModuleCategory.COMBAT, InputConstants.KEY_R);
         addValues(cpsValue, rangeValue, aimrange);
@@ -74,12 +76,12 @@ public class Killaura extends Module {
         float pressPercentageValue = 17 / 100f;
         if (target != null && nowta && mc.player != null) {
             //rattarget(rotations[0],rotations[1])
-            if (rattarget(rotations[0], rotations[1]) && mc.player.canAttack(target) && jztargetrange(target) <= rangeValue.getValue()) {
+            if (rattarget(rotations[0]) && mc.player.canAttack(target) && jztargetrange(target) <= rangeValue.getValue()) {
                 mc.getConnection().send(ServerboundInteractPacket.createAttackPacket(target, true));
                 // mc.player.attack(target);
                 mc.player.swing(InteractionHand.MAIN_HAND);
                 try {
-                    TimeUnit.MILLISECONDS.sleep((long) (1000 / dealya * pressPercentageValue));
+                    TimeUnit.MILLISECONDS.sleep((long) (1000 / dealya * pressPercentageValue) + (int) ((Math.random() * 800) + -800));
                     return true;
                 } catch (Exception ev) {
                     return false;
@@ -92,22 +94,22 @@ public class Killaura extends Module {
         return false;
     }
 
-    public boolean rattarget(double roY, double roX) {
+    public boolean rattarget(double roY) {
         if (jztargetrange(target) <= rangeValue.getValue() && target != null) {
-            mc.gui.getChat().addMessage(new TextComponent("Rat t"));
+           // mc.gui.getChat().addMessage(new TextComponent("Rat t"));
             if (mc.player == null) {
-                mc.gui.getChat().addMessage(new TextComponent("Rat PL f"));
+              //  mc.gui.getChat().addMessage(new TextComponent("Rat PL f"));
                 return false;
             }
             if (Math.abs(roY - mc.player.getYRot()) <= 20f) {
-                mc.gui.getChat().addMessage(new TextComponent("Rat ok"));
+             //   mc.gui.getChat().addMessage(new TextComponent("Rat ok"));
                 return true;
             }
 
         } else {
-            mc.gui.getChat().addMessage(new TextComponent("Rat f"));
+          //  mc.gui.getChat().addMessage(new TextComponent("Rat f"));
         }
-        mc.gui.getChat().addMessage(new TextComponent("Rat exit"));
+      //  mc.gui.getChat().addMessage(new TextComponent("Rat exit"));
         return false;
     }
 
@@ -123,19 +125,19 @@ public class Killaura extends Module {
                 LivingEntity livingEntity = (LivingEntity) entity;
                 if (target == null) {
                     if (livingEntity != mc.player && !livingEntity.isInvisible()) {
-                          mc.gui.getChat().addMessage(new TextComponent(livingEntity.getName().toString()));
+                       //   mc.gui.getChat().addMessage(new TextComponent(livingEntity.getName().toString()));
                         return livingEntity;
                     }
                 }
                 if (unjztargetrange(livingEntity) < aimrange.getValue()) {
                     if (target != null) {
                         if (check(livingEntity) && unjztargetrange(livingEntity) < unjztargetrange(target)) {
-                             mc.gui.getChat().addMessage(new TextComponent("A3"));
+                         //    mc.gui.getChat().addMessage(new TextComponent("A3"));
                             return livingEntity;
                         }
                     } else {
                         if (check(livingEntity)) {
-                              mc.gui.getChat().addMessage(new TextComponent("A4"));
+                          //    mc.gui.getChat().addMessage(new TextComponent("A4"));
                             return livingEntity;
                         }
                     }
@@ -150,6 +152,7 @@ public class Killaura extends Module {
         target = findtarget();
         nowta = false;
         if (target != null) {
+
             if (unjztargetrange(target) <= aimrange.getValue()) {
                 float[] rotations = RotationUtils.getSimpleRotations(target);
                 float tr = (float) jztargetrange(target);
@@ -166,28 +169,25 @@ public class Killaura extends Module {
                     rotations[0] += (float) ((Math.random() * 0.7) + -0.7);
                 }
                   mc.player.setYHeadRot(rotations[0]);
-                mc.player.setYBodyRot(-rotations[0]);
                 mc.player.setYRot(rotations[0]);
                 mc.player.setXRot(rotations[1]);
 
                 nowta = true;
             } else if (!mc.player.isOnGround()) {
+                //funny
                 if (mc.player.getYHeadRot() != 0) {
                     mc.player.setYBodyRot(-mc.player.getYHeadRot());
-                } else {
-                    mc.player.setYBodyRot(-90);
+                } else if(mc.player.getYHeadRot() >=35&&mc.player.getYHeadRot()<=-35){
+                    mc.player.setYBodyRot((float) (-90 +((Math.random() * 8) + -7)));
                 }
             } else if (mc.player.isOnGround()) {
                 return;
             }
-            mc.gui.getChat().addMessage(new TextComponent("2A"));
+           // mc.gui.getChat().addMessage(new TextComponent("2A"));
         } else {
-             mc.gui.getChat().addMessage(new TextComponent("3A"));
+            // mc.gui.getChat().addMessage(new TextComponent("3A"));
         }
     }
-
-    // mc.getConnection().send(ServerboundInteractPacket.createAttackPacket(target, mc.player.isShiftKeyDown()));
-    //  mc.player.swing(InteractionHand.MAIN_HAND);
     public final double jztargetrange(LivingEntity a) {
         if (mc.player != null) {
             return Math.abs(a.getX() - mc.player.getX()) + Math.abs(a.getZ() - mc.player.getZ()) + Math.abs(a.getY() - mc.player.getY());
