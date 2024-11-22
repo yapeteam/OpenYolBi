@@ -1,17 +1,24 @@
 package cn.yapeteam.yolbi.module.impl.movement;
 
 import cn.yapeteam.loader.Natives;
+import cn.yapeteam.loader.logger.Logger;
 import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.event.Listener;
 import cn.yapeteam.yolbi.event.impl.render.EventRender2D;
 import cn.yapeteam.yolbi.font.AbstractFontRenderer;
 import cn.yapeteam.yolbi.module.Module;
 import cn.yapeteam.yolbi.module.ModuleCategory;
+import cn.yapeteam.yolbi.module.values.impl.NumberValue;
 import cn.yapeteam.yolbi.utils.render.ColorUtils;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
+import org.lwjgl.system.CallbackI;
+
+import java.util.concurrent.TimeUnit;
+
+import static cn.yapeteam.yolbi.module.impl.combat.AutoClicker.generate;
 
 public class YolBiTelly extends Module {
     public YolBiTelly() {
@@ -19,11 +26,14 @@ public class YolBiTelly extends Module {
         addValues();
     }
   //  public AbstractFontRenderer font = YolBi.instance.getFontManager().getMINE14();
+    private NumberValue<Integer> cps = new NumberValue<Integer>("RCPS",27,1,50,1);
+    private NumberValue<Float> pitch = new NumberValue<Float>("Pitch",85.0f,-180.1f,180.1f,0.01f);
     private float y;
     @Override
     protected void onEnable() {
         y = MathYaw();
         selectBlock();
+        dealya = 1000 / generate(13, 5);
     }
 
     public static int findBlock() {
@@ -63,6 +73,7 @@ public class YolBiTelly extends Module {
             yaw -= delta;
         return yaw;
     }
+    double dealya = -1;
     public void startaucr(boolean b){
         if(b){
             Natives.SendRight(true);
@@ -81,13 +92,17 @@ public class YolBiTelly extends Module {
             return;
         }
         mc.player.setYRot(y);
-        mc.player.setXRot(83);
-        int i =0;
+        mc.player.setXRot(pitch.getValue());
         if(!mc.player.isOnGround()){
             startaucr(true);
         }else if(mc.player.isOnGround()){
             startaucr(false);
         }
-
+        try{
+            float pressPercentageValue = 17 / 100f;
+            TimeUnit.MILLISECONDS.sleep((long) (1000 / dealya * pressPercentageValue) + (int) ((Math.random() * 800) + -800));
+        }catch (Throwable ev){
+            Logger.exception(ev);
+        }
     }
 }

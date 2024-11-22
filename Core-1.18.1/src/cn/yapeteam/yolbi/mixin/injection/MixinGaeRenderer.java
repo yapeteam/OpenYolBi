@@ -8,10 +8,14 @@ import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.event.impl.render.EventRender2D;
 import cn.yapeteam.yolbi.event.impl.render.EventRender3D;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.Camera;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.world.entity.LivingEntity;
+import org.apache.http.concurrent.Cancellable;
 
 @Mixin(GameRenderer.class)
-public class MixinGameRenderer {
+public class MixinGaeRenderer {
     @Inject(
             method = "render",
             desc = "(FJZ)V",

@@ -23,6 +23,7 @@
     <orderEntry type="library" name="libs" level="project" />
     <orderEntry type="module" module-name="YMixin" />
     <orderEntry type="library" name="minecraft-1.18.1" level="project" />
+
     <orderEntry type="library" name="1.18.1" level="project" />
     <orderEntry type="library" name="shared" level="project" />
     <orderEntry type="library" name="darwin" level="project" />

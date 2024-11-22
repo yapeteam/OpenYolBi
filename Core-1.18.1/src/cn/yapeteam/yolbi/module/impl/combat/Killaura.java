@@ -32,6 +32,7 @@ public class Killaura extends Module {
 
     private NumberValue<Double> aimrange = new NumberValue<Double>("aIMRANGE", 4.5, 3.1, 7.1, 0.1);
     private NumberValue<Integer> cpsValue = new NumberValue<Integer>("CPS", 11, 1, 20, 1);
+    private NumberValue<Integer> math = new NumberValue<Integer>("几率",10,1,100,1);
     private NumberValue<Double> rangeValue = new NumberValue<Double>("Range", 3.1d, 2.0, 6.0, 0.01);
     private NumberValue<Integer> player = new NumberValue<Integer>("Player", 1, 0, 1, 1);
     public static LivingEntity target;
@@ -57,17 +58,6 @@ public class Killaura extends Module {
         this.targets.clear();
         target = null;
     }
-
-    /*  public static double generate(double cps, double range) {
-          double mean = 1000.0 / cps;
-          double stddev = mean * range / cps;
-          double noise;
-          do {
-              noise = mean + random.nextGaussian() * stddev;
-          } while (noise <= 0);
-          return Math.max(noise, 1);
-      }
-     */
     @Listener
     public boolean startauc(EventRender2D e) {
         if (target == null) return false;
@@ -76,9 +66,8 @@ public class Killaura extends Module {
         float pressPercentageValue = 17 / 100f;
         if (target != null && nowta && mc.player != null) {
             //rattarget(rotations[0],rotations[1])
-            if (rattarget(rotations[0]) && mc.player.canAttack(target) && jztargetrange(target) <= rangeValue.getValue()) {
+            if (rattarget(rotations[0]) && mc.player.canAttack(target) && jztargetrange(target) <= rangeValue.getValue()&&mc.player.canAttack(target)&&(Math.random() * 100) + 1/100 <= math.getValue()/100) {
                 mc.getConnection().send(ServerboundInteractPacket.createAttackPacket(target, true));
-                // mc.player.attack(target);
                 mc.player.swing(InteractionHand.MAIN_HAND);
                 try {
                     TimeUnit.MILLISECONDS.sleep((long) (1000 / dealya * pressPercentageValue) + (int) ((Math.random() * 800) + -800));

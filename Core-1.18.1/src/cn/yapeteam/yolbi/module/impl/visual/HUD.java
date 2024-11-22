@@ -22,7 +22,6 @@ public class HUD extends Module {
     public AbstractFontRenderer font = YolBi.instance.getFontManager().getMINE14();
     public String text = "";
     public int x = 2, y = 10, c = -1;
-
     @Listener
     private void renderArrayList(EventRender2D e) {
         mc.options.fov = 140;
@@ -38,5 +37,7 @@ public class HUD extends Module {
             text += "\n";
         }
         font.drawStringWithShadow(poseStack, text, x, y, -1);
+
     }
+
 }
