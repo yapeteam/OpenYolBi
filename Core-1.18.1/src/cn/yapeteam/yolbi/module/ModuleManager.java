@@ -37,7 +37,7 @@ public class ModuleManager {
 
     @Listener
     private void onKey(EventKey e) {
-        modules.stream().filter(m -> m.getKey() == e.getKey()).collect(Collectors.toList()).forEach(Module::toggle);
+        modules.stream().filter(m -> m.getKey() == e.getKey()).toList().forEach(Module::toggle);
     }
 
     public <T extends Module> T getModule(Class<T> clazz) {
