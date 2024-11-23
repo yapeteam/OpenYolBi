@@ -14,7 +14,7 @@ import net.minecraft.world.level.block.Block;
 
 public class Eagle extends Module {
     public Eagle() {
-        super("Eagle", ModuleCategory.MOVEMENT);
+        super("蹲搭", ModuleCategory.MOVEMENT);
     }
 
     public static Block getBlock(BlockPos pos) {

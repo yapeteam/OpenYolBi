@@ -26,14 +26,14 @@ import static cn.yapeteam.yolbi.module.impl.combat.AutoClicker.generate;
 public class Killaura extends Module {
     private Boolean open = false;
     public Killaura() {
-        super("Killaura", ModuleCategory.COMBAT, InputConstants.KEY_R);
-        addValues(cpsValue, rangeValue, aimrange);
+        super("杀戮光环", ModuleCategory.COMBAT, InputConstants.KEY_R);
+        addValues(cpsValue, rangeValue, aimrange,math);
     }
 
-    private NumberValue<Double> aimrange = new NumberValue<Double>("aIMRANGE", 4.5, 3.1, 7.1, 0.1);
-    private NumberValue<Integer> cpsValue = new NumberValue<Integer>("CPS", 11, 1, 20, 1);
+    private NumberValue<Double> aimrange = new NumberValue<Double>("瞄准距离", 4.5, 3.1, 7.1, 0.1);
+    private NumberValue<Integer> cpsValue = new NumberValue<Integer>("打击次数", 11, 1, 20, 1);
     private NumberValue<Integer> math = new NumberValue<Integer>("几率",10,1,100,1);
-    private NumberValue<Double> rangeValue = new NumberValue<Double>("Range", 3.1d, 2.0, 6.0, 0.01);
+    private NumberValue<Double> rangeValue = new NumberValue<Double>("距离", 3.1d, 2.0, 6.0, 0.01);
     private NumberValue<Integer> player = new NumberValue<Integer>("Player", 1, 0, 1, 1);
     public static LivingEntity target;
     private List<LivingEntity> targets = new ArrayList<>();

@@ -46,7 +46,7 @@ public class AutoClicker extends Module {
     private Thread clickThread = null;
 
     public AutoClicker() {
-        super("AutoClicker", ModuleCategory.COMBAT);
+        super("连点器", ModuleCategory.COMBAT);
         addValues(cps, range, pressPercentage, leftClick, rightClick, clickprio);
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             Natives.SendLeft(false);

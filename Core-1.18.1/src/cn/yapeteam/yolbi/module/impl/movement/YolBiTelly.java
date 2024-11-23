@@ -22,12 +22,12 @@ import static cn.yapeteam.yolbi.module.impl.combat.AutoClicker.generate;
 
 public class YolBiTelly extends Module {
     public YolBiTelly() {
-        super("YolBiTelly",ModuleCategory.COMBAT,InputConstants.KEY_R);
-        addValues();
+        super("神桥",ModuleCategory.MOVEMENT,InputConstants.KEY_R);
+        addValues(cps,pitch);
     }
   //  public AbstractFontRenderer font = YolBi.instance.getFontManager().getMINE14();
-    private NumberValue<Integer> cps = new NumberValue<Integer>("RCPS",27,1,50,1);
-    private NumberValue<Float> pitch = new NumberValue<Float>("Pitch",85.0f,-180.1f,180.1f,0.01f);
+    private NumberValue<Integer> cps = new NumberValue<Integer>("点击次数",27,1,50,1);
+    private NumberValue<Float> pitch = new NumberValue<Float>("神桥上下瞄准",85.0f,-180.1f,180.1f,0.01f);
     private float y;
     @Override
     protected void onEnable() {

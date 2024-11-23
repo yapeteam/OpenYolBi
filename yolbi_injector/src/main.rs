@@ -49,6 +49,7 @@ fn main() {
         println!("https://www.minecraft.net/zh-hans/eula");
         println!("YapeTeam对于因违反许可协议而产生的任何后果不承担责任。");
         println!("本软件承诺永久免费，请您确保从合法的免费渠道获得。");
+        println!("如是1.18.1请使用浏览器打开localhost:23333调参");
         if print.is_ok() {
             let symbol: Symbol<fn()> = print.unwrap();
             symbol();
