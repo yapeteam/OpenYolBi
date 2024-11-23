@@ -16,10 +16,12 @@ public class EntityPlayerSPTransformer extends ASMTransformer {
         super(LocalPlayer.class);
     }
 
+    @SuppressWarnings("unused")
     public static EventMotion onMotion(double x, double y, double z, float yaw, float pitch) {
         return YolBi.instance.getEventManager().post(new EventMotion(x, y, z, yaw, pitch));
     }
 
+    @SuppressWarnings("unused")
     public static void onUpdateEvent() {
         //Agent.System.out.println("update");
         //Agent.System.out.println(EventManager.REGISTRY_MAP);
@@ -27,6 +29,7 @@ public class EntityPlayerSPTransformer extends ASMTransformer {
     }
     //func_175161_p,onUpdateWalkingPlayer,0,called every tick when the player is on foot. Performs all the things that normally happen during movement.
 
+    @SuppressWarnings("unused")
     public static void onLivingUpdateEvent() {
         //Agent.System.out.println("livingupdate");
         //Agent.System.out.println(EventManager.REGISTRY_MAP);
@@ -53,8 +56,6 @@ public class EntityPlayerSPTransformer extends ASMTransformer {
         }
 
         methodNode.instructions.insert(target, list);
-
-
     }
 
     @Inject(method = "tick", desc = "()V")//@Mixin(method=Methods.onUpdate_Entity)
@@ -151,7 +152,5 @@ public class EntityPlayerSPTransformer extends ASMTransformer {
 
         }
         methodNode.instructions.insert(list);
-
-
     }
 }
