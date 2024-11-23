@@ -9,7 +9,7 @@ import cn.yapeteam.yolbi.module.ModuleCategory;
 
 public class SelfDestruct extends Module {
     public SelfDestruct() {
-        super("自我退出", ModuleCategory.MISC);
+        super("SelfExit", ModuleCategory.MISC);
     }
 
     public void onEnable() {

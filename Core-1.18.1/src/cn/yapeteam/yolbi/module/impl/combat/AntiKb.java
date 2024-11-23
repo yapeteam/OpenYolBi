@@ -16,12 +16,12 @@ import java.util.concurrent.TimeUnit;
 
 public class AntiKb extends Module {
     public AntiKb (){
-        super("反击退", ModuleCategory.COMBAT, InputConstants.KEY_R);
+        super("AntiKB", ModuleCategory.COMBAT, InputConstants.KEY_R);
     }
     public float h ;
-    private NumberValue<Integer> x = new NumberValue<Integer>("X轴击退减少",10,0,100,1);
-    private NumberValue<Integer> Z = new NumberValue<Integer>("Z轴击退减少",10,0,100,1);
-    private NumberValue<Integer> lon = new NumberValue<Integer>("延时",150,20,10000,20);
+    private NumberValue<Integer> x = new NumberValue<Integer>("X",10,0,100,1);
+    private NumberValue<Integer> Z = new NumberValue<Integer>("Z",10,0,100,1);
+    private NumberValue<Integer> lon = new NumberValue<Integer>("delay",150,20,10000,20);
     @Override
     protected void onEnable() {
         if(mc.player==null)return;

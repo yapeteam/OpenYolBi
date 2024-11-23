@@ -10,7 +10,7 @@ import net.minecraft.world.phys.Vec3;
 
 public class Sprint extends Module {
     public Sprint(){
-        super("疾跑", ModuleCategory.MOVEMENT, InputConstants.KEY_R);
+        super("Sprint", ModuleCategory.MOVEMENT, InputConstants.KEY_R);
         addValues();
     }
     @Listener
