@@ -34,11 +34,9 @@ public class NetworkHandlerTransformer extends ASMTransformer {
         mn.instructions.insert(list);
     }
 
+    @SuppressWarnings("unused")
     public static boolean onPacket(Object packet) {
-        if (PacketUtils.shouldSkip((Packet) packet)) {
-            PacketUtils.remove((Packet) packet);
-            return false;
-        }
+        if (PacketUtils.skip) return false;
         //Agent.logger.info(Mappings.getUnobfClass(packet.getClass().getName()));
         return ((CancellableEvent) YolBi.instance.getEventManager().post(new EventPacketSend((Packet) packet))).isCancelled();
     }

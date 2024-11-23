@@ -1,11 +1,9 @@
 package cn.yapeteam.yolbi.mixin.transformer;
 
 import cn.yapeteam.ymixin.ASMTransformer;
-
 import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.event.impl.player.EventChat;
 import net.minecraft.client.gui.screens.Screen;
-
 import org.objectweb.asm_9_2.Opcodes;
 import org.objectweb.asm_9_2.Type;
 import org.objectweb.asm_9_2.tree.*;
@@ -32,6 +30,7 @@ public class GuiScreenTransformer extends ASMTransformer {
         methodNode.instructions.insert(list);
     }
 
+    @SuppressWarnings("unused")
     public static boolean handler(String msg) {
         EventChat eventChat = new EventChat(msg);
         YolBi.instance.getEventManager().post(eventChat);

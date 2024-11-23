@@ -26,10 +26,12 @@ public class MinecraftTransformer extends ASMTransformer {
         methodNode.instructions.insert(new MethodInsnNode(Opcodes.INVOKESTATIC, Type.getInternalName(MinecraftTransformer.class), "onGetRenderViewEntity", "()V"));
     }
 
+    @SuppressWarnings("unused")
     public static void onRunTick() {
         YolBi.instance.getEventManager().post(new EventTick());
     }
 
+    @SuppressWarnings("unused")
     public static void onGetRenderViewEntity() {
         YolBi.instance.getEventManager().post(new EventView());
     }
