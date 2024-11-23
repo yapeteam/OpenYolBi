@@ -4,12 +4,19 @@ import cn.yapeteam.ymixin.utils.Mapper;
 import cn.yapeteam.yolbi.utils.IMinecraft;
 import net.minecraft.network.protocol.Packet;
 
+import java.util.Objects;
+
 public class PacketUtils implements IMinecraft {
     public static boolean skip = false;
 
     public static void sendPacketNoEvent(Packet packet) {
         skip = true;
-        mc.getConnection().send(packet);
+        if (isCPacket(packet)) {
+            mc.getConnection().send(packet);
+        }
+        if (isSPacket(packet)) {
+            packet.handle(Objects.requireNonNull(mc.getConnection().getConnection().getPacketListener()));
+        }
         skip = false;
     }
 
