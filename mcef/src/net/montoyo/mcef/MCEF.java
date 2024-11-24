@@ -35,8 +35,8 @@ public class MCEF {
         SKIP_UPDATES = true;
         WARN_UPDATES = true;
         USE_FORGE_SPLASH = false;
-        CEF_ARGS = new String[]{"--disable-gpu"};
-        SHUTDOWN_JCEF = false;
+        //CEF_ARGS = new String[]{"--disable-gpu"};
+        SHUTDOWN_JCEF = true;
         SECURE_MIRRORS_ONLY = false;
 
         //Config: debug
