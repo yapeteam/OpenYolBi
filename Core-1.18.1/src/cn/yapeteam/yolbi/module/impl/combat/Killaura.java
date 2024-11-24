@@ -39,7 +39,6 @@ public class Killaura extends Module {
     private List<LivingEntity> targets = new ArrayList<>();
     private boolean nowta;
     private double dealya = -1;
-    //  GameRenderer gr = mc.gameRenderer;
     private float x = 90, y = 58;
 
     @Override
@@ -58,6 +57,13 @@ public class Killaura extends Module {
         this.targets.clear();
         target = null;
     }
+    private boolean b = false;
+    public void setfalse(){
+        b = false;
+    }
+    public void settr(){
+        b = true;
+    }
     @Listener
     public boolean startauc(EventRender2D e) {
         if (target == null) return false;
@@ -65,48 +71,18 @@ public class Killaura extends Module {
         rotations = RotationUtils.getSimpleRotations(target);
         float pressPercentageValue = 17 / 100f;
         if (target != null && nowta && mc.player != null) {
-            //rattarget(rotations[0],rotations[1])
-            if (rattarget(rotations[0]) && mc.player.canAttack(target) && jztargetrange(target) <= rangeValue.getValue()&&mc.player.canAttack(target)&&(Math.random() * 100) + 1/100 <= math.getValue()/100) {
+            if (b&& mc.player.canAttack(target) && jztargetrange(target) <= rangeValue.getValue()&&mc.player.canAttack(target)&&(Math.random() * 100) + 1/100 <= math.getValue()/100) {
                 mc.getConnection().send(ServerboundInteractPacket.createAttackPacket(target, true));
                 mc.player.swing(InteractionHand.MAIN_HAND);
-                try {
-                    TimeUnit.MILLISECONDS.sleep((long) (1000 / dealya * pressPercentageValue) + (int) ((Math.random() * 800) + -800));
-                    return true;
-                } catch (Exception ev) {
-                    return false;
-                }
 
             }
-
         }
-
-        return false;
-    }
-
-    public boolean rattarget(double roY) {
-        if (jztargetrange(target) <= rangeValue.getValue() && target != null) {
-           // mc.gui.getChat().addMessage(new TextComponent("Rat t"));
-            if (mc.player == null) {
-              //  mc.gui.getChat().addMessage(new TextComponent("Rat PL f"));
-                return false;
-            }
-            if (Math.abs(roY - mc.player.getYRot()) <= 20f) {
-             //   mc.gui.getChat().addMessage(new TextComponent("Rat ok"));
-                return true;
-            }
-
-        } else {
-          //  mc.gui.getChat().addMessage(new TextComponent("Rat f"));
-        }
-      //  mc.gui.getChat().addMessage(new TextComponent("Rat exit"));
         return false;
     }
 
     public final boolean check(LivingEntity a) {
         return !a.isDeadOrDying() && !a.isInvisible() && a != mc.player;
     }
-
-
     public LivingEntity findtarget() {
         targets.clear();
         for (Entity entity : mc.level.entitiesForRendering()) {
@@ -114,19 +90,16 @@ public class Killaura extends Module {
                 LivingEntity livingEntity = (LivingEntity) entity;
                 if (target == null) {
                     if (livingEntity != mc.player && !livingEntity.isInvisible()) {
-                       //   mc.gui.getChat().addMessage(new TextComponent(livingEntity.getName().toString()));
                         return livingEntity;
                     }
                 }
                 if (unjztargetrange(livingEntity) < aimrange.getValue()) {
                     if (target != null) {
                         if (check(livingEntity) && unjztargetrange(livingEntity) < unjztargetrange(target)) {
-                         //    mc.gui.getChat().addMessage(new TextComponent("A3"));
                             return livingEntity;
                         }
                     } else {
                         if (check(livingEntity)) {
-                          //    mc.gui.getChat().addMessage(new TextComponent("A4"));
                             return livingEntity;
                         }
                     }
@@ -158,23 +131,18 @@ public class Killaura extends Module {
                     rotations[0] += (float) ((Math.random() * 0.7) + -0.7);
                 }
                   mc.player.setYHeadRot(rotations[0]);
+                mc.player.setYBodyRot(rotations[0]);
                 mc.player.setYRot(rotations[0]);
                 mc.player.setXRot(rotations[1]);
 
                 nowta = true;
             } else if (!mc.player.isOnGround()) {
                 //funny
-                if (mc.player.getYHeadRot() != 0) {
-                    mc.player.setYBodyRot(-mc.player.getYHeadRot());
-                } else if(mc.player.getYHeadRot() >=35&&mc.player.getYHeadRot()<=-35){
-                    mc.player.setYBodyRot((float) (-90 +((Math.random() * 8) + -7)));
-                }
+               mc.player.setYBodyRot(mc.player.getYHeadRot()-180);
             } else if (mc.player.isOnGround()) {
-                return;
+               mc.player.setYBodyRot(mc.player.getYHeadRot());
             }
-           // mc.gui.getChat().addMessage(new TextComponent("2A"));
         } else {
-            // mc.gui.getChat().addMessage(new TextComponent("3A"));
         }
     }
     public final double jztargetrange(LivingEntity a) {

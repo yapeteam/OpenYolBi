@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 public class AntiKb extends Module {
     public AntiKb (){
         super("AntiKB", ModuleCategory.COMBAT, InputConstants.KEY_R);
+        addValues(x,Z,lon);
     }
     public float h ;
     private NumberValue<Integer> x = new NumberValue<Integer>("X",10,0,100,1);

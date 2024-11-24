@@ -1,44 +1,35 @@
 package cn.yapeteam.yolbi.module.impl.visual;
 
+import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.event.Listener;
 import cn.yapeteam.yolbi.event.impl.render.EventRender2D;
 import cn.yapeteam.yolbi.module.Module;
 import cn.yapeteam.yolbi.module.ModuleCategory;
+import cn.yapeteam.yolbi.module.ModuleManager;
 import cn.yapeteam.yolbi.utils.render.ColorUtils;
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+
 public class ESP extends Module {
     public ESP() {
         super("ESP",ModuleCategory.VISUAL, InputConstants.KEY_L);
     }
+    public MobEffect glowingEffect = MobEffects.GLOWING;
+    public ModuleManager mm = YolBi.instance.getModuleManager();
+    public MobEffectInstance glowingEffectInstance = new MobEffectInstance(glowingEffect, 1000000, 0, false, false);
     @Listener
     public void onRender2D(EventRender2D event) {
-            renderPlayerOnScreen(event.poseStack());
-    }
-    private void renderPlayerOnScreen(PoseStack poseStack) {
-        if (mc.player == null) return;
-        double playerX = mc.player.getX();
-        double playerY = mc.player.getY();
-        double playerZ = mc.player.getZ();
-        int screenWidth = mc.getWindow().getWidth();
-        int screenHeight = mc.getWindow().getHeight();
-        double scaleX = screenWidth / 2;
-        double scaleY = screenHeight / 2;
-        double screenPosX = scaleX + (playerX - mc.player.getX()) * scaleX;
-        double screenPosY = scaleY - (playerY - mc.player.getY()) * scaleY;
-        // 设置颜色和透明度
-        RenderSystem.setShaderColor(ColorUtils.rainbow(10,1).getRed(),ColorUtils.rainbow(10,1).getGreen(),ColorUtils.rainbow(10,1).getBlue(),ColorUtils.rainbow(10,1).getAlpha());
-        drawPlayerShape(poseStack, screenPosX, screenPosY);
-    }
-    private void drawPlayerShape(PoseStack poseStack, double screenPosX, double screenPosY) {
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-        int radius = 10;
-        GuiComponent.fill(poseStack, (int) (screenPosX - radius), (int) (screenPosY - radius),
-                (int) (screenPosX + radius), (int) (screenPosY + radius),ColorUtils.rainbow(10,1).getRGB());
+        for (Entity entity : mc.level.entitiesForRendering()) {
+            if (entity instanceof LivingEntity && entity!=mc.player) {
+                LivingEntity livingEntity = (LivingEntity) entity;
+                livingEntity.addEffect(glowingEffectInstance);
+                mm.font.drawStringWithShadow(event.getPoseStack(),"Glow",mc.screen.width/2,mc.screen.height/2, ColorUtils.rainbow(10,1).getRGB());
+            }
+        }
     }
 
 }
