@@ -57,6 +57,13 @@ public class Killaura extends Module {
         this.targets.clear();
         target = null;
     }
+    private boolean b = false;
+    public void setfalse(){
+        b = false;
+    }
+    public void settr(){
+        b = true;
+    }
     @Listener
     public boolean startauc(EventRender2D e) {
         if (target == null) return false;
@@ -64,33 +71,15 @@ public class Killaura extends Module {
         rotations = RotationUtils.getSimpleRotations(target);
         float pressPercentageValue = 17 / 100f;
         if (target != null && nowta && mc.player != null) {
-            if (rattarget(rotations[0]) && mc.player.canAttack(target) && jztargetrange(target) <= rangeValue.getValue()&&mc.player.canAttack(target)&&(Math.random() * 100) + 1/100 <= math.getValue()/100) {
+            if (b&& mc.player.canAttack(target) && jztargetrange(target) <= rangeValue.getValue()&&mc.player.canAttack(target)&&(Math.random() * 100) + 1/100 <= math.getValue()/100) {
                 mc.getConnection().send(ServerboundInteractPacket.createAttackPacket(target, true));
                 mc.player.swing(InteractionHand.MAIN_HAND);
-                try {
-                    TimeUnit.MILLISECONDS.sleep((long) (1000 / dealya * pressPercentageValue) + (int) ((Math.random() * 800) + -800));
-                    return true;
-                } catch (Exception ev) {
-                    return false;
-                }
+
             }
         }
         return false;
     }
 
-    public boolean rattarget(double roY) {
-        if (jztargetrange(target) <= rangeValue.getValue() && target != null) {
-            if (mc.player == null) {
-                return false;
-            }
-            if (Math.abs(roY - mc.player.getYRot()) <= 20f) {
-                return true;
-            }
-
-        } else {
-        }
-        return false;
-    }
     public final boolean check(LivingEntity a) {
         return !a.isDeadOrDying() && !a.isInvisible() && a != mc.player;
     }

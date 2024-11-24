@@ -1,6 +1,7 @@
 package cn.yapeteam.yolbi.module.impl.combat;
 
 import cn.yapeteam.loader.Natives;
+import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.module.Module;
 import cn.yapeteam.yolbi.module.ModuleCategory;
 import cn.yapeteam.yolbi.module.values.impl.BooleanValue;
@@ -15,8 +16,9 @@ public class AutoClicker extends Module {
     private final NumberValue<Integer> cps = new NumberValue<>("cps", 17, 1, 100, 1);
     private final NumberValue<Double> range = new NumberValue<>("cps range", 1.5, 0.1d, 2.5d, 0.1);
     private final NumberValue<Integer> pressPercentage = new NumberValue<>("Press Percentage", 20, 0, 100, 1);
-    private final BooleanValue leftClick = new BooleanValue("leftClick", true),
-            rightClick = new BooleanValue("rightClick", false);
+    private final BooleanValue leftClick = new BooleanValue("leftClick", true);
+    public Killaura ka = YolBi.instance.getka();
+    private BooleanValue rightClick = new BooleanValue("rightClick", false);
     private final ModeValue<String> clickprio = new ModeValue<>("Click Priority", "Left", "Left", "Right");
     private double delay = -1;
     public double getDelay(){
@@ -70,6 +72,7 @@ public class AutoClicker extends Module {
         try {
             float pressPercentageValue = pressPercentage.getValue() / 100f;
             Natives.SendLeft(true);
+
             Thread.sleep((long) (1000 / delay * pressPercentageValue));
             Natives.SendLeft(false);
             Thread.sleep((long) (1000 / delay * (1 - pressPercentageValue)));
@@ -81,7 +84,9 @@ public class AutoClicker extends Module {
         try {
             float pressPercentageValue = pressPercentage.getValue() / 100f;
             Natives.SendRight(true);
+            ka.settr();
             Thread.sleep((long) (1000 / delay * pressPercentageValue));
+            ka.setfalse();
             Natives.SendRight(false);
             Thread.sleep((long) (1000 / delay * (1 - pressPercentageValue)));
         } catch (InterruptedException ignored) {

@@ -8,6 +8,7 @@ import cn.yapeteam.yolbi.event.EventManager;
 import cn.yapeteam.yolbi.font.FontManager;
 import cn.yapeteam.yolbi.managers.RotationManager;
 import cn.yapeteam.yolbi.module.ModuleManager;
+import cn.yapeteam.yolbi.module.impl.combat.Killaura;
 import cn.yapeteam.yolbi.server.WebServer;
 import lombok.Getter;
 
@@ -27,6 +28,7 @@ public class YolBi {
     private RotationManager rotationManager;
     private CommandManager commandManager;
     private FontManager fontManager;
+    private Killaura ka;
 
     public EventManager getEventManager() {
         if (eventManager == null)
@@ -50,7 +52,11 @@ public class YolBi {
             fontManager = new FontManager();
         return fontManager;
     }
-
+    public Killaura getka() {
+        if (ka == null)
+            ka = new Killaura();
+        return ka;
+    }
 
     public static void initialize() {
         if (initialized || instance == null) return;
