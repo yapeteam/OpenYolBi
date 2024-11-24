@@ -6,12 +6,10 @@ import lombok.Setter;
 import java.util.ArrayList;
 
 
+@Setter
+@Getter
 public class Music {
-    @Getter
-    @Setter
     String name;
-    @Getter
-    @Setter
     ArrayList<MusicNote> notes;
 
     public Music() {
