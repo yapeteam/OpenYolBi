@@ -1,16 +1,21 @@
 package cn.yapeteam.yolbi.module;
 
+import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.event.Listener;
 import cn.yapeteam.yolbi.event.impl.game.EventKey;
+import cn.yapeteam.yolbi.event.impl.render.EventRender2D;
+import cn.yapeteam.yolbi.font.AbstractFontRenderer;
 import cn.yapeteam.yolbi.module.impl.combat.AntiKb;
 import cn.yapeteam.yolbi.module.impl.combat.AutoClicker;
 import cn.yapeteam.yolbi.module.impl.combat.Killaura;
 import cn.yapeteam.yolbi.module.impl.misc.SelfDestruct;
 import cn.yapeteam.yolbi.module.impl.movement.Eagle;
+import cn.yapeteam.yolbi.module.impl.movement.Sprint;
 import cn.yapeteam.yolbi.module.impl.movement.YolBiTelly;
 import cn.yapeteam.yolbi.module.impl.visual.ClientTheme;
 import cn.yapeteam.yolbi.module.impl.visual.ESP;
 import cn.yapeteam.yolbi.module.impl.visual.HUD;
+import com.mojang.blaze3d.vertex.PoseStack;
 import lombok.Getter;
 
 import java.util.List;
@@ -21,7 +26,7 @@ import java.util.stream.Collectors;
 @SuppressWarnings({"unchecked", "unused"})
 public class ModuleManager {
     private final List<Module> modules = new CopyOnWriteArrayList<>();
-
+    public AbstractFontRenderer font = YolBi.instance.getFontManager().getMINE14();
     public void load() {
         modules.add(new SelfDestruct());
         modules.add(new ClientTheme());
@@ -32,9 +37,9 @@ public class ModuleManager {
         modules.add(new AntiKb());
         modules.add(new ESP());
         modules.add(new YolBiTelly());
+        modules.add(new Sprint());
         modules.sort((m1, m2) -> -Integer.compare(m2.getName().charAt(0), m1.getName().charAt(0)));
     }
-
     @Listener
     private void onKey(EventKey e) {
         modules.stream().filter(m -> m.getKey() == e.getKey()).collect(Collectors.toList()).forEach(Module::toggle);

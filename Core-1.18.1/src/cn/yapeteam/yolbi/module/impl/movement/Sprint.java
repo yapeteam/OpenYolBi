@@ -27,7 +27,8 @@ public class Sprint extends Module {
         }
         //为负后
         else if (dotProduct < 0) {
-            mc.player.setSprinting(false);
+            mc.player.setYBodyRot(mc.player.getYHeadRot()-180);
+            mc.player.setSprinting(true);
         } else {
             Natives.SetKeyBoard(InputConstants.KEY_W,true);
             mc.player.setSprinting(true);

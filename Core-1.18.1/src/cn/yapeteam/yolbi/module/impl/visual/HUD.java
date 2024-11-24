@@ -25,6 +25,7 @@ public class HUD extends Module {
     private NumberValue<Integer> fov = new NumberValue<Integer>("Fov",140,10,200,2);
     public String text = "";
     public int x = 2, y = 10, c = -1;
+
     @Listener
     private void renderArrayList(EventRender2D e) {
         mc.options.fov = fov.getValue();
