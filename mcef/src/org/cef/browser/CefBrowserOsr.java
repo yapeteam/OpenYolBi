@@ -5,7 +5,9 @@ import net.montoyo.mcef.api.IBrowser;
 import net.montoyo.mcef.api.IStringVisitor;
 import net.montoyo.mcef.client.ClientProxy;
 import net.montoyo.mcef.client.StringVisitor;
+import net.montoyo.mcef.utilities.Keyboard;
 import net.montoyo.mcef.utilities.Log;
+import net.montoyo.mcef.utilities.UnsafeUtils;
 import org.cef.CefClient;
 import org.cef.DummyComponent;
 import org.cef.callback.*;
@@ -16,6 +18,7 @@ import org.cef.misc.CefPdfPrintSettings;
 import org.cef.network.CefRequest;
 
 import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -427,25 +430,6 @@ public class CefBrowserOsr extends CefBrowser_N implements CefRenderHandler, IBr
         return this.renderer_.texture_id_[0];
     }
 
-    @Override
-    public void injectMouseMove(int x, int y, int mods, boolean left) {
-        MouseEvent ev = new MouseEvent(this.dc_, 503, 0L, mods, x, y, 0, false);
-        this.lastMouseEvent = ev;
-        sendMouseEvent(ev);
-    }
-
-    @Override
-    public void injectMouseButton(int x, int y, int mods, int btn, boolean pressed, int ccnt) {
-        MouseEvent ev = new MouseEvent(this.dc_, pressed ? 501 : 502, 0L, mods, x, y, ccnt, false, btn);
-        sendMouseEvent(ev);
-    }
-
-    @Override
-    public void injectKeyTyped(char c, int mods) {
-        KeyEvent ev = new KeyEvent(this.dc_, 400, 0L, mods, 0, c);
-        sendKeyEvent(ev);
-    }
-
     public static int remapKeycode(int kc, char c) {
         switch (kc) {
             case 1:
@@ -480,22 +464,246 @@ public class CefBrowserOsr extends CefBrowser_N implements CefRenderHandler, IBr
     }
 
     @Override
-    public void injectKeyPressedByKeyCode(int keyCode, char c, int mods) {
-        KeyEvent ev = new KeyEvent(this.dc_, 401, 0L, mods, remapKeycode(keyCode, c), c);
+    public void sendMouseMove(int x, int y, int mods, boolean left) {
+        MouseEvent ev = new MouseEvent(this.dc_, 503, 0L, mods, x, y, 0, false);
+        this.lastMouseEvent = ev;
+        sendMouseEvent(ev);
+    }
+
+    @Deprecated
+    public void injectMouseButton(int x, int y, int mods, int btn, boolean pressed, int ccnt) {
+        MouseEvent ev = new MouseEvent(this.dc_, pressed ? 501 : 502, 0L, mods, x, y, ccnt, false, btn);
+        sendMouseEvent(ev);
+    }
+
+    @Override
+    public void sendMouseButton(int x, int y, int mods, int button, boolean pressed, int ccnt) {
+        if (button == 2) {
+            button = 0;
+        } else if (button == 3) {
+            button = 2;
+        }
+
+        if (button == 4 && canGoBack()) {
+            goBack();
+            return;
+        } else if (button == 5 && canGoForward()) {
+            goForward();
+            return;
+        }
+
+        MouseEvent event = new MouseEvent(dc_, pressed ? MouseEvent.MOUSE_PRESSED : MouseEvent.MOUSE_RELEASED, 0, mods, x, y, ccnt, false, button);
+        sendMouseEvent(event);
+    }
+
+    @Override
+    public void sendMouseWheel(int x, int y, int mods, int amount, int rot) {
+        MouseWheelEvent event = new MouseWheelEvent(dc_, MouseEvent.MOUSE_WHEEL, 0, mods, x, y, 0, false, MouseWheelEvent.WHEEL_UNIT_SCROLL, amount, rot);
+        sendMouseWheelEvent(event);
+    }
+
+    @Override
+    public void sendKeyPressed(int key, char c, int mods) {
+        if (key == Keyboard.KEY_BACK || key == Keyboard.KEY_HOME || key == Keyboard.KEY_END ||
+                key == Keyboard.KEY_UP || key == Keyboard.KEY_DOWN || key == Keyboard.KEY_LEFT || key == Keyboard.KEY_RIGHT ||
+                key == Keyboard.KEY_CAPITAL || key == Keyboard.KEY_PAUSE || key == Keyboard.KEY_INSERT) {
+            KeyEvent ev = UnsafeUtils.makeEvent(dc_, remapKeyCode(key, KeyEvent.CHAR_UNDEFINED, mods), KeyEvent.CHAR_UNDEFINED,
+                    KeyEvent.KEY_LOCATION_UNKNOWN, KeyEvent.KEY_PRESSED, 0, remapModifiers(mods), mapScanCode(key, c));
+            sendKeyEvent(ev);
+        } else {
+
+            int raw = key;
+
+            if (c == '\n') {
+                raw = 13;
+            }
+
+            KeyEvent ev = UnsafeUtils.makeEvent(dc_, remapKeyCode(key, c, mods), c,
+                    KeyEvent.KEY_LOCATION_UNKNOWN, KeyEvent.KEY_PRESSED, 0, remapModifiers(mods), mapScanCode(key, c), raw);
+            sendKeyEvent(ev);
+        }
+    }
+
+    @Override
+    public void sendKeyTyped(int key, int mods) {
+        char c = (char) key;
+        int keyRemapped = remapKeyCode(key, (char) key, mods);
+
+        if (key != KeyEvent.VK_UNDEFINED) {
+
+            if (key == Keyboard.KEY_BACK || key == Keyboard.KEY_HOME || key == Keyboard.KEY_END ||
+                    key == Keyboard.KEY_UP || key == Keyboard.KEY_DOWN || key == Keyboard.KEY_RIGHT ||
+                    key == Keyboard.KEY_LEFT || key == Keyboard.KEY_PAUSE || key == Keyboard.KEY_INSERT) {
+                KeyEvent ev = UnsafeUtils.makeEvent(dc_, keyRemapped, KeyEvent.CHAR_UNDEFINED,
+                        KeyEvent.KEY_LOCATION_UNKNOWN, KeyEvent.KEY_TYPED, 0, remapModifiers(mods), mapScanCode(keyRemapped, c));
+                sendKeyEvent(ev);
+            } else if (key == KeyEvent.VK_ENTER || key == Keyboard.KEY_RETURN || key == Keyboard.KEY_NUMPADENTER) {
+
+                int raw = key;
+
+                if (c == '\n') {
+                    raw = 13;
+                }
+
+                KeyEvent ev = UnsafeUtils.makeEvent(dc_, key, '\n',
+                        KeyEvent.KEY_LOCATION_UNKNOWN, KeyEvent.KEY_TYPED, 0, remapModifiers(mods), mapScanCode(key, c), raw);
+                sendKeyEvent(ev);
+            } else {
+                KeyEvent ev = UnsafeUtils.makeEvent(dc_, keyRemapped, c,
+                        KeyEvent.KEY_LOCATION_UNKNOWN, KeyEvent.KEY_TYPED, 0, remapModifiers(mods), mapScanCode(keyRemapped, c));
+                sendKeyEvent(ev);
+            }
+        }
+    }
+
+    @Override
+    public void sendKeyReleased(int key, char c, int mods) {
+        KeyEvent ev;
+        if (key == Keyboard.KEY_BACK || key == Keyboard.KEY_HOME || key == Keyboard.KEY_END || key == Keyboard.KEY_UP ||
+                key == Keyboard.KEY_DOWN || key == Keyboard.KEY_RIGHT || key == Keyboard.KEY_LEFT || key == Keyboard.KEY_PAUSE ||
+                key == Keyboard.KEY_INSERT) {
+            ev = UnsafeUtils.makeEvent(dc_, remapKeyCode(key, KeyEvent.CHAR_UNDEFINED, mods), c,
+                    KeyEvent.KEY_LOCATION_UNKNOWN, KeyEvent.KEY_RELEASED, 0, remapModifiers(mods), mapScanCode(key, c));
+        } else {
+            ev = UnsafeUtils.makeEvent(dc_, remapKeyCode(key, c, mods), c,
+                    KeyEvent.KEY_LOCATION_UNKNOWN, KeyEvent.KEY_RELEASED, 0, remapModifiers(mods), mapScanCode(key, c));
+        }
         sendKeyEvent(ev);
     }
 
     @Override
-    public void injectKeyReleasedByKeyCode(int keyCode, char c, int mods) {
-        KeyEvent ev = new KeyEvent(this.dc_, 402, 0L, mods, remapKeycode(keyCode, c), c);
-        sendKeyEvent(ev);
+    public void sendPaste() {
+        String clipboardText = getStringFromClipboard();
+
+        if (clipboardText != null) {
+            for (char c : clipboardText.toCharArray()) {
+                KeyEvent ev = new KeyEvent(dc_, KeyEvent.KEY_TYPED, 0, 0, 0, c);
+                sendKeyEvent(ev);
+            }
+        }
     }
 
-    @Override
-    public void injectMouseWheel(int x, int y, int mods, int amount, int rot) {
-        MouseWheelEvent ev = new MouseWheelEvent(this.dc_, 507, 0L, mods, x, y, 0, false, 0, amount, rot);
-        sendMouseWheelEvent(ev);
+    public static String getStringFromClipboard() {
+        try {
+            return Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null).getTransferData(DataFlavor.stringFlavor).toString();
+        } catch (Exception e) {
+            return null;
+        }
     }
+
+
+    private int remapModifiers(int mods) {
+
+        int vkMods = 0;
+
+        if ((mods & Keyboard.KEY_LCONTROL) != 0) {
+            vkMods |= KeyEvent.CTRL_DOWN_MASK | KeyEvent.CTRL_MASK;
+        }
+
+        if ((mods & Keyboard.KEY_LMENU) != 0) {
+            vkMods |= KeyEvent.ALT_DOWN_MASK | KeyEvent.ALT_MASK;
+        }
+
+        if ((mods & Keyboard.KEY_LSHIFT) != 0) {
+            vkMods |= KeyEvent.SHIFT_DOWN_MASK | KeyEvent.SHIFT_MASK;
+        }
+
+        if ((mods & Keyboard.KEY_LMETA) != 0) {
+            vkMods |= KeyEvent.META_DOWN_MASK | KeyEvent.META_MASK;
+        }
+
+        return vkMods;
+    }
+
+    private int remapKeyCode(int key, char c, int mods) {
+
+        if (key == Keyboard.KEY_ESCAPE) {
+            return KeyEvent.VK_ESCAPE;
+        }
+
+        if (key == Keyboard.KEY_TAB) {
+            return KeyEvent.VK_TAB;
+        }
+
+        int ck = getChar(key, 0, mods);
+
+        if (ck == 0) {
+            return c;
+        }
+
+        return ck;
+    }
+
+    private int getChar(int key, int scanCode, int mod) {
+
+        if (key == Keyboard.KEY_LCONTROL || key == Keyboard.KEY_RCONTROL || key == Keyboard.KEY_END) {
+            return '\uFFFF';
+        }
+
+        if (key == Keyboard.KEY_RETURN || key == Keyboard.KEY_NUMPADENTER || key == KeyEvent.VK_ENTER) {
+            return '\n';
+        }
+
+        if (key == Keyboard.KEY_SPACE) {
+            return 32;
+        }
+
+        if (key == Keyboard.KEY_BACK) {
+            return 8;
+        }
+
+        if (key == Keyboard.KEY_DELETE) {
+            return '\u007F';
+        }
+
+        return key;
+    }
+
+    private long mapScanCode(int key, char c) {
+
+        if (key == Keyboard.KEY_LCONTROL || key == Keyboard.KEY_RCONTROL) {
+            return 29;
+        }
+
+        if (key == Keyboard.KEY_DELETE) {
+            return 83;
+        }
+
+        if (key == Keyboard.KEY_LEFT) {
+            return 75;
+        }
+
+        if (key == Keyboard.KEY_DOWN) {
+            return 80;
+        }
+
+        if (key == Keyboard.KEY_UP) {
+            return 72;
+        }
+
+        if (key == Keyboard.KEY_RIGHT) {
+            return 77;
+        }
+
+        if (key == Keyboard.KEY_END) {
+            return 79;
+        }
+
+        if (key == Keyboard.KEY_HOME) {
+            return 71;
+        }
+
+        if (key == Keyboard.KEY_RETURN || key == Keyboard.KEY_NUMPADENTER || key == KeyEvent.VK_ENTER) {
+            return 28;
+        }
+
+        if (key == Keyboard.KEY_BACK) {
+            return 14;
+        }
+
+        return 0;
+    }
+
 
     @Override
     public void runJS(String script, String frame) {
