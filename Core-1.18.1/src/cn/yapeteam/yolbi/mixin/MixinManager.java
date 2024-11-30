@@ -27,6 +27,7 @@ public class MixinManager {
         mixinTransformer = new MixinTransformer(JVMTIWrapper.instance::getClassBytes);
         addMixin("MixinMinecraft");
         addMixin("MixinGaeRenderer");
+        addMixin("CameraMixin");
         addTransformer(new EntityPlayerSPTransformer());
         addTransformer(new EntityTransformer());
         addTransformer(new GuiScreenTransformer());

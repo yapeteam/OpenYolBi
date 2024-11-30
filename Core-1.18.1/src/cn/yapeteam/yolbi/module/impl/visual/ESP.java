@@ -2,11 +2,12 @@ package cn.yapeteam.yolbi.module.impl.visual;
 
 import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.event.Listener;
-import cn.yapeteam.yolbi.event.impl.render.EventRender2D;
+import cn.yapeteam.yolbi.event.impl.render.EventRender3D;
 import cn.yapeteam.yolbi.module.Module;
 import cn.yapeteam.yolbi.module.ModuleCategory;
 import cn.yapeteam.yolbi.module.ModuleManager;
 import cn.yapeteam.yolbi.utils.render.ColorUtils;
+import cn.yapeteam.yolbi.utils.render.RenderUtils;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -22,11 +23,12 @@ public class ESP extends Module {
     public ModuleManager mm = YolBi.instance.getModuleManager();
     public MobEffectInstance glowingEffectInstance = new MobEffectInstance(glowingEffect, 1000000, 0, false, false);
     @Listener
-    public void onRender2D(EventRender2D event) {
+    public void onRender2D(EventRender3D event) {
         for (Entity entity : mc.level.entitiesForRendering()) {
             if (entity instanceof LivingEntity && entity!=mc.player) {
                 LivingEntity livingEntity = (LivingEntity) entity;
                 livingEntity.addEffect(glowingEffectInstance);
+                RenderUtils.renderEntityBoundingBox(event.getPoseStack(),entity,ColorUtils.rainbow(10,1).getRGB(),false);
                 mm.font.drawStringWithShadow(event.getPoseStack(),"Glow",mc.screen.width/2,mc.screen.height/2, ColorUtils.rainbow(10,1).getRGB());
             }
         }

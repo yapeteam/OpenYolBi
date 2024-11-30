@@ -38,7 +38,7 @@ public class HUD extends Module {
         ERor.drawStringWithShadow(poseStack, "Yolbi " + VersionInfo.version, 2, 2, ColorUtils.rainbow(10,1).getRGB());
         for (Module module : YolBi.instance.getModuleManager().getModules().stream().filter(Module::isEnabled).collect(Collectors.toList())) {
             text = text + module.getName() + (module.getSuffix() != null ? (" " + ChatFormatting.GRAY + module.getSuffix()) : "");
-            text += "\n";
+            text += "\n\n";
         }
         font.drawStringWithShadow(poseStack, text, x, y, -1);
 

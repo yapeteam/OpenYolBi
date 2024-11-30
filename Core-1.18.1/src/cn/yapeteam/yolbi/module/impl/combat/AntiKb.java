@@ -52,17 +52,22 @@ public class AntiKb extends Module {
 
         double x2 = mc.player.getDeltaMovement().x;
         double z2 = mc.player.getDeltaMovement().z;
+        double y2 = mc.player.getDeltaMovement().y;
         if(mc.player.isOnGround()){
             mc.player.setDeltaMovement(0.0, mc.player.getDeltaMovement().y+0.42, 0.0);
         }else{
             if(x2 - x.getValue()/100 <0){
                 x2 = 0;
+            }else{
+                x2 = x2 - x.getValue()/150;
             }
             if(z2 - Z.getValue()/100 <0){
                 z2 = 0;
+            }else{
+                z2 = z2 - Z.getValue()/150;
             }
-
-            mc.player.setDeltaMovement(x2 , mc.player.getDeltaMovement().y, z2);
+            y2 = mc.player.getDeltaMovement().y  + 0.42/(y2*0.7);
+            mc.player.setDeltaMovement(x2  , y2, z2);
         }
 
     }
