@@ -1,6 +1,7 @@
 package net.montoyo.mcef.client;
 
 import cn.yapeteam.loader.Loader;
+import cn.yapeteam.loader.logger.Logger;
 import lombok.Getter;
 import net.montoyo.mcef.BaseProxy;
 import net.montoyo.mcef.MCEF;
@@ -9,6 +10,7 @@ import net.montoyo.mcef.api.IDisplayHandler;
 import net.montoyo.mcef.api.IJSQueryHandler;
 import net.montoyo.mcef.api.IScheme;
 import net.montoyo.mcef.utilities.Log;
+import net.montoyo.mcef.utilities.Util;
 import net.montoyo.mcef.virtual.VirtualBrowser;
 import org.cef.CefApp;
 import org.cef.CefClient;
@@ -76,6 +78,7 @@ public class ClientProxy extends BaseProxy {
             libs.add("chrome_elf.dll");
             libs.add("libcef.dll");
             libs.add("jcef.dll");
+            Util.unzip(new File(ROOT, "libcef.zip").getAbsolutePath(), ROOT);
 
             for (String lib : libs) {
                 File f = new File(ROOT, lib);
@@ -85,7 +88,8 @@ public class ClientProxy extends BaseProxy {
                     f = f.getAbsoluteFile();
                 }
 
-                System.load(f.getPath());
+                System.load(f.getAbsolutePath());
+                Logger.success("loaded {}", f.getAbsolutePath());
             }
 
         } catch (Throwable t) {

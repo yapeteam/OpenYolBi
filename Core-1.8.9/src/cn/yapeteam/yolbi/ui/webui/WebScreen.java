@@ -13,6 +13,8 @@ import net.montoyo.mcef.api.IJSQueryHandler;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
+import java.io.IOException;
+
 @Getter
 public abstract class WebScreen extends GuiScreen
         implements IDisplayHandler, IJSQueryHandler {
@@ -40,7 +42,7 @@ public abstract class WebScreen extends GuiScreen
         if (browser != null)
             browser.resize(mc.displayWidth, mc.displayHeight);
         //Create GUI
-        Keyboard.enableRepeatEvents(true);
+        // Keyboard.enableRepeatEvents(true);
     }
 
     @Super
@@ -56,7 +58,7 @@ public abstract class WebScreen extends GuiScreen
         }
     }
 
-    @Super
+/*    @Super
     @Override
     public void handleInput() {
         while (Keyboard.next()) {
@@ -98,6 +100,63 @@ public abstract class WebScreen extends GuiScreen
                     browser.injectMouseButton(sx, y, 0, btn + 1, pressed, 1);
             }
         }
+    }*/
+
+    @Super
+    @Override
+    public void handleInput() {
+        while (Keyboard.next()) {
+            if (Keyboard.getEventKey() == Keyboard.KEY_ESCAPE) {
+                mc.displayGuiScreen(null);
+                return;
+            }
+
+            boolean pressed = Keyboard.getEventKeyState();
+            char key = Keyboard.getEventCharacter();
+            int num = Keyboard.getEventKey();
+
+            if (browser != null) {
+
+                if (pressed) {
+                    browser.sendKeyPressed(num, key, 0);
+                } else {
+                    browser.sendKeyReleased(num, key, 0);
+                }
+
+                if (key != 0) {
+                    browser.sendKeyTyped(key, 0);
+                    if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) && Keyboard.isKeyDown(Keyboard.KEY_V)) {
+                        browser.sendPaste();
+                    }
+                }
+            }
+
+            if (pressed) {
+                try {
+                    keyTyped(key, num);
+                } catch (IOException ignored) {
+                }
+            }
+        }
+
+        while (Mouse.next()) {
+            int btn = Mouse.getEventButton();
+            boolean pressed = Mouse.getEventButtonState();
+            int sx = Mouse.getEventX();
+            int sy = Mouse.getEventY();
+            int wheel = Mouse.getEventDWheel();
+
+            if (browser != null) { //Inject events into browser. TODO: Handle mods & leaving.
+                int y = mc.displayHeight - sy; //Don't forget to flip Y axis.
+
+                if (wheel != 0)
+                    browser.sendMouseWheel(sx, y, 0, 1, wheel);
+                else if (btn == -1)
+                    browser.sendMouseMove(sx, y, 0, y < 0);
+                else
+                    browser.sendMouseButton(sx, y, 0, btn + 1, pressed, 1);
+            }
+        }
     }
 
     @Super
@@ -109,7 +168,7 @@ public abstract class WebScreen extends GuiScreen
             browser = null;
         }
 
-        Keyboard.enableRepeatEvents(false);
+        //Keyboard.enableRepeatEvents(false);
     }
 
     @Super

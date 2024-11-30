@@ -23,14 +23,8 @@ public class BrowserScreen extends GuiScreen {
     private GuiButton fwd = null;
     private GuiButton go = null;
     private GuiButton min = null;
-    private GuiButton vidMode = null;
     private GuiTextField url = null;
     private String urlToLoad;
-
-    private static final String YT_REGEX1 = "^https?://(?:www\\.)?youtube\\.com/watch\\?v=([a-zA-Z0-9_\\-]+)$";
-    private static final String YT_REGEX2 = "^https?://(?:www\\.)?youtu\\.be/([a-zA-Z0-9_\\-]+)$";
-    private static final String YT_REGEX3 = "^https?://(?:www\\.)?youtube\\.com/embed/([a-zA-Z0-9_\\-]+)(\\?.+)?$";
-
 
     public BrowserScreen() {
         urlToLoad = MCEF.HOME_PAGE;
@@ -50,8 +44,6 @@ public class BrowserScreen extends GuiScreen {
     @Super
     @Override
     public void initGui() {
-        BrowserHandler.INSTANCE.hudBrowser = null;
-
         if (browser == null) {
             //Grab the API and make sure it isn't null.
             API api = MCEFApi.getAPI();
@@ -78,8 +70,6 @@ public class BrowserScreen extends GuiScreen {
             buttonList.add(fwd = (new GuiButton(1, 20, 0, 20, 20, ">")));
             buttonList.add(go = (new GuiButton(2, width - 60, 0, 20, 20, "Go")));
             buttonList.add(min = (new GuiButton(3, width - 20, 0, 20, 20, "_")));
-            buttonList.add(vidMode = (new GuiButton(4, width - 40, 0, 20, 20, "YT")));
-            vidMode.enabled = false;
 
             url = new GuiTextField(5, fontRenderer, 40, 0, width - 100, 20);
             url.setMaxStringLength(65535);
@@ -89,10 +79,8 @@ public class BrowserScreen extends GuiScreen {
             buttonList.add(fwd);
             buttonList.add(go);
             buttonList.add(min);
-            buttonList.add(vidMode);
 
             //Handle resizing
-            vidMode.xPosition = width - 40;
             go.xPosition = width - 60;
             min.xPosition = width - 20;
 
@@ -169,12 +157,16 @@ public class BrowserScreen extends GuiScreen {
 
             if (browser != null && !focused) { //Inject events into browser
                 if (pressed)
-                    browser.injectKeyPressedByKeyCode(num, key, 0);
+                    browser.sendKeyPressed(num, key, 0);
                 else
-                    browser.injectKeyReleasedByKeyCode(num, key, 0);
+                    browser.sendKeyReleased(num, key, 0);
 
-                if (key != 0)
-                    browser.injectKeyTyped(key, 0);
+                if (key != 0) {
+                    browser.sendKeyTyped(key, 0);
+                    if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) && Keyboard.isKeyDown(Keyboard.KEY_V)) {
+                        browser.sendPaste();
+                    }
+                }
             }
 
             //Forward event to text box.
@@ -196,11 +188,11 @@ public class BrowserScreen extends GuiScreen {
                 int y = mc.displayHeight - sy - scaleY(20); //Don't forget to flip Y axis.
 
                 if (wheel != 0)
-                    browser.injectMouseWheel(sx, y, 0, 1, wheel);
+                    browser.sendMouseWheel(sx, y, 0, 1, wheel);
                 else if (btn == -1)
-                    browser.injectMouseMove(sx, y, 0, y < 0);
+                    browser.sendMouseMove(sx, y, 0, y < 0);
                 else
-                    browser.injectMouseButton(sx, y, 0, btn + 1, pressed, 1);
+                    browser.sendMouseButton(sx, y, 0, btn + 1, pressed, 1);
             }
 
             if (pressed) { //Forward events to GUI.
@@ -222,7 +214,6 @@ public class BrowserScreen extends GuiScreen {
     public void onUrlChanged(IBrowser b, String nurl) {
         if (b == browser && url != null) {
             url.setText(nurl);
-            vidMode.enabled = nurl.matches(YT_REGEX1) || nurl.matches(YT_REGEX2) || nurl.matches(YT_REGEX3);
         }
     }
 
@@ -241,22 +232,6 @@ public class BrowserScreen extends GuiScreen {
         } else if (src.id == 3) {
             BrowserHandler.INSTANCE.setBackup(this);
             mc.displayGuiScreen(null);
-        } else if (src.id == 4) {
-            String loc = browser.getURL();
-            String vId = null;
-            boolean redo = false;
-
-            if (loc.matches(YT_REGEX1))
-                vId = loc.replaceFirst(YT_REGEX1, "$1");
-            else if (loc.matches(YT_REGEX2))
-                vId = loc.replaceFirst(YT_REGEX2, "$1");
-            else if (loc.matches(YT_REGEX3))
-                redo = true;
-
-            if (vId != null || redo) {
-                BrowserHandler.INSTANCE.setBackup(this);
-                mc.displayGuiScreen(new ScreenCfg(browser, vId));
-            }
         }
     }
 

@@ -23,27 +23,38 @@ public class VirtualBrowser implements IBrowser {
     }
 
     @Override
-    public void injectMouseMove(int x, int y, int mods, boolean left) {
+    public void sendMouseMove(int x, int y, int mods, boolean left) {
+
     }
 
     @Override
-    public void injectMouseButton(int x, int y, int mods, int btn, boolean pressed, int ccnt) {
+    public void sendMouseButton(int x, int y, int mods, int button, boolean pressed, int ccnt) {
+
     }
 
     @Override
-    public void injectKeyTyped(char c, int mods) {
+    public void sendMouseWheel(int x, int y, int mods, int amount, int rot) {
+
     }
 
     @Override
-    public void injectKeyPressedByKeyCode(int keyCode, char c, int mods) {
+    public void sendKeyPressed(int key, char c, int mods) {
+
     }
 
     @Override
-    public void injectKeyReleasedByKeyCode(int keyCode, char c, int mods) {
+    public void sendKeyTyped(int key, int mods) {
+
     }
 
     @Override
-    public void injectMouseWheel(int x, int y, int mods, int amount, int rot) {
+    public void sendKeyReleased(int key, char c, int mods) {
+
+    }
+
+    @Override
+    public void sendPaste() {
+
     }
 
     @Override
