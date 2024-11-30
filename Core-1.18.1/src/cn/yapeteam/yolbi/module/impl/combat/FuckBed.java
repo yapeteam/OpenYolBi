@@ -82,16 +82,12 @@ public class FuckBed extends Module {
     }
     private void breakBedsideBlock(BlockPos centerPos){
         for (int x = -2; x <= 2; x++) {
-            for (int y = -2; y <= 2; y++) {
-                for (int z = -2; z <= 2; z++) {
-                    BlockPos targetPos = centerPos.offset(x, 0, z);
+                    BlockPos targetPos = centerPos.offset(x, 1, 0);
                     if (!targetPos.equals(centerPos)) {
                         if (hasBlockAt(targetPos)) {
                             breakBlock(targetPos);
                         }
                     }
-                }
-            }
         }
 
     }
