@@ -1,5 +1,6 @@
 package cn.yapeteam.yolbi.module.impl.combat;
 
+import cn.yapeteam.loader.Natives;
 import cn.yapeteam.yolbi.event.Listener;
 import cn.yapeteam.yolbi.event.impl.render.EventRender2D;
 import cn.yapeteam.yolbi.module.Module;
@@ -9,9 +10,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import cn.yapeteam.yolbi.utils.player.RotationUtilsBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -22,7 +21,7 @@ import java.util.List;
 
 public class FuckBed extends Module {
     public FuckBed(){
-        super("F**kBed", ModuleCategory.COMBAT, InputConstants.KEY_CAPSLOCK);
+        super("OnlyBed", ModuleCategory.COMBAT, InputConstants.KEY_CAPSLOCK);
         addValues(range);
     }
     private NumberValue<Double> range = new NumberValue<Double>("MaxRange",5.5,0.1,6.1d,0.1d);
@@ -39,7 +38,18 @@ public class FuckBed extends Module {
         }
         float[] r = RotationUtilsBlock.getSimpleRotations(bedPosition.getX(),bedPosition.getY(),bedPosition.getZ());
         mc.player.setYBodyRot(r[0]);
-        breakBlock(bedPosition);
+        //breakBlock(bedPosition);
+        breakBedsideBlock(bedPosition);
+        if(GetRange(mc.player.blockPosition(),bedPosition)<=4.9){
+            mc.player.setYRot(r[0]);
+            mc.player.setXRot(r[1]);
+            if(hasBlockAt(bedPosition)){
+                Natives.SendLeft(true);
+            }else{
+                Natives.SendLeft(false);
+            }
+        }
+
     }
     private BlockPos findBedsAround(BlockPos center, int radius) {
         List<BlockPos> bedPositions = new ArrayList<>();
@@ -70,6 +80,21 @@ public class FuckBed extends Module {
 
         return mi;
     }
+    private void breakBedsideBlock(BlockPos centerPos){
+        for (int x = -2; x <= 2; x++) {
+            for (int y = -2; y <= 2; y++) {
+                for (int z = -2; z <= 2; z++) {
+                    BlockPos targetPos = centerPos.offset(x, y, z);
+                    if (!targetPos.equals(centerPos)) {
+                        if (hasBlockAt(targetPos)) {
+                            breakBlock(targetPos);
+                        }
+                    }
+                }
+            }
+        }
+
+    }
     public boolean hasBlockAt( BlockPos pos) {
         if (mc.level == null) {
             return false;
@@ -80,15 +105,7 @@ public class FuckBed extends Module {
     }
     private void breakBlock(BlockPos pos) {
         Level world = mc.level;
-        Player player = mc.player;
-        BlockPos b = new BlockPos(pos.getX(),pos.getY()+1,pos.getZ());
         Block block = mc.level.getBlockState(pos).getBlock();
-        Block bb = mc.level.getBlockState(b).getBlock();
-        if(hasBlockAt(b)){
-            mc.level.destroyBlock(b,true);
-            world.updateNeighborsAt(b, bb);
-            world.updateNeighborsAt(b.below(), bb);
-        }
         mc.level.destroyBlock(pos,true);
         world.updateNeighborsAt(pos, block);
         world.updateNeighborsAt(pos.below(), block);
