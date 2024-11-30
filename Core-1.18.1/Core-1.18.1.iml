@@ -29,6 +29,7 @@
     <orderEntry type="module" module-name="VersionInfo" />
     <orderEntry type="library" name="yapeteam" level="project" />
     <orderEntry type="module" module-name="Loader" />
+    <orderEntry type="library" name="forge-1.18.1" level="project" />
     <orderEntry type="library" name="forge-1.12.2" level="project" />
   </component>
 </module>

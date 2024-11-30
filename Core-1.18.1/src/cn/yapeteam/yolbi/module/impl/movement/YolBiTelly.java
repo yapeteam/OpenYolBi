@@ -86,7 +86,7 @@ public class YolBiTelly extends Module {
         if(mc.player==null){
             return;
         }
-        PoseStack ps = e.poseStack();
+        PoseStack ps = e.getPoseStack();
      //   font.drawStringWithShadow(ps,"请注意后方安全",mc.screen.width/2,mc.screen.height/2, ColorUtils.rainbow(4,1).getRGB());
         if(y==-1111111){
             return;

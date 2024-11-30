@@ -29,7 +29,29 @@ public class YolBi {
     private CommandManager commandManager;
     private FontManager fontManager;
     private Killaura ka;
-
+    private boolean b = false;
+    private float f = 0,g = 0;
+    public void setb(boolean b1){
+        b = b1;
+        return;
+    }
+    public boolean getb(){
+        return b;
+    }
+    public void setf(float f1){
+        f = f1;
+        return;
+    }
+    public void setg(float g1){
+        g = g1;
+        return;
+    }
+    public float getf(){
+        return f;
+    }
+    public float getg(){
+        return g;
+    }
     public EventManager getEventManager() {
         if (eventManager == null)
             eventManager = new EventManager();
