@@ -2,20 +2,20 @@ package cn.yapeteam.yolbi.module.impl.movement;
 
 import cn.yapeteam.loader.Natives;
 import cn.yapeteam.loader.logger.Logger;
-import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.event.Listener;
 import cn.yapeteam.yolbi.event.impl.render.EventRender2D;
-import cn.yapeteam.yolbi.font.AbstractFontRenderer;
 import cn.yapeteam.yolbi.module.Module;
 import cn.yapeteam.yolbi.module.ModuleCategory;
-import cn.yapeteam.yolbi.module.values.impl.NumberValue;
-import cn.yapeteam.yolbi.utils.render.ColorUtils;
+import cn.yapeteam.yolbi.utils.player.RotationUtilsBlock;
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
-import org.lwjgl.system.CallbackI;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static cn.yapeteam.yolbi.module.impl.combat.AutoClicker.generate;
@@ -23,17 +23,13 @@ import static cn.yapeteam.yolbi.module.impl.combat.AutoClicker.generate;
 public class YolBiTelly extends Module {
     public YolBiTelly() {
         super("Scaffold",ModuleCategory.MOVEMENT,InputConstants.KEY_R);
-        addValues(cps,pitch);
+        addValues();
     }
   //  public AbstractFontRenderer font = YolBi.instance.getFontManager().getMINE14();
-    private NumberValue<Integer> cps = new NumberValue<Integer>("Cps",27,1,50,1);
-    private NumberValue<Float> pitch = new NumberValue<Float>("Pitch",85.0f,-180.1f,180.1f,0.01f);
-    private float y;
     @Override
     protected void onEnable() {
-        y = MathYaw();
         selectBlock();
-        dealya = 1000 / generate(13, 5);
+        daly = 1000 / generate(13, 5);
     }
 
     public static int findBlock() {
@@ -56,53 +52,75 @@ public class YolBiTelly extends Module {
 
         return false;
     }
-    public float MathYaw(){
-        if (mc.player == null) {
-            return -1111111;
-        }
-        //This is from 1.8.9 TIMER_err
-        float yaw = mc.player.getYRot() + 180;
-        float delta = yaw % 45;
-        if (delta > 22.5 && delta <= 45)
-            yaw += 45 - delta;
-        else if (delta < -22.5 && delta >= -45)
-            yaw -= 45 + delta;
-        else if (delta <= 22.5 && delta > 0)
-            yaw -= delta;
-        else if (delta >= -22.5 && delta < 0)
-            yaw -= delta;
-        return yaw;
-    }
-    double dealya = -1;
-    public void startaucr(boolean b){
+
+    double daly = -1;
+    public void startAutoClicker(boolean b){
         if(b){
             Natives.SendRight(true);
         }else{
             Natives.SendRight(false);
         }
     }
+    public boolean hasBlockAt( BlockPos pos) {
+        if (mc.level == null) {
+            return false;
+        }
+        BlockState blockState = null;
+        blockState = mc.level.getBlockState(pos);
+        return !blockState.isAir();
+    }
+    private double GetRange(BlockPos a,BlockPos b){
+        return Math.abs(a.getX() - b.getX()) + Math.abs(a.getY() - b.getY()) + Math.abs(a.getZ() - b.getZ());
+    }
+    private BlockPos findBedsAround(BlockPos center, int radius) {
+        List<BlockPos> bedPositions = new ArrayList<>();
+        for (int x = -radius; x <= radius; x++) {
+            for (int y = -radius; y <= radius; y++) {
+                for (int z = -radius; z <= radius; z++) {
+                    BlockPos pos = center.offset(x, y, z);
+                    BlockState state = mc.level.getBlockState(pos);
+                    Block block = state.getBlock();
+                    if (hasBlockAt(pos)) {
+                        bedPositions.add(pos);
+                    }
+                }
+            }
+        }
+        int min = 911111111;
+        BlockPos mi = new BlockPos(983978,983978,983978);
+        BlockPos b = new BlockPos(mc.player.getX(),mc.player.getY(),mc.player.getZ());
+        for(int i=0;i<bedPositions.size();i++){
+            //  mc.gui.getChat().addMessage(new TextComponent("Find bed in "+ bedPositions.get(i).getX()+" " + bedPositions.get(i).getY() +" "+ bedPositions.get(i).getZ()));
+            if(GetRange(bedPositions.get(i),b)<min){
+                if(GetRange(bedPositions.get(i),b)<=radius){
+                    mi = bedPositions.get(i);
+                }
+            }
+
+        }
+
+        return mi;
+    }
     @Listener
     public void aim(EventRender2D e){
         if(mc.player==null){
             return;
         }
-        PoseStack ps = e.getPoseStack();
-     //   font.drawStringWithShadow(ps,"请注意后方安全",mc.screen.width/2,mc.screen.height/2, ColorUtils.rainbow(4,1).getRGB());
-        if(y==-1111111){
+        BlockPos block = findBedsAround(mc.player.blockPosition(), 2);
+        if(block.equals(new BlockPos(983978,983978,983978))){
             return;
         }
-        mc.player.setYRot(y);
-        mc.player.setXRot(pitch.getValue());
-        if(!mc.player.isOnGround()){
-            startaucr(true);
-        }else if(mc.player.isOnGround()){
-            startaucr(false);
-        }
+        float []r = RotationUtilsBlock.getSimpleRotations(block.getX()-0.5d,block.getY()+0.5d,block.getZ()-0.5d);
+        mc.player.setYRot(r[0]);
+        mc.player.setXRot(r[1]);
+            startAutoClicker(true);
+
         try{
             float pressPercentageValue = 17 / 100f;
-            TimeUnit.MILLISECONDS.sleep((long) (1000 / dealya * pressPercentageValue) + (int) ((Math.random() * 800) + -800));
+            TimeUnit.MILLISECONDS.sleep((long) (1000 / daly * pressPercentageValue) + (int) ((Math.random() * 800) + -800));
         }catch (Throwable ev){
             Logger.exception(ev);
         }
+        startAutoClicker(false);
     }
 }

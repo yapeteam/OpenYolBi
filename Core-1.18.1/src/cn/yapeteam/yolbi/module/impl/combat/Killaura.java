@@ -87,10 +87,11 @@ public class Killaura extends Module {
         if (target == null) return false;
         float[] rotations;
         rotations = RotationUtils.getSimpleRotations(target);
+        mc.player.setYBodyRot(rotations[0]);
         float pressPercentageValue = 17 / 100f;
         if (target != null && nowta && mc.player != null&&Math.abs(rotations[0] - mc.player.getYRot()) <=16d - jztargetrange(target)) {
             if (jztargetrange(target) <= rangeValue.getValue()&&((Math.random() * 100) + 1)/100 <= math.getValue()/100) {
-                mc.getConnection().send(ServerboundInteractPacket.createAttackPacket(target, true));
+                mc.player.attack(target);
                 mc.player.swing(InteractionHand.MAIN_HAND);
 
             }
@@ -147,9 +148,6 @@ public class Killaura extends Module {
                 }
                 if (Math.abs(rotations[0] - mc.player.getYRot()) <= 16f - tr-5f) {
                     rotations[0] = mc.player.getYRot();
-                }
-                if (Math.abs(rotations[0] - mc.player.getYRot()) <= 16f - tr-5f) {
-                    rotations[1] = mc.player.getXRot();
                 }
                 if ((int) ((Math.random() * 4) + -3) == 1) {
                     rotations[0] += (float) ((Math.random() * 0.7) + -0.7);
