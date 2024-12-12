@@ -10,7 +10,9 @@ import cn.yapeteam.yolbi.managers.RotationManager;
 import cn.yapeteam.yolbi.module.ModuleManager;
 import cn.yapeteam.yolbi.module.impl.combat.Killaura;
 import cn.yapeteam.yolbi.server.WebServer;
+import cn.yapeteam.yolbi.utils.player.DebugOutPut;
 import lombok.Getter;
+import net.minecraft.world.phys.Vec3;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,6 +24,7 @@ public class YolBi {
     public static final String version = VersionInfo.version;
     public static final File YOLBI_DIR = new File(System.getProperty("user.home"), ".yolbi");
     public static boolean initialized = false;
+    public static final Vec3 EV3 = new Vec3(983978,983978,983978);
     private EventManager eventManager;
     private ConfigManager configManager;
     private ModuleManager moduleManager;
@@ -31,27 +34,6 @@ public class YolBi {
     private Killaura ka;
     private boolean b = false;
     private float f = 0,g = 0;
-    public void setb(boolean b1){
-        b = b1;
-        return;
-    }
-    public boolean getb(){
-        return b;
-    }
-    public void setf(float f1){
-        f = f1;
-        return;
-    }
-    public void setg(float g1){
-        g = g1;
-        return;
-    }
-    public float getf(){
-        return f;
-    }
-    public float getg(){
-        return g;
-    }
     public EventManager getEventManager() {
         if (eventManager == null)
             eventManager = new EventManager();
@@ -105,7 +87,9 @@ public class YolBi {
             Logger.exception(e);
         }
     }
-
+    public static void  information(String text){
+            DebugOutPut.informationDebug(text);
+    }
     public void shutdown() {
         try {
             Logger.info("Shutting down Yolbi Lite");

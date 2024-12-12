@@ -1,6 +1,5 @@
 package cn.yapeteam.yolbi.module.impl.combat;
 
-import cn.yapeteam.loader.Natives;
 import cn.yapeteam.yolbi.event.Listener;
 import cn.yapeteam.yolbi.event.impl.render.EventRender2D;
 import cn.yapeteam.yolbi.module.Module;
@@ -9,12 +8,10 @@ import cn.yapeteam.yolbi.module.values.impl.NumberValue;
 import com.mojang.blaze3d.platform.InputConstants;
 import cn.yapeteam.yolbi.utils.player.RotationUtilsBlock;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,7 +78,7 @@ public class FuckBed extends Module {
     private void breakBedsideBlock(BlockPos centerPos){
         for (int x = -2; x <= 2; x++) {
             for (int z = -2; z <= 2; z++) {
-                    BlockPos targetPos = centerPos.offset(x, 0, z);
+                    BlockPos targetPos = centerPos.offset(x, Math.abs(x), z);
                     BlockPos targetPosB = centerPos.offset(0,0,1);
                     if (!targetPos.equals(centerPos)&&!targetPos.equals(targetPosB)) {
                         if (hasBlockAt(targetPos)) {

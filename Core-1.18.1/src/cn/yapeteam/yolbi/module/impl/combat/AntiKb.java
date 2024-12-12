@@ -5,7 +5,10 @@ import cn.yapeteam.yolbi.event.impl.render.EventRender2D;
 import cn.yapeteam.yolbi.module.Module;
 import cn.yapeteam.yolbi.module.ModuleCategory;
 import cn.yapeteam.yolbi.module.values.impl.NumberValue;
+import cn.yapeteam.yolbi.utils.network.PacketUtils;
 import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 
 public class AntiKb extends Module {
     public AntiKb (){
@@ -14,6 +17,7 @@ public class AntiKb extends Module {
     }
     public float h ;
     private NumberValue<Integer> x = new NumberValue<Integer>("X",10,0,100,1);
+    private int unReduceTimes = 0;
     private NumberValue<Integer> Z = new NumberValue<Integer>("Z",10,0,100,1);
     @Override
     protected void onEnable() {
@@ -27,23 +31,24 @@ public class AntiKb extends Module {
     @Listener
     private void onUp(EventRender2D e){
         if(mc.player==null)return;
-        if(mc.player.getHealth()<h){
-            clearKnockback();
+        if(mc.player.hurtTime > 0){
+            if (unReduceTimes > 0 ) {
+                    mc.player.setSprinting(true);
+                doReduce();
+                unReduceTimes--;
+            } else {
+                unReduceTimes = 0;
+            }
             h = mc.player.getHealth();
         }else{
             h = mc.player.getHealth();
         }
     }
-
-    private void clearKnockback() {
-        double y2 = mc.player.getDeltaMovement().y;
-        if(mc.player.isOnGround()){
-            mc.player.setDeltaMovement(0.0, mc.player.getDeltaMovement().y+0.42, 0.0);
-        }else{
-            y2 = mc.player.getDeltaMovement().y  + 0.42/(y2*0.7);
-            mc.player.setDeltaMovement(mc.player.getDeltaMovement().x*(1 - x.getValue().doubleValue()/100)  , mc.player.getDeltaMovement().y + y2*1.1, mc.player.getDeltaMovement().z*(1 - Z.getValue().doubleValue()/100));
+    private void doReduce() {
+        for (int i = 0; i < 10; i++) {
+            mc.player.setDeltaMovement(mc.player.getDeltaMovement().x *0.6,mc.player.getDeltaMovement().y,mc.player.getDeltaMovement().z*0.6);
         }
-
     }
+
 }
 

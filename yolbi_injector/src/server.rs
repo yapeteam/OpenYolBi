@@ -1,10 +1,7 @@
 use indicatif::{ProgressBar, ProgressStyle};
-use once_cell::sync::Lazy;
-use std::io::{self, Read};
+use std::io::{self, Read, Write};
 use std::net::{Shutdown, TcpListener, TcpStream};
-use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
-use std::sync::Mutex;
-use std::thread;
+use std::str;
 
 pub(crate) fn start() -> Result<(), Box<dyn std::error::Error>> {
     let listener = TcpListener::bind("127.0.0.1:20181")?;
@@ -28,85 +25,72 @@ pub(crate) fn start() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-static NEXT_PROCESS: AtomicU64 = AtomicU64::new(0);
-static RUNNING: AtomicBool = AtomicBool::new(true);
-static PROGRESS_BAR: Lazy<Mutex<ProgressBar>> = Lazy::new(|| {
-    let pb = ProgressBar::new(100);
-    pb.set_style(ProgressStyle::default_bar()
-        .template("{spinner:.green} {msg} [{elapsed_precise}] [{wide_bar:.white}] {pos:>7}/{len:7} {percent:>7}%").unwrap()
-        .progress_chars("#-"));
-    Mutex::new(pb)
-});
-
 fn handle_client(mut stream: TcpStream) -> io::Result<()> {
     let mut buffer = [0u8; 1024];
-    thread::spawn(move || {
-        while RUNNING.load(Ordering::SeqCst) {
-            let pb = PROGRESS_BAR.lock().unwrap();
-            let position = NEXT_PROCESS.load(Ordering::SeqCst);
-            pb.set_position(position);
-            drop(pb); // 显式释放锁
-            thread::sleep(std::time::Duration::from_millis(100)); // 控制更新频率
-        }
-        println!("Output thread exiting");
-    });
-    let mut logs: Vec<String> = Vec::new();
-    while RUNNING.load(Ordering::SeqCst) {
+    let progress_bar = ProgressBar::new(100);
+    progress_bar.set_style(ProgressStyle::default_bar()
+        .template("{spinner:.green} [{elapsed_precise}] [{wide_bar:.white}] {pos:>7}/{len:7} {percent:>7}%").unwrap()
+    );
+
+    let mut next: u64 = 0;
+    loop {
         match stream.read(&mut buffer)? {
             0 => {
-                logs.iter().for_each(|l| {
-                    print!("{}", l);
-                });
                 println!("Connection closed by the client.");
                 break;
             }
             prediction_size => {
-                let message = std::str::from_utf8(&buffer[..prediction_size]).unwrap().trim_end_matches("\r\n");
-                let head = if message.len() > 3 { &message[0..2] } else { message };
-                let body = if message.contains("=>") { &message[4..] } else { message };
-                let pb = PROGRESS_BAR.lock().unwrap();
-                match head {
+                let message = str::from_utf8(&buffer[..prediction_size]).unwrap();
+                let mut values: Vec<&str> = message.split("=>").collect();
+                values[0] = values[0].trim_end_matches("\r\n");
+                if values.len() > 1 { values[1] = values[1].trim_end_matches("\r\n"); }
+                match values[0] {
                     "S1" => {
-                        pb.reset();
-                        pb.set_message("mapping");
+                        progress_bar.reset();
+                        progress_bar.set_message("mapping");
                     }
                     "S2" => {
-                        pb.reset();
-                        pb.set_message("transformation");
+                        progress_bar.reset();
+                        progress_bar.set_message("transformation");
                     }
-                    "P1" | "P2" => {
-                        if let Ok(value) = body.parse::<f32>() {
-                            NEXT_PROCESS.store(value as u64, Ordering::SeqCst)
+                    "P1" => {
+                        if let Ok(value) = values[1].parse::<f32>() {
+                            next = value as u64;
                         }
                     }
-                    "E1" | "E2" => {
-                        pb.finish_and_clear();
-                    }
-                    "LG" => {
-                        if let Ok(value) = body.parse::<String>() {
-                            let line = format!("{}\n", value.trim_end_matches('\n'));
-                            if !(line.contains("=>") || line.len() <= 2) {
-                                logs.push(line);
-                            }
+                    "P2" => {
+                        if let Ok(value) = values[1].parse::<f32>() {
+                            next = value as u64;
                         }
                     }
-                    "ED" => {
-                        logs.iter().for_each(|l| {
-                            print!("{}", l);
-                        });
-                        pb.finish_with_message("completed");
-                        RUNNING.store(false, Ordering::SeqCst);
+                    "E1" => {
+                        progress_bar.finish_and_clear();
+                    }
+                    "E2" => {
+                        progress_bar.finish_and_clear();
+                    }
+                    "LOG" => {
+                        if let Ok(value) = values[1].parse::<String>() {
+                            print!("\x1b[2K\r{}\n", value.trim_end_matches('\n'));
+                            progress_bar.set_position(next)
+                        }
+                    }
+                    "CLOSE" => {
+                        println!("INJECT SUCCESSFULLY");
                         break;
                     }
                     _ => {}
                 }
-                drop(pb);
             }
         }
     }
-    println!("Press Enter to exit...");
-    let mut input = String::new();
-    io::stdin().read_line(&mut input).expect("Failed to read line");
+    println!("Press any key to exit...");
+    io::stdout().flush()?;
+    let mut input = [0u8; 1];
+    if let Ok(_) = io::stdin().read(&mut input) {
+        println!("Exiting...");
+    }
+
     stream.shutdown(Shutdown::Both)?;
     Ok(())
 }

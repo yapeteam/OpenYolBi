@@ -84,9 +84,7 @@ public class AutoClicker extends Module {
         try {
             float pressPercentageValue = pressPercentage.getValue() / 100f;
             Natives.SendRight(true);
-            ka.settr();
             Thread.sleep((long) (1000 / delay * pressPercentageValue));
-            ka.setfalse();
             Natives.SendRight(false);
             Thread.sleep((long) (1000 / delay * (1 - pressPercentageValue)));
         } catch (InterruptedException ignored) {

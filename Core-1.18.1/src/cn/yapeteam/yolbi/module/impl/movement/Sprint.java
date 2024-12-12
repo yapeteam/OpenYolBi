@@ -16,26 +16,6 @@ public class Sprint extends Module {
     @Listener
     public void onUpdate(EventRender2D e){
         if(mc.player!=null)return;
-        float yaw = mc.player.getYRot();
-        Vec3 velocity = mc.player.getDeltaMovement();
-        float forwardDirection = (float) Math.cos(Math.toRadians(yaw));
-        float sidewaysDirection = (float) Math.sin(Math.toRadians(yaw));
-        double dotProduct = velocity.x * forwardDirection + velocity.z * sidewaysDirection;
-        //为正前
-        if (dotProduct > 0) {
-            mc.player.setSprinting(true);
-        }
-        //为负后
-        else if (dotProduct < 0) {
-            mc.player.setYBodyRot(mc.player.getYHeadRot()-180);
-            mc.player.setSprinting(true);
-        } else {
-            Natives.SetKeyBoard(InputConstants.KEY_W,true);
-            mc.player.setSprinting(true);
-            Natives.SetKeyBoard(InputConstants.KEY_W,true);
-            Natives.SetKeyBoard(InputConstants.KEY_S,true);
-            Natives.SetKeyBoard(InputConstants.KEY_W,false);
-        }
-        mc.options.fov = 140;
+        mc.player.setSprinting(true);
     }
 }

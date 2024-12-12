@@ -52,4 +52,5 @@ public class RotationUtils implements Wrapper {
 
       return getRotationFromEyeToPoint(targetPos);
    }
+
 }

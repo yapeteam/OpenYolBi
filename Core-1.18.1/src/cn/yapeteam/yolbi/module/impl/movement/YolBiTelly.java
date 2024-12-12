@@ -2,17 +2,24 @@ package cn.yapeteam.yolbi.module.impl.movement;
 
 import cn.yapeteam.loader.Natives;
 import cn.yapeteam.loader.logger.Logger;
+import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.event.Listener;
+import cn.yapeteam.yolbi.event.impl.player.EventMotion;
 import cn.yapeteam.yolbi.event.impl.render.EventRender2D;
 import cn.yapeteam.yolbi.module.Module;
 import cn.yapeteam.yolbi.module.ModuleCategory;
+import cn.yapeteam.yolbi.utils.level.BlockAABBUtils;
 import cn.yapeteam.yolbi.utils.player.RotationUtilsBlock;
+import com.google.common.eventbus.Subscribe;
 import com.mojang.blaze3d.platform.InputConstants;
+import lombok.experimental.SuperBuilder;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +33,18 @@ public class YolBiTelly extends Module {
         addValues();
     }
   //  public AbstractFontRenderer font = YolBi.instance.getFontManager().getMINE14();
+    private BlockPos block;
+    private Vec3 vc3;
+    private float []r;
     @Override
     protected void onEnable() {
+        if(mc.player == null)return;
+        block = findBedsAround(mc.player.blockPosition(), 2);
+        if(block.equals(new BlockPos(983978,983978,983978))){
+            return;
+        }
+        vc3 = BlockAABBUtils.FindPosOnWallOfTheMiddle(block);
+        float []r = RotationUtilsBlock.getSimpleRotations(vc3.x,vc3.y,vc3.z);
         selectBlock();
         daly = 1000 / generate(13, 5);
     }
@@ -102,24 +119,26 @@ public class YolBiTelly extends Module {
         return mi;
     }
     @Listener
-    public void aim(EventRender2D e){
-        if(mc.player==null){
+    public void aim(EventMotion e){
+        YolBi.information("Jpin motion");
+        if(mc.player==null||r == null||block == null||vc3==null){
             return;
         }
-        BlockPos block = findBedsAround(mc.player.blockPosition(), 2);
-        if(block.equals(new BlockPos(983978,983978,983978))){
-            return;
-        }
-        float []r = RotationUtilsBlock.getSimpleRotations(block.getX()-0.5d,block.getY()+0.5d,block.getZ()-0.5d);
-        mc.player.setYRot(r[0]);
-        mc.player.setXRot(r[1]);
-            startAutoClicker(true);
+        YolBi.information("Jpin2 motion");
+        e.setYaw(r[0]);
+        e.setPitch(r[1]);
+        YolBi.information("Lin motion");
+       // mc.player.setYRot(r[0]);
 
+        //mc.player.setXRot(r[1]);
+            startAutoClicker(true);
         try{
             float pressPercentageValue = 17 / 100f;
-            TimeUnit.MILLISECONDS.sleep((long) (1000 / daly * pressPercentageValue) + (int) ((Math.random() * 800) + -800));
+            Thread.sleep((long) (1000 / daly * pressPercentageValue) + (int) ((Math.random() * 800) + -800));
         }catch (Throwable ev){
-            Logger.exception(ev);
+            YolBi.information("TIMER_err error");
+            //mc.gui.getChat().addMessage(new TextComponent("TIMER_err error"));
+            //  Logger.info(“);
         }
         startAutoClicker(false);
     }
