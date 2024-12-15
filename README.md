@@ -9,8 +9,6 @@
 
 为支持Minecraft开源社区 ~~(打死妖猫的圈钱梦想)~~ ，我决定开放YolBi Lite Legacy分支
 
-为防止二次特征，loader模块不予公开
-
 此仓库将长期维护，欢迎各位加入开发
 
 # YolBi Lite Legacy

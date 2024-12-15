@@ -26,8 +26,6 @@ public class MCEF {
         WARN_UPDATES = true;
         USE_FORGE_SPLASH = false;
         CEF_ARGS = new String[]{"--autoplay-policy=no-user-gesture-required", "--disable-web-security"};
-        SHUTDOWN_JCEF = true;
-        SECURE_MIRRORS_ONLY = false;
 
         //Config: debug
         CHECK_VRAM_LEAK = true;

@@ -11,7 +11,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 
 public class AntiKb extends Module {
-    public AntiKb (){
+    public AntiKb() {
         super("AntiKB", ModuleCategory.COMBAT, InputConstants.KEY_R);
         addValues(x,Z);
     }
@@ -26,7 +26,7 @@ public class AntiKb extends Module {
     }
     @Override
     protected void onDisable() {
-        h= -100;
+        h = -100;
     }
     @Listener
     private void onUp(EventRender2D e){
