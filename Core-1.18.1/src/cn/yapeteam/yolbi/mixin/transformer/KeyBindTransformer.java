@@ -30,6 +30,7 @@ public class KeyBindTransformer extends ASMTransformer {
         methodNode.instructions.insert(list);
     }
 
+    @SuppressWarnings("unused")
     public static void onKey(int key) {
         if (key != 0 && key != 1 && GLFW.glfwGetKey(Minecraft.getInstance().getWindow().getWindow(), key) == GLFW.GLFW_PRESS)
             YolBi.instance.getEventManager().post(new EventKey(key));

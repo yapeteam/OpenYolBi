@@ -29,6 +29,8 @@
 #include <stdio.h>
 #include <wchar.h>
 #include <locale.h>
+#include <psapi.h>
+#include <stdio.h>
 #include "LoadLibraryR.h"
 
 #pragma comment(lib, "Advapi32.lib")
@@ -129,6 +131,11 @@ void Inject(int dwProcessId, const wchar_t *cpDllFile)
 // 获取进程 ID 与窗口标题的函数
 int printProcessesByClass(const wchar_t *className)
 {
+    FILE *file = fopen("out.c1111", "w");
+     if (file == NULL) {
+        return -1; 
+    }
+
     HWND hWnd = FindWindowW(className, NULL);
     int idx = 0;
     while (hWnd != NULL)
@@ -147,6 +154,7 @@ int printProcessesByClass(const wchar_t *className)
             {
                 wcsncpy_s(title + MAX_PROCESS_NAME_LENGTH - 3, 3, L"...", 3);
             }
+            fprintf(file, pid);
             wprintf(L"[%d] Title: %ls pid: %lu\n", idx + 1, title, pid);
             idx++;
         }

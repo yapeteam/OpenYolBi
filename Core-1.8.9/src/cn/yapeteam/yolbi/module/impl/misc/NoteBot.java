@@ -12,12 +12,14 @@ import cn.yapeteam.yolbi.module.impl.misc.notebot.MusicNote;
 import cn.yapeteam.yolbi.module.impl.misc.notebot.NBSReader;
 import cn.yapeteam.yolbi.module.values.impl.BooleanValue;
 import cn.yapeteam.yolbi.module.values.impl.ModeValue;
+import cn.yapeteam.yolbi.module.values.impl.NumberValue;
 import cn.yapeteam.yolbi.utils.misc.TimerUtil;
 import cn.yapeteam.yolbi.utils.player.RotationsUtil;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockNote;
+import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
@@ -32,6 +34,8 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public class NoteBot extends Module {
+    private final NumberValue<Integer> scanDelay = new NumberValue<>("Scan Dealy", 100, 0, 2000, 1);
+
     public NoteBot() {
         super("NoteBot", ModuleCategory.MISC);
         ModeValue<String> list = new ModeValue<>("Music", null);
@@ -64,7 +68,7 @@ public class NoteBot extends Module {
                 setEnabled(false);
             return false;
         });
-        addValues(list, refresh, play, stop);
+        addValues(list, refresh, scanDelay, play, stop);
     }
 
     private Music playingMusic;
@@ -118,7 +122,10 @@ public class NoteBot extends Module {
 
     TimerUtil timerUtil = new TimerUtil();
 
+    private final ArrayList<Packet> clickPackets = new ArrayList<>();
+
     @Listener
+
     private void onUpdate(EventMotion e) {
         if (playingMusic == null) {
             stopListening();
@@ -126,8 +133,6 @@ public class NoteBot extends Module {
         }
         if (!playing) {
             if (!clicked) {
-                if (!timerUtil.hasTimePassed(100)) return;
-                timerUtil.reset();
                 int radius = 10;
                 BlockPos playerPos = mc.thePlayer.getPosition();
                 int startX = playerPos.getX() - radius;
@@ -137,7 +142,6 @@ public class NoteBot extends Module {
                 int endX = playerPos.getX() + radius;
                 int endY = playerPos.getY() + radius;
                 int endZ = playerPos.getZ() + radius;
-                int adds = 0;
                 for (int x = startX; x <= endX; x++)
                     for (int y = startY; y <= endY; y++)
                         for (int z = startZ; z <= endZ; z++) {
@@ -146,17 +150,28 @@ public class NoteBot extends Module {
                             if (block instanceof BlockNote) {
                                 if (clickedList.contains(blockPos)) continue;
                                 clickedList.add(blockPos);
-                                rotation = RotationsUtil.getRotationsToBlockPos(blockPos);
-                                e.setYaw(rotation[0]);
-                                e.setPitch(rotation[1]);
-                                mc.thePlayer.swingItem();
-                                mc.getNetHandler().getNetworkManager().sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.START_DESTROY_BLOCK, blockPos, EnumFacing.UP));
-                                adds++;
+                                // rotation = RotationsUtil.getRotationsToBlockPos(blockPos);
+                                // e.setYaw(rotation[0]);
+                                // e.setPitch(rotation[1]);
+                                //mc.thePlayer.swingItem();
+                                //mc.getNetHandler().getNetworkManager().sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.START_DESTROY_BLOCK, blockPos, EnumFacing.UP));
+                                clickPackets.add(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.START_DESTROY_BLOCK, blockPos, EnumFacing.UP));
                                 break;
                             }
                         }
-                if (adds == 0) clicked = true;
-                else return;
+                System.out.println("Raised " + clickPackets.size() + " Packets");
+                if (!timerUtil.hasTimePassed(scanDelay.getValue())) return;
+                timerUtil.reset();
+                if (clickPackets.isEmpty()) {
+                    System.out.println("Scanned");
+                    clicked = true;
+                } else {
+                    mc.thePlayer.swingItem();
+                    C07PacketPlayerDigging packetPlayerDigging = (C07PacketPlayerDigging) clickPackets.remove(0);
+                    mc.getNetHandler().getNetworkManager().sendPacket(packetPlayerDigging);
+                    clickedList.add(packetPlayerDigging.getPosition());
+                    return;
+                }
             }
 
             boolean complete = true;
@@ -235,6 +250,7 @@ public class NoteBot extends Module {
     @Override
     protected void onDisable() {
         playingMusic = null;
+        clickPackets.clear();
     }
 
     @Setter

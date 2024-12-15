@@ -8,8 +8,11 @@ import cn.yapeteam.yolbi.event.EventManager;
 import cn.yapeteam.yolbi.font.FontManager;
 import cn.yapeteam.yolbi.managers.RotationManager;
 import cn.yapeteam.yolbi.module.ModuleManager;
+import cn.yapeteam.yolbi.module.impl.combat.Killaura;
 import cn.yapeteam.yolbi.server.WebServer;
+import cn.yapeteam.yolbi.utils.player.DebugOutPut;
 import lombok.Getter;
+import net.minecraft.world.phys.Vec3;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,19 +24,21 @@ public class YolBi {
     public static final String version = VersionInfo.version;
     public static final File YOLBI_DIR = new File(System.getProperty("user.home"), ".yolbi");
     public static boolean initialized = false;
+    public static final Vec3 EV3 = new Vec3(983978,983978,983978);
     private EventManager eventManager;
     private ConfigManager configManager;
     private ModuleManager moduleManager;
     private RotationManager rotationManager;
     private CommandManager commandManager;
     private FontManager fontManager;
-
+    private Killaura ka;
+    private boolean b = false;
+    private float f = 0,g = 0;
     public EventManager getEventManager() {
         if (eventManager == null)
             eventManager = new EventManager();
         return eventManager;
     }
-
     public RotationManager getRotationManager() {
         if (rotationManager == null)
             rotationManager = new RotationManager();
@@ -50,6 +55,11 @@ public class YolBi {
         if (fontManager == null)
             fontManager = new FontManager();
         return fontManager;
+    }
+    public Killaura getka() {
+        if (ka == null)
+            ka = new Killaura();
+        return ka;
     }
 
     public static void initialize() {
@@ -77,7 +87,9 @@ public class YolBi {
             Logger.exception(e);
         }
     }
-
+    public static void  information(String text){
+            DebugOutPut.informationDebug(text);
+    }
     public void shutdown() {
         try {
             Logger.info("Shutting down Yolbi Lite");

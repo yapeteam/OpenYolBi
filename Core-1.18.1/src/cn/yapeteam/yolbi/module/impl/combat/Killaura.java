@@ -1,201 +1,199 @@
 package cn.yapeteam.yolbi.module.impl.combat;
 
+import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.event.Listener;
+import cn.yapeteam.yolbi.event.impl.player.EventMotion;
 import cn.yapeteam.yolbi.event.impl.render.EventRender2D;
 import cn.yapeteam.yolbi.module.Module;
 import cn.yapeteam.yolbi.module.ModuleCategory;
 import cn.yapeteam.yolbi.module.values.impl.NumberValue;
 import cn.yapeteam.yolbi.utils.player.RotationUtils;
 import com.mojang.blaze3d.platform.InputConstants;
-import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.protocol.game.ServerboundInteractPacket;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import static cn.yapeteam.yolbi.module.impl.combat.AutoClicker.generate;
 
 public class Killaura extends Module {
-
+    private Boolean open = false;
     public Killaura() {
-        super("Killaura",ModuleCategory.COMBAT,InputConstants.KEY_R);
-        addValues(cpsValue, rangeValue,aimrange);
+        super("Killaura", ModuleCategory.COMBAT, InputConstants.KEY_R);
+        addValues(cpsValue, rangeValue, aimrange,math,s);
     }
-    private  NumberValue<Double> aimrange = new NumberValue<Double>("aIMRANGE",4.5,3.1,7.1,0.1);
-    private  NumberValue<Integer> cpsValue = new NumberValue<Integer>("CPS", 11, 1, 20, 1);
-    private  NumberValue<Double> rangeValue = new NumberValue<Double>("Range", 3.1d, 2.0, 6.0, 0.01);
-    private  NumberValue<Integer> player = new NumberValue<Integer>("Player",1,0,1,1);
-    private static LivingEntity target;
+    private NumberValue<Double> aimrange = new NumberValue<Double>("aimrange", 4.5, 3.1, 7.1, 0.1);
+    private NumberValue<Integer> cpsValue = new NumberValue<Integer>("cps", 11, 1, 20, 1);
+    private NumberValue<Integer> math = new NumberValue<Integer>("probability",10,1,100,1);
+    private NumberValue<Double> rangeValue = new NumberValue<Double>("range", 3.1d, 2.0, 6.0, 0.01);
+    private NumberValue<Integer> player = new NumberValue<Integer>("Player", 1, 0, 1, 1);
+    private NumberValue<Integer> s = new NumberValue<Integer>("Team", 1, 0, 1, 1);
+    public static LivingEntity target;
     private List<LivingEntity> targets = new ArrayList<>();
     private boolean nowta;
     private double dealya = -1;
-    GameRenderer gr = mc.gameRenderer;
-    private float x=90,y=58;
+    private float x = 90, y = 58;
+
     @Override
     protected void onEnable() {
+        open = true;
         dealya = 1000 / generate(13, 5);
         this.targets.clear();
         target = findtarget();
         x = mc.player.getXRot();
         y = mc.player.getYRot();
     }
-   // private static final Random random = new Random();
+
     @Override
     protected void onDisable() {
+        open = false;
         this.targets.clear();
         target = null;
     }
-  /*  public static double generate(double cps, double range) {
-        double mean = 1000.0 / cps;
-        double stddev = mean * range / cps;
-        double noise;
-        do {
-            noise = mean + random.nextGaussian() * stddev;
-        } while (noise <= 0);
-        return Math.max(noise, 1);
+    private boolean samestart(boolean a,boolean b){
+        return  a&&b;
     }
-   */ @Listener
-    public boolean startauc(EventRender2D e){
+    @Listener
+    public boolean startauc(EventRender2D e) {
+        PoseStack ps = e.getPoseStack();
+        if (target == null) return false;
         float[] rotations;
         rotations = RotationUtils.getSimpleRotations(target);
+        mc.player.setYBodyRot(rotations[0]);
         float pressPercentageValue = 17 / 100f;
-        if(target!=null&&nowta&&mc.player!=null){
-            //rattarget(rotations[0],rotations[1])
-            if(rattarget(rotations[0],rotations[1])&&mc.player.canAttack(target)&&jztargetrange(target)<=rangeValue.getValue()){
-                mc.getConnection().send(ServerboundInteractPacket.createAttackPacket(target, true));
-               // mc.player.attack(target);
-                mc.player.swing(InteractionHand.MAIN_HAND);
-                try{
-                    TimeUnit.MILLISECONDS.sleep((long) (1000 / dealya * pressPercentageValue));
-                    return true;
-                }catch (Exception ev){
+        mc.player.setSprinting(true);
+        if (target != null &&  mc.player != null) {
+            if (jztargetrange(target) <= rangeValue.getValue()&&((Math.random() * 100) + 1)/100 <= math.getValue()/100) {
+                boolean isMovingForward = mc.options.keyUp.isDown();
+                    if (isMovingForward) {
+                        double distance = jztargetrange(target);
+                            if (distance < 3.0 && !mc.options.keyDown.isDown()) {
+                               mc.options.keyDown.setDown(true);
+                            } else if(distance == 3.0){
+                                if(mc.options.keyDown.isDown()||mc.options.keyUp.isDown()&&!samestart(mc.options.keyUp.isDown(), mc.options.keyDown.isDown())){
+                                    if(mc.options.keyUp.isDown()){
+                                        if(!mc.options.keyDown.isDown()){
+                                            mc.options.keyDown.setDown(true);
+                                        }
+                                        mc.options.keyUp.setDown(false);
+                                        mc.options.keyDown.setDown(false);
+                                    }else if(mc.options.keyDown.isDown()){
+                                        if(!mc.options.keyUp.isDown()){
+                                            mc.options.keyUp.setDown(true);
+                                        }
+                                        mc.options.keyDown.setDown(false);
+                                        mc.options.keyUp.setDown(false);
+                                    }
+                                }
+                            }else if (distance >= 3.0 && distance <=4 &&mc.options.keyDown.isDown()) {
+                                mc.options.keyUp.setDown(false);
+                                if (!mc.options.keyUp.isDown()) {
+                                    mc.options.keyUp.setDown(true);
+                                }
+                            }
+                    }
+            }
+        }
+        return false;
+    }
+
+    public final boolean check(LivingEntity a) {
+        if(s.getValue() == 1){
+            return !a.isDeadOrDying() && !a.isInvisible() && a != mc.player;
+        }else if(s.getValue() == 0){
+            YolBi.information("Join zero");
+            Player player2 = null;
+            if(a instanceof  Player){
+                if(mc.player != (Player)a){
+                    YolBi.information("Is player");
+                    player2 = (Player) a;
+                }else{
+                    YolBi.information("Is my");
                     return false;
                 }
-
+            }else {
+                YolBi.information("Isn`t player");
+                return false;
+            }
+            if(mc.player.getInventory() == null || player2.getInventory() == null){
+                YolBi.information("Normal no arrmor");
+                return !a.isDeadOrDying() && !a.isInvisible() && a != mc.player;
+            }else{
+                YolBi.information("Yes arrmor");
+            }
+            if(mc.player.getInventory().armor.get(0).equals(player2.getInventory().armor.get(0))&&player2.getInventory().armor!=null &&mc.player.getInventory().armor!=null){
+                YolBi.information(mc.player.getInventory().armor.get(mc.player.getInventory().armor.size()).toString() + "  and  " + player2.getInventory().armor.get(player2.getInventory().armor.size()).toString());
+                YolBi.information("join arrmor");
+                return !a.isDeadOrDying() && !a.isInvisible() && a != mc.player;
+            }else {
+                YolBi.information("None");
+                return false;
             }
 
+        }else {
+            return false;
         }
-
-    return false;
     }
-
-    public boolean rattarget(double roY,double roX){
-       if(jztargetrange(target)<=rangeValue.getValue()&&target!=null){
-           mc.gui.getChat().addMessage(new TextComponent("Rat t"));
-           if(mc.player==null){
-               mc.gui.getChat().addMessage(new TextComponent("Rat PL f"));
-               return false;
-           }
-           float tr = (float) jztargetrange(target);
-           if(tr>=16){
-               tr = 12.9f;
-               mc.gui.getChat().addMessage(new TextComponent("Rat tr"));
-           }
-           if(Math.abs(roY-mc.player.getYRot())<=16f-tr&&Math.abs(roX-mc.player.getYRot())<=16f-tr){
-               mc.gui.getChat().addMessage(new TextComponent("Rat ok"));
-               return true;
-           }
-
-       }else{
-           mc.gui.getChat().addMessage(new TextComponent("Rat f"));
-       }
-        mc.gui.getChat().addMessage(new TextComponent("Rat exit"));
-       return false;
-    }
-    public final boolean cheak(LivingEntity a){
-        return !a.isDeadOrDying()&&!a.isInvisible()&&a!=mc.player;
-    }
-    public  LivingEntity findtarget(){
-       targets.clear();
+    public LivingEntity findtarget() {
+        targets.clear();
         for (Entity entity : mc.level.entitiesForRendering()) {
             if (entity instanceof LivingEntity) {
-                LivingEntity livingEntity = (LivingEntity)entity;
-                if(target==null){
-                    if(livingEntity!=mc.player&&!livingEntity.isInvisible()){
-                      //  mc.gui.getChat().addMessage(new TextComponent(livingEntity.getName().toString()));
+                LivingEntity livingEntity = (LivingEntity) entity;
+                if (target == null) {
+                    if (livingEntity != mc.player && !livingEntity.isInvisible()) {
                         return livingEntity;
                     }
                 }
-                if(unjztargetrange(livingEntity)<aimrange.getValue()){
-                    if(target!=null){
-                        if (cheak(livingEntity)&&unjztargetrange(livingEntity)<unjztargetrange(target)) {
-                           // mc.gui.getChat().addMessage(new TextComponent("A3"));
+                if (unjztargetrange(livingEntity) < aimrange.getValue()) {
+                    if (target != null) {
+                        if (check(livingEntity) && jztargetrange(livingEntity) < jztargetrange(target)&&jztargetrange(livingEntity)<= aimrange.getValue().doubleValue()) {
                             return livingEntity;
                         }
-                    }else{
-                        if (cheak(livingEntity)) {
-                          //  mc.gui.getChat().addMessage(new TextComponent("A4"));
+                    } else {
+                        if (check(livingEntity) && jztargetrange(livingEntity)<=aimrange.getValue().doubleValue()) {
                             return livingEntity;
                         }
                     }
-
                 }
             }
         }
         return null;
     }
-    public LivingEntity ta;
     @Listener
-    public void oner(EventRender2D event) {
-        ta = findtarget();
-        target = ta;
+    public void oner(EventMotion event) {
+        target = findtarget();
         nowta = false;
-        if (target != null) {
-            if(unjztargetrange(target)<=aimrange.getValue()){
-                float[] rotations = RotationUtils.getSimpleRotations(target);
-                float tr = (float) jztargetrange(target);
-                if(tr>=16){
-                    tr = 12.9f;
+        if (target != null ) {
+            float[] smoothedRotations = RotationUtils.getSimpleRotations(target);
+            if (jztargetrange(target) <= aimrange.getValue()) {
+                if(xj(smoothedRotations[0],mc.player.getYRot())<= 16 - jztargetrange(target)){
+                    mc.player.setYRot((float) (smoothedRotations[0] + Math.random()*1.3));
+                }if(xj(smoothedRotations[0],mc.player.getYRot())<= 16 - jztargetrange(target)){
+                    mc.player.setXRot((float) (smoothedRotations[1] + Math.random()*1.3));
                 }
-                if(Math.abs(rotations[0]-mc.player.getYRot())<=16f-tr){
-                    rotations[0] = mc.player.getYRot();
-                }if(Math.abs(rotations[0]-mc.player.getYRot())<=16f-tr){
-                    rotations[1] = mc.player.getXRot();
-                }
-                if((int)((Math.random()*4) + -3)==1){
-                    rotations[0]+= (float) ((Math.random()*0.7) + -0.7);
-                }
-              //  mc.player.setYHeadRot(rotations[0]);
-                mc.player.setYBodyRot(rotations[0]);
-                mc.player.setYRot(rotations[0]);
-                mc.player.setXRot(rotations[1]);
-              //  mc.player.setXRot();
-                gr.getMainCamera().setAnglesInternal(x,y);
-                nowta = true;
-                //mc.gui.getChat().addMessage(new TextComponent(target.getName().toString()));
-            }else if(!mc.player.isOnGround()){
-             //   mc.player.setOnGround(true);
-            //    mc.player.setSprinting(true);
-                if(mc.player.getYHeadRot()!=0){
-                    mc.player.setYBodyRot(-mc.player.getYHeadRot());
-                }else{
-                    mc.player.setYBodyRot(-90);
-                }
-            }else if(mc.player.isOnGround()){
-                return;
+                mc.player.setYRot(smoothedRotations[0]);
+                mc.player.setXRot(smoothedRotations[1]);
+                    nowta = true;
             }
-         //   mc.gui.getChat().addMessage(new TextComponent(target.getName().toString()+" SP"));
-        }else{
-          //  mc.gui.getChat().addMessage(new TextComponent("A"));
         }
     }
-           // mc.getConnection().send(ServerboundInteractPacket.createAttackPacket(target, mc.player.isShiftKeyDown()));
-          //  mc.player.swing(InteractionHand.MAIN_HAND);
-public final double jztargetrange(LivingEntity a){
-    if (mc.player != null) {
-        return Math.abs(a.getX()-mc.player.getX()) + Math.abs(a.getZ()-mc.player.getZ()) + Math.abs(a.getY()-mc.player.getY());
+
+    public final float xj(float a,float b){
+        return Math.abs(a - b);
     }
-    return -1;
-}
-public final double unjztargetrange(LivingEntity a){
-    if (mc.player != null) {
-        return Math.abs(a.getX()-mc.player.getX()) + Math.abs(a.getZ()-mc.player.getZ()) ;
+    public final double jztargetrange(LivingEntity a) {
+        if (mc.player != null) {
+            return Math.abs(a.getX() - mc.player.getX()) + Math.abs(a.getZ() - mc.player.getZ()) + Math.abs(a.getY() - mc.player.getY());
+        }
+        return -1;
     }
-    return -1;
-}
+
+    public final double unjztargetrange(LivingEntity a) {
+        if (mc.player != null) {
+            return Math.abs(a.getX() - mc.player.getX()) + Math.abs(a.getZ() - mc.player.getZ());
+        }
+        return -1;
+    }
 }

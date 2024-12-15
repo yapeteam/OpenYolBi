@@ -12,8 +12,4 @@ import lombok.Setter;
 @AllArgsConstructor
 public class EventRender2D extends Event {
     private final PoseStack poseStack;
-
-    public PoseStack poseStack() {
-        return poseStack;
-    }
 }

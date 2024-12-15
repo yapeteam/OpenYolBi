@@ -6,7 +6,36 @@
     <meta charset="UTF-8">
     <title>ClickUI</title>
     <script src="jquery.js"></script>
-    <script src="components.js"></script>
+    <script src="panel.js"></script>
+    <script src="module.js"></script>
+    <script src="value.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            window.mcefQuery({
+                request: "clickui/cats: ",
+                persistent: false,
+                onSuccess: function (msg) {
+                    const array = JSON.parse(msg);
+                    for (let i = 0; i < array.length; i++) {
+                        const val = array[i];
+                        const panelDiv = document.createElement("div");
+                        panelDiv.id = val;
+                        panelDiv.classList.add("panel");
+                        panelDiv.classList.add("content");
+                        panelDiv.innerHTML = `<a>${val}</a>`;
+                        panelDiv.style.zIndex = String(i);
+                        panelDiv.style.left = 20 + (50 + 200) * i + "px";
+                        panelDiv.style.top = "80px";
+                        document.body.appendChild(panelDiv);
+                        new Panel(panelDiv);
+                    }
+                },
+                onFailure: function (err, msg) {
+                    console.log(msg);
+                },
+            });
+        });
+    </script>
     <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 

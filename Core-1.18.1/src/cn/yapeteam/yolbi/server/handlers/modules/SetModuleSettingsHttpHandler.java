@@ -99,7 +99,7 @@ public class SetModuleSettingsHttpHandler implements HttpHandler {
         byte[] response = JsonObject.toString().getBytes(StandardCharsets.UTF_8);
 
         // Set CORS headers
-        httpExchange.getResponseHeaders().set("Content-Type", "application/json");
+        httpExchange.getResponseHeaders().set("Content-Type", "application/json; charset=utf-8");
         httpExchange.getResponseHeaders().set("Access-Control-Allow-Origin", "*");  // Allow requests from any origin
         httpExchange.getResponseHeaders().set("Access-Control-Allow-Methods", "GET, OPTIONS");
         httpExchange.getResponseHeaders().set("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization");

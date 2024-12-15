@@ -18,11 +18,11 @@ public class MCEFInitializer {
     @Listener
     private static void onTick(EventTick e) {
         if (!initialized) {
-            initialized = true;
             CefBrowserFactory.Renderer = ImplCefRenderer.class;
             MCEF.PROXY.registerScheme("yolbi", YolBiScheme.class, true, false, false, true, true, false, false);
-            MCEF.INSTANCE.onInit(Minecraft.getMinecraft().mcDataDir.getAbsolutePath().replaceAll("\\\\", "/"));
+            MCEF.INSTANCE.onInit();
             new BrowserHandler().onInit();
+            initialized = true;
         }
     }
 
