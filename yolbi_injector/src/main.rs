@@ -18,7 +18,7 @@ fn release_resources(yolbi_path: PathBuf) -> Result<(), ZipError> {
     let mut zip = ZipArchive::new(Cursor::new(included_zip))?;
     zip.extract(&yolbi_path)?;
 
-    println!("resources released at: {}", yolbi_path.display());
+    println!("文件储存在: {}", yolbi_path.display());
     Ok(())
 }
 
@@ -42,6 +42,10 @@ fn main() {
                          "   ╚═╝    ╚═════╝ ╚══════╝╚═════╝ ╚═╝    ╚══════╝╚═╝   ╚═╝   ╚══════╝"
                  )
         );
+        println!("ReBuild 0.4.0 #0001");
+        println!("您在使用本工具做的任何事情我们YolbiTeam不承担任何责任");
+        println!("我们的YOLBI LITE public 是免费的此工具版本为public如遇到付费购买请退货");
+        println!("©YolbiTeam");
         if print.is_ok() {
             let symbol: Symbol<fn()> = print.unwrap();
             symbol();
@@ -49,12 +53,12 @@ fn main() {
             return;
         }
 
-        print!("pid: ");
+        print!("请输入上文pid提供的数字请启动游戏才会有: ");
         io::stdout().flush().unwrap();
 
         let mut input = String::new();
         if io::stdin().read_line(&mut input).is_err() {
-            println!("unexpected error");
+            println!("致命错误 #0");
             return;
         }
 

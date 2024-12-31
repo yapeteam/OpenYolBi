@@ -1,5 +1,7 @@
 package cn.yapeteam.yolbi.module.impl.combat;
 
+import cn.yapeteam.loader.Natives;
+import java.awt.event.KeyEvent;
 import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.event.Listener;
 import cn.yapeteam.yolbi.event.impl.player.EventMotion;
@@ -12,9 +14,12 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.client.loading.EarlyLoaderGUI;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static cn.yapeteam.yolbi.module.impl.combat.AutoClicker.generate;
 
@@ -33,6 +38,7 @@ public class Killaura extends Module {
     public static LivingEntity target;
     private List<LivingEntity> targets = new ArrayList<>();
     private boolean nowta;
+    private int oper = 1;
     private double dealya = -1;
     private float x = 90, y = 58;
 
@@ -40,61 +46,51 @@ public class Killaura extends Module {
     protected void onEnable() {
         open = true;
         dealya = 1000 / generate(13, 5);
-        this.targets.clear();
+        if(targets!=null){
+            this.targets.clear();
+        }
         target = findtarget();
-        x = mc.player.getXRot();
-        y = mc.player.getYRot();
+        if (mc.player != null) {
+            x = mc.player.getXRot();
+            y = mc.player.getYRot();
+        }
     }
-
+    public  boolean isKeyPressed() {
+        oper += 1;
+        return GLFW.glfwGetKey(mc.getWindow().getWindow(), InputConstants.KEY_LEFT) == GLFW.GLFW_PRESS;
+    }
     @Override
     protected void onDisable() {
         open = false;
-        this.targets.clear();
+        if(targets!=null){
+            this.targets.clear();
+        }
         target = null;
-    }
-    private boolean samestart(boolean a,boolean b){
-        return  a&&b;
     }
     @Listener
     public boolean startauc(EventRender2D e) {
-        PoseStack ps = e.getPoseStack();
-        if (target == null) return false;
-        float[] rotations;
-        rotations = RotationUtils.getSimpleRotations(target);
-        mc.player.setYBodyRot(rotations[0]);
-        float pressPercentageValue = 17 / 100f;
-        mc.player.setSprinting(true);
-        if (target != null &&  mc.player != null) {
-            if (jztargetrange(target) <= rangeValue.getValue()&&((Math.random() * 100) + 1)/100 <= math.getValue()/100) {
-                boolean isMovingForward = mc.options.keyUp.isDown();
-                    if (isMovingForward) {
-                        double distance = jztargetrange(target);
-                            if (distance < 3.0 && !mc.options.keyDown.isDown()) {
-                               mc.options.keyDown.setDown(true);
-                            } else if(distance == 3.0){
-                                if(mc.options.keyDown.isDown()||mc.options.keyUp.isDown()&&!samestart(mc.options.keyUp.isDown(), mc.options.keyDown.isDown())){
-                                    if(mc.options.keyUp.isDown()){
-                                        if(!mc.options.keyDown.isDown()){
-                                            mc.options.keyDown.setDown(true);
-                                        }
-                                        mc.options.keyUp.setDown(false);
-                                        mc.options.keyDown.setDown(false);
-                                    }else if(mc.options.keyDown.isDown()){
-                                        if(!mc.options.keyUp.isDown()){
-                                            mc.options.keyUp.setDown(true);
-                                        }
-                                        mc.options.keyDown.setDown(false);
-                                        mc.options.keyUp.setDown(false);
-                                    }
-                                }
-                            }else if (distance >= 3.0 && distance <=4 &&mc.options.keyDown.isDown()) {
-                                mc.options.keyUp.setDown(false);
-                                if (!mc.options.keyUp.isDown()) {
-                                    mc.options.keyUp.setDown(true);
-                                }
-                            }
-                    }
+        if(isKeyPressed()){
+            if (target == null) return false;
+            float[] rotations;
+            rotations = RotationUtils.getSimpleRotations(target);
+            mc.player.setYBodyRot(rotations[0]);
+            mc.player.setSprinting(true);
+            if ( mc.player != null) {
+                    double distance = jztargetrange(target);
+                        if (distance < 3.0) {
+                            mc.options.keyDown.setDown(true);
+                        } else if(distance == 3.0){
+                            mc.options.keyDown.setDown(false);
+                            mc.options.keyUp.setDown(false);
+                        }else if (distance >= 3.0 ) {
+                            mc.options.keyDown.setDown(false);
+                            mc.options.keyUp.setDown(true);
+                        }
             }
+            return false;
+        }else {
+            mc.options.keyDown.setDown(false);
+            mc.options.keyUp.setDown(false);
         }
         return false;
     }
@@ -103,32 +99,24 @@ public class Killaura extends Module {
         if(s.getValue() == 1){
             return !a.isDeadOrDying() && !a.isInvisible() && a != mc.player;
         }else if(s.getValue() == 0){
-            YolBi.information("Join zero");
             Player player2 = null;
             if(a instanceof  Player){
                 if(mc.player != (Player)a){
-                    YolBi.information("Is player");
                     player2 = (Player) a;
                 }else{
-                    YolBi.information("Is my");
                     return false;
                 }
             }else {
-                YolBi.information("Isn`t player");
                 return false;
             }
             if(mc.player.getInventory() == null || player2.getInventory() == null){
-                YolBi.information("Normal no arrmor");
                 return !a.isDeadOrDying() && !a.isInvisible() && a != mc.player;
             }else{
-                YolBi.information("Yes arrmor");
             }
             if(mc.player.getInventory().armor.get(0).equals(player2.getInventory().armor.get(0))&&player2.getInventory().armor!=null &&mc.player.getInventory().armor!=null){
                 YolBi.information(mc.player.getInventory().armor.get(mc.player.getInventory().armor.size()).toString() + "  and  " + player2.getInventory().armor.get(player2.getInventory().armor.size()).toString());
-                YolBi.information("join arrmor");
                 return !a.isDeadOrDying() && !a.isInvisible() && a != mc.player;
             }else {
-                YolBi.information("None");
                 return false;
             }
 
@@ -163,21 +151,23 @@ public class Killaura extends Module {
     }
     @Listener
     public void oner(EventMotion event) {
-        target = findtarget();
-        nowta = false;
-        if (target != null ) {
-            float[] smoothedRotations = RotationUtils.getSimpleRotations(target);
-            if (jztargetrange(target) <= aimrange.getValue()) {
-                if(xj(smoothedRotations[0],mc.player.getYRot())<= 16 - jztargetrange(target)){
-                    mc.player.setYRot((float) (smoothedRotations[0] + Math.random()*1.3));
-                }if(xj(smoothedRotations[0],mc.player.getYRot())<= 16 - jztargetrange(target)){
-                    mc.player.setXRot((float) (smoothedRotations[1] + Math.random()*1.3));
+        if(isKeyPressed()){
+                target = findtarget();
+                nowta = false;
+                if (target != null ) {
+                    float[] smoothedRotations = RotationUtils.getSimpleRotations(target);
+                    if (jztargetrange(target) <= aimrange.getValue()) {
+                        if(xj(smoothedRotations[0],mc.player.getYRot())<= 16 - jztargetrange(target)){
+                            mc.player.setYRot((float) (smoothedRotations[0] + Math.random()*1.3));
+                        }if(xj(smoothedRotations[0],mc.player.getYRot())<= 16 - jztargetrange(target)){
+                            mc.player.setXRot((float) (smoothedRotations[1] + Math.random()*1.3));
+                        }
+                        mc.player.setYRot(smoothedRotations[0]);
+                        mc.player.setXRot(smoothedRotations[1]);
+                        nowta = true;
+                    }
                 }
-                mc.player.setYRot(smoothedRotations[0]);
-                mc.player.setXRot(smoothedRotations[1]);
-                    nowta = true;
             }
-        }
     }
 
     public final float xj(float a,float b){

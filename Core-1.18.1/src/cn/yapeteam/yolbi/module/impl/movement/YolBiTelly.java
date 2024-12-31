@@ -4,12 +4,15 @@ import cn.yapeteam.loader.Natives;
 import cn.yapeteam.loader.logger.Logger;
 import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.event.Listener;
+import cn.yapeteam.yolbi.event.impl.player.EventLook;
 import cn.yapeteam.yolbi.event.impl.player.EventMotion;
 import cn.yapeteam.yolbi.event.impl.render.EventRender2D;
 import cn.yapeteam.yolbi.module.Module;
 import cn.yapeteam.yolbi.module.ModuleCategory;
+import cn.yapeteam.yolbi.module.values.impl.NumberValue;
 import cn.yapeteam.yolbi.utils.level.BlockAABBUtils;
 import cn.yapeteam.yolbi.utils.player.RotationUtilsBlock;
+import cn.yapeteam.yolbi.utils.vector.Vector2f;
 import com.google.common.eventbus.Subscribe;
 import com.mojang.blaze3d.platform.InputConstants;
 import lombok.experimental.SuperBuilder;
@@ -30,11 +33,12 @@ import static cn.yapeteam.yolbi.module.impl.combat.AutoClicker.generate;
 public class YolBiTelly extends Module {
     public YolBiTelly() {
         super("Scaffold",ModuleCategory.MOVEMENT,InputConstants.KEY_R);
-        addValues();
+        addValues(a);
     }
   //  public AbstractFontRenderer font = YolBi.instance.getFontManager().getMINE14();
     private BlockPos block;
     private Vec3 vc3;
+    private NumberValue<Integer> a = new NumberValue<Integer>("Debug",0,0,1,1);
     private float []r;
     @Override
     protected void onEnable() {
@@ -44,7 +48,7 @@ public class YolBiTelly extends Module {
             return;
         }
         vc3 = BlockAABBUtils.FindPosOnWallOfTheMiddle(block);
-        float []r = RotationUtilsBlock.getSimpleRotations(vc3.x,vc3.y,vc3.z);
+        r = RotationUtilsBlock.getSimpleRotations(vc3.x,vc3.y,vc3.z);
         selectBlock();
         daly = 1000 / generate(13, 5);
     }
@@ -119,26 +123,24 @@ public class YolBiTelly extends Module {
         return mi;
     }
     @Listener
-    public void aim(EventMotion e){
-        YolBi.information("Jpin motion");
+    public void aim(EventLook e){
         if(mc.player==null||r == null||block == null||vc3==null){
             return;
         }
-        YolBi.information("Jpin2 motion");
-        e.setYaw(r[0]);
-        e.setPitch(r[1]);
-        YolBi.information("Lin motion");
-       // mc.player.setYRot(r[0]);
+        if(a.getValue().intValue() == 0){
+            mc.player.setYRot(r[0]);
+            mc.player.setXRot(r[1]);
+            mc.gui.getChat().addMessage(new TextComponent("runed"));
+        }else {
+            e.setRotation(new Vector2f(r[0],r[1]));
+        }
 
-        //mc.player.setXRot(r[1]);
-            startAutoClicker(true);
+        startAutoClicker(true);
         try{
             float pressPercentageValue = 17 / 100f;
             Thread.sleep((long) (1000 / daly * pressPercentageValue) + (int) ((Math.random() * 800) + -800));
         }catch (Throwable ev){
-            YolBi.information("TIMER_err error");
-            //mc.gui.getChat().addMessage(new TextComponent("TIMER_err error"));
-            //  Logger.info(“);
+            Logger.exception(ev);
         }
         startAutoClicker(false);
     }
