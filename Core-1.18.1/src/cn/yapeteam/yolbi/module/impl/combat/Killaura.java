@@ -1,50 +1,51 @@
 package cn.yapeteam.yolbi.module.impl.combat;
 
 import cn.yapeteam.loader.Natives;
-import java.awt.event.KeyEvent;
 import cn.yapeteam.yolbi.YolBi;
 import cn.yapeteam.yolbi.event.Listener;
-import cn.yapeteam.yolbi.event.impl.player.EventMotion;
 import cn.yapeteam.yolbi.event.impl.render.EventRender2D;
 import cn.yapeteam.yolbi.module.Module;
 import cn.yapeteam.yolbi.module.ModuleCategory;
+import cn.yapeteam.yolbi.module.Thread.Thread_KillauraPacket;
+import cn.yapeteam.yolbi.module.values.impl.BooleanValue;
 import cn.yapeteam.yolbi.module.values.impl.NumberValue;
+import cn.yapeteam.yolbi.utils.math.WorkOutNextToPlayerPoint;
 import cn.yapeteam.yolbi.utils.player.RotationUtils;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.client.loading.EarlyLoaderGUI;
-import org.lwjgl.glfw.GLFW;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static cn.yapeteam.yolbi.module.impl.combat.AutoClicker.generate;
 
 public class Killaura extends Module {
-    private Boolean open = false;
     public Killaura() {
         super("Killaura", ModuleCategory.COMBAT, InputConstants.KEY_R);
-        addValues(cpsValue, rangeValue, aimrange,math,s);
+        addValues(cpsValue,ab, rangeValue, aimrange,math,team,packet,legit);
     }
     private NumberValue<Double> aimrange = new NumberValue<Double>("aimrange", 4.5, 3.1, 7.1, 0.1);
     private NumberValue<Integer> cpsValue = new NumberValue<Integer>("cps", 11, 1, 20, 1);
+    private NumberValue<Integer> ab = new NumberValue<Integer>("cps range",5,1,10,1);
     private NumberValue<Integer> math = new NumberValue<Integer>("probability",10,1,100,1);
     private NumberValue<Double> rangeValue = new NumberValue<Double>("range", 3.1d, 2.0, 6.0, 0.01);
     private NumberValue<Integer> player = new NumberValue<Integer>("Player", 1, 0, 1, 1);
-    private NumberValue<Integer> s = new NumberValue<Integer>("Team", 1, 0, 1, 1);
+    private BooleanValue team = new BooleanValue("Team","BJDTEAM or False",true);
+    private BooleanValue packet = new BooleanValue("Packet",true);
+    private BooleanValue legit = new BooleanValue("Legit",false);
     public static LivingEntity target;
     private List<LivingEntity> targets = new ArrayList<>();
-    private boolean nowta;
     private int oper = 1;
     private double dealya = -1;
     private float x = 90, y = 58;
 
     @Override
     protected void onEnable() {
-        open = true;
         dealya = 1000 / generate(13, 5);
         if(targets!=null){
             this.targets.clear();
@@ -55,50 +56,60 @@ public class Killaura extends Module {
             y = mc.player.getYRot();
         }
     }
-    public  boolean isKeyPressed() {
-        oper += 1;
-        return GLFW.glfwGetKey(mc.getWindow().getWindow(), InputConstants.KEY_LEFT) == GLFW.GLFW_PRESS;
-    }
     @Override
     protected void onDisable() {
-        open = false;
         if(targets!=null){
             this.targets.clear();
         }
         target = null;
+        if(!Natives.IsKeyDown(InputConstants.KEY_S)&&mc.options.keyDown.isDown()){
+            mc.options.keyDown.setDown(false);
+        }
+        if(!Natives.IsKeyDown(InputConstants.KEY_W)&&mc.options.keyUp.isDown()){
+            mc.options.keyUp.setDown(false);
+        }
     }
     @Listener
     public boolean startauc(EventRender2D e) {
-        if(isKeyPressed()){
-            if (target == null) return false;
-            float[] rotations;
-            rotations = RotationUtils.getSimpleRotations(target);
-            mc.player.setYBodyRot(rotations[0]);
-            mc.player.setSprinting(true);
+        if(this.isEnabled()&&Natives.IsKeyDown(this.getKey())){
+            if (target == null || mc.player == null){
+                YolBi.information("ii");
+                return false;
+            }
             if ( mc.player != null) {
                     double distance = jztargetrange(target);
                         if (distance < 3.0) {
                             mc.options.keyDown.setDown(true);
                         } else if(distance == 3.0){
-                            mc.options.keyDown.setDown(false);
-                            mc.options.keyUp.setDown(false);
-                        }else if (distance >= 3.0 ) {
-                            mc.options.keyDown.setDown(false);
+                            mc.options.keyDown.setDown(true);
+                        }else if (distance >= 3.0 &&distance<= aimrange.getValue()) {
                             mc.options.keyUp.setDown(true);
+                            mc.options.keyDown.setDown(false);
+                        }else if(distance> aimrange.getValue()){
+                            if(!Natives.IsKeyDown(InputConstants.KEY_S)&&mc.options.keyDown.isDown()){
+                                mc.options.keyDown.setDown(false);
+                            }
+                            if(!Natives.IsKeyDown(InputConstants.KEY_W)&&mc.options.keyUp.isDown()){
+                                mc.options.keyUp.setDown(false);
+                            }
                         }
             }
             return false;
         }else {
-            mc.options.keyDown.setDown(false);
-            mc.options.keyUp.setDown(false);
+            if(!Natives.IsKeyDown(InputConstants.KEY_S)&&mc.options.keyDown.isDown()){
+                mc.options.keyDown.setDown(false);
+            }
+            if(!Natives.IsKeyDown(InputConstants.KEY_W)&&mc.options.keyUp.isDown()){
+                mc.options.keyUp.setDown(false);
+            }
         }
         return false;
     }
 
     public final boolean check(LivingEntity a) {
-        if(s.getValue() == 1){
+        if(!team.getValue()){
             return !a.isDeadOrDying() && !a.isInvisible() && a != mc.player;
-        }else if(s.getValue() == 0){
+        }else if(team.getValue()){
             Player player2 = null;
             if(a instanceof  Player){
                 if(mc.player != (Player)a){
@@ -109,20 +120,44 @@ public class Killaura extends Module {
             }else {
                 return false;
             }
-            if(mc.player.getInventory() == null || player2.getInventory() == null){
-                return !a.isDeadOrDying() && !a.isInvisible() && a != mc.player;
-            }else{
+            if (mc.player.getInventory().armor != null&&player2.getInventory().armor!=null) {
+                if(mc.player.getInventory().armor.get(3).getItem() == player2.getInventory().armor.get(3).getItem()){
+                    YolBi.information("Join");
+                    return false;
+                }
             }
-            if(mc.player.getInventory().armor.get(0).equals(player2.getInventory().armor.get(0))&&player2.getInventory().armor!=null &&mc.player.getInventory().armor!=null){
-                YolBi.information(mc.player.getInventory().armor.get(mc.player.getInventory().armor.size()).toString() + "  and  " + player2.getInventory().armor.get(player2.getInventory().armor.size()).toString());
-                return !a.isDeadOrDying() && !a.isInvisible() && a != mc.player;
-            }else {
-                return false;
-            }
-
+            return true;
         }else {
             return false;
         }
+    }
+    private Vec3 PreMoveForTarget(LivingEntity livingEntity){
+        double posX = livingEntity.getX();
+        double posY = livingEntity.getY();
+        double posZ = livingEntity.getZ();
+        double motionX = livingEntity.getDeltaMovement().x;
+        double motionY = livingEntity.getDeltaMovement().y;
+        double motionZ = livingEntity.getDeltaMovement().z;
+        double nextPosX = posX + motionX;
+        double nextPosY = posY + motionY;
+        double nextPosZ = posZ + motionZ;
+        return new Vec3(nextPosX,nextPosY,nextPosZ);
+    }
+    public static Vec3 getClosestPointToPlayer(LivingEntity target) {
+        WorkOutNextToPlayerPoint.Vec3d playerPosition = new WorkOutNextToPlayerPoint.Vec3d(mc.player.getX(),mc.player.getY()-0.1f,mc.player.getZ());
+        WorkOutNextToPlayerPoint.AxisAlignedBB boundingBox = new WorkOutNextToPlayerPoint.AxisAlignedBB(target.getBoundingBox().minX, target.getBoundingBox().minY, target.getBoundingBox().minZ, target.getBoundingBox().maxX, target.getBoundingBox().maxY, target.getBoundingBox().maxZ);
+        WorkOutNextToPlayerPoint.Vec3d closestPoint = WorkOutNextToPlayerPoint.getClosestPointToPlayer(playerPosition, boundingBox);
+       return new Vec3(closestPoint.x,closestPoint.y,closestPoint.z);
+
+    }
+    public static void renderAndDecorateFakeItem(PoseStack matrixStack, ItemStack itemStack, int x, int y, float rotation) {
+        ItemRenderer itemRenderer = mc.getItemRenderer();
+        itemRenderer.renderAndDecorateFakeItem(itemStack, x, y);
+        matrixStack.pushPose();
+        matrixStack.translate(x + 8, y + 8, 0);
+        matrixStack.translate(-(x + 8), -(y + 8), 0);
+        itemRenderer.renderAndDecorateFakeItem(itemStack, x, y);
+        matrixStack.popPose();
     }
     public LivingEntity findtarget() {
         targets.clear();
@@ -149,38 +184,58 @@ public class Killaura extends Module {
         }
         return null;
     }
+    private  ItemStack handItem = mc.player.getMainHandItem();
     @Listener
-    public void oner(EventMotion event) {
-        if(isKeyPressed()){
+    public void oner(EventRender2D event) {
+        if(this.isEnabled()&& Natives.IsKeyDown(this.getKey())){
+            YolBi.information("open");
                 target = findtarget();
-                nowta = false;
                 if (target != null ) {
-                    float[] smoothedRotations = RotationUtils.getSimpleRotations(target);
+
+                    Thread_KillauraPacket.OpenThread(false);
+                    YolBi.information(":");
+
+                    float[] smoothedRotations;
                     if (jztargetrange(target) <= aimrange.getValue()) {
-                        if(xj(smoothedRotations[0],mc.player.getYRot())<= 16 - jztargetrange(target)){
-                            mc.player.setYRot((float) (smoothedRotations[0] + Math.random()*1.3));
-                        }if(xj(smoothedRotations[0],mc.player.getYRot())<= 16 - jztargetrange(target)){
-                            mc.player.setXRot((float) (smoothedRotations[1] + Math.random()*1.3));
+                        Vec3 PRe = PreMoveForTarget(target);
+                        if(target.getDeltaMovement().x + target.getDeltaMovement().z + target.getDeltaMovement().y >5.0){
+                            YolBi.information("PRE");
+                            smoothedRotations = RotationUtils.getSimpleRotations2(PRe.add(0,1,0),target);
+                        }else {
+                            YolBi.information("NExtto");
+                            Vec3 next = getClosestPointToPlayer(target);
+                            smoothedRotations = RotationUtils.getSimpleRotations2(next.add(0,0,0),target);
                         }
+                        smoothedRotations[1] -= 4.5f;
                         mc.player.setYRot(smoothedRotations[0]);
                         mc.player.setXRot(smoothedRotations[1]);
-                        nowta = true;
+                        if(legit.getValue()&&packet.getValue()){
+                            legit.setValue(false);
+                        }
+                        if(cpsValue.getValue() < ab.getValue()){
+                            ab.setValue(cpsValue.getValue() -1);
+                        }
+                        Thread_KillauraPacket.setTarget(target,cpsValue.getValue(),ab.getValue());
+                        Thread_KillauraPacket.OpenThread(true);
                     }
                 }
-            }
+        }else {
+            Thread_KillauraPacket.OpenThread(false);
+        }
+        renderAndDecorateFakeItem(event.getPoseStack(),handItem,mc.screen.width,10,12f);
     }
 
     public final float xj(float a,float b){
         return Math.abs(a - b);
     }
-    public final double jztargetrange(LivingEntity a) {
+    public static double jztargetrange(LivingEntity a) {
         if (mc.player != null) {
             return Math.abs(a.getX() - mc.player.getX()) + Math.abs(a.getZ() - mc.player.getZ()) + Math.abs(a.getY() - mc.player.getY());
         }
         return -1;
     }
 
-    public final double unjztargetrange(LivingEntity a) {
+    public static double unjztargetrange(LivingEntity a) {
         if (mc.player != null) {
             return Math.abs(a.getX() - mc.player.getX()) + Math.abs(a.getZ() - mc.player.getZ());
         }

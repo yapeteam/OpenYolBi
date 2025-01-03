@@ -1,11 +1,9 @@
 package cn.yapeteam.yolbi.utils.player;
 
-import cn.yapeteam.yolbi.utils.player.Wrapper;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import cn.yapeteam.yolbi.utils.player.Vector3d;
 
 
 public class RotationUtils implements Wrapper {
@@ -50,6 +48,18 @@ public class RotationUtils implements Wrapper {
          targetPos = new Vector3d(target.getX(), target.getY() + (double)(target.getEyeHeight() / 2.0F), target.getZ());
       }
 
+      return getRotationFromEyeToPoint(targetPos);
+   }
+   public static float[] getSimpleRotations2(Vec3 target,LivingEntity target2) {
+      double yDist = target.x - mc.player.getY();
+      Vector3d targetPos;
+      if (yDist >= 1.547) {
+         targetPos = new Vector3d(target.x(), target.y(), target.z());
+      } else if (yDist <= -1.547) {
+         targetPos = new Vector3d(target.x(), target.y() + (double)target2.getEyeHeight(), target.z);
+      } else {
+         targetPos = new Vector3d(target.x, target.y+ (double)(target2.getEyeHeight() / 2.0F), target.z());
+      }
       return getRotationFromEyeToPoint(targetPos);
    }
 

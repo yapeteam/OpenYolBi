@@ -8,11 +8,11 @@ import cn.yapeteam.yolbi.font.AbstractFontRenderer;
 import cn.yapeteam.yolbi.module.Module;
 import cn.yapeteam.yolbi.module.ModuleCategory;
 import cn.yapeteam.yolbi.module.values.impl.NumberValue;
-import cn.yapeteam.yolbi.utils.Cam.RenderBox;
-import cn.yapeteam.yolbi.utils.network.PacketUtils;
+import cn.yapeteam.yolbi.utils.player.DebugOutPut;
 import cn.yapeteam.yolbi.utils.render.ColorUtils;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
+import org.lwjgl.opengl.GL11;
 
 import java.util.stream.Collectors;
 
@@ -31,9 +31,10 @@ public class HUD extends Module {
 
     @Listener
     private void renderArrayList(EventRender2D e) {
-
-        mc.options.fov = fov.getValue();
         PoseStack poseStack = e.getPoseStack();
+        DebugOutPut.renderInformationBox(mc.screen.width-200,mc.screen.height-100,10,20,ColorUtils.color(141,141,141,50),e.getPoseStack(),5,"1");
+        mc.options.fov = fov.getValue();
+
 
         text = "";
         int rgba = (alpha.getValue() << 24) | (ColorUtils.rainbow(10,1).getRed() << 16) | (ColorUtils.rainbow(10,1).getGreen() << 8) | ColorUtils.rainbow(10,1).getBlue();

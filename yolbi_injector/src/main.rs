@@ -42,9 +42,10 @@ fn main() {
                          "   ╚═╝    ╚═════╝ ╚══════╝╚═════╝ ╚═╝    ╚══════╝╚═╝   ╚═╝   ╚══════╝"
                  )
         );
-        println!("ReBuild 0.4.0 #0001");
+        println!("ReBuild 0.4.0 #0037");
         println!("您在使用本工具做的任何事情我们YolbiTeam不承担任何责任");
         println!("我们的YOLBI LITE public 是免费的此工具版本为public如遇到付费购买请退货");
+        println!("提示1.18.1打开调参需要再浏览器打开网页>>http://localhost:23333/<<");
         println!("©YolbiTeam");
         if print.is_ok() {
             let symbol: Symbol<fn()> = print.unwrap();
@@ -62,7 +63,7 @@ fn main() {
             return;
         }
 
-        let input: c_int = input.trim().parse().expect("not a number");
+        let input: c_int = input.trim().parse().expect("密码是数字吗");
 
         let inject = lib.get(b"Inject\0");
         if inject.is_ok() {

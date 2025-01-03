@@ -6,18 +6,18 @@ use std::str;
 pub(crate) fn start() -> Result<(), Box<dyn std::error::Error>> {
     let listener = TcpListener::bind("127.0.0.1:20181")?;
 
-    println!("Server started on {}", listener.local_addr()?);
+    println!("注射打开于 {}", listener.local_addr()?);
 
     for stream in listener.incoming() {
         match stream {
             Ok(stream) => {
-                println!("Client connected!");
+                println!("客户端链接");
                 handle_client(stream)?;
-                println!("Client disconnected!");
-                break; // 只处理一个客户端
+                println!("客户端已注射");
+                break;
             }
             Err(e) => {
-                eprintln!("Connection failed: {}", e);
+                eprintln!("连接失败: {}", e);
                 continue;
             }
         }
@@ -36,7 +36,7 @@ fn handle_client(mut stream: TcpStream) -> io::Result<()> {
     loop {
         match stream.read(&mut buffer)? {
             0 => {
-                println!("Connection closed by the client.");
+                println!("来自客户端的链接关闭");
                 break;
             }
             prediction_size => {
@@ -47,11 +47,13 @@ fn handle_client(mut stream: TcpStream) -> io::Result<()> {
                 match values[0] {
                     "S1" => {
                         progress_bar.reset();
-                        progress_bar.set_message("mapping");
+                        progress_bar.set_message("编写地图");
+                        println!("编写地图中");
                     }
                     "S2" => {
                         progress_bar.reset();
-                        progress_bar.set_message("transformation");
+                        progress_bar.set_message("重定向");
+                        println!("重定向中")
                     }
                     "P1" => {
                         if let Ok(value) = values[1].parse::<f32>() {
@@ -76,19 +78,13 @@ fn handle_client(mut stream: TcpStream) -> io::Result<()> {
                         }
                     }
                     "CLOSE" => {
-                        println!("INJECT SUCCESSFULLY");
+                        println!("注射成功");
                         break;
                     }
                     _ => {}
                 }
             }
         }
-    }
-    println!("Press any key to exit...");
-    io::stdout().flush()?;
-    let mut input = [0u8; 1];
-    if let Ok(_) = io::stdin().read(&mut input) {
-        println!("Exiting...");
     }
 
     stream.shutdown(Shutdown::Both)?;

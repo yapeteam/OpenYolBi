@@ -12,7 +12,7 @@ public class YeShiEE extends Module {
     @Override
     protected void onEnable() {
         if(mc.options!=null){
-            mc.options.gamma = 500;
+            mc.options.gamma = 5000;
         }
 
     }

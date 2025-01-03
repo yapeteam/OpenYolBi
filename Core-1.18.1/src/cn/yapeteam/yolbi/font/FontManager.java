@@ -23,6 +23,9 @@ public class FontManager {
         FLUXICON14 = createFontRenderer("fluxicon.ttf", 18);
         MINE18 = createFontRenderer("MINE.ttf",18);
         MINE14 = createFontRenderer("MINE.ttf",14);
+        RENDER5 = createFontRenderer("RenderBox.ttf",5);
+        RENDER10 = createFontRenderer("RenderBox.ttf",10);
+        RENDER20 = createFontRenderer("RenderBox.ttf",20);
         default18 = createFontRenderer(new Font(null, Font.PLAIN, 18), 18);
     }
     private final AbstractFontRenderer MINE18;
@@ -35,6 +38,9 @@ public class FontManager {
     private final AbstractFontRenderer PingFangBold18;
     private final AbstractFontRenderer FLUXICON14;
     private final AbstractFontRenderer default18;
+    private final AbstractFontRenderer RENDER5;
+    private final AbstractFontRenderer RENDER10;
+    private final AbstractFontRenderer RENDER20;
 
     public static Font getFont(int size, InputStream is) {
         Font font;

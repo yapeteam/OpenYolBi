@@ -5,6 +5,20 @@
     </CLASSES>
     <JAVADOC />
     <SOURCES />
+    <excluded>
+      <root url="jar://$PROJECT_DIR$/libs/lwjgl.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/lwjgl-natives-windows.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/gson-2.2.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/guava-17.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/authlib-1.5.21.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/commons-io-2.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/httpcore-4.3.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/lombok-1.18.32.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/httpclient-4.3.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/annotations-24.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/log4j-api-2.0-beta9.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/commons-logging-1.1.3.jar!/" />
+    </excluded>
     <jarDirectory url="file://$PROJECT_DIR$/libs" recursive="false" />
   </library>
 </component>
