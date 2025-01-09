@@ -73,4 +73,6 @@ For custom build, please edit `YBuild.xml`
 
 [libloading](https://github.com/nagisa/rust_libloading)
 
+![Alt](https://repobeats.axiom.co/api/embed/36bee748b6ab9d54484325966bbc8a7388d8b032.svg "Repobeats analytics image")
+
 <hr>
