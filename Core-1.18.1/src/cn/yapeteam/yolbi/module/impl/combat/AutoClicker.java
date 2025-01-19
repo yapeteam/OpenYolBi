@@ -17,24 +17,31 @@ public class AutoClicker extends Module {
     private final NumberValue<Double> range = new NumberValue<>("cps range", 1.5, 0.1d, 2.5d, 0.1);
     private final NumberValue<Integer> pressPercentage = new NumberValue<>("Press Percentage", 20, 0, 100, 1);
     private final BooleanValue leftClick = new BooleanValue("leftClick", true);
-    public Killaura ka = YolBi.instance.getka();
-    private BooleanValue rightClick = new BooleanValue("rightClick", false);
+    private final BooleanValue rightClick = new BooleanValue("rightClick", false);
+    private final BooleanValue smartMode = new BooleanValue("Smart Mode", true);
     private final ModeValue<String> clickprio = new ModeValue<>("Click Priority", "Left", "Left", "Right");
+    
     private double delay = -1;
-    public double getDelay(){
-        if(delay>0){
+    private long lastClickTime = 0;
+    private boolean isComboMode = false;
+    private int comboHits = 0;
+    private static final Random random = new Random();
+
+    public double getDelay() {
+        if(delay > 0) {
             return delay;
-        }else{
+        } else {
             return -1.1;
         }
     }
+
     @Override
     public void onEnable() {
-        delay = 1000 / generate(cps.getValue(), range.getValue());
+        delay = calculateInitialDelay();
         clickThread = new Thread(() -> {
             while (isEnabled()) {
-                delay = 1000 / generate(cps.getValue(), range.getValue());
                 try {
+                    updateClickingStrategy();
                     sendClick();
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
@@ -44,19 +51,45 @@ public class AutoClicker extends Module {
         clickThread.start();
     }
 
+    private double calculateInitialDelay() {
+        return 1000 / generate(cps.getValue(), range.getValue());
+    }
+
+    private void updateClickingStrategy() {
+        Killaura ka = YolBi.instance.getka();
+        if (ka != null && ka.getTarget2() != null && smartMode.getValue()) {
+            if (ka.getTarget2().hurtTime > 0) {
+                comboHits++;
+                if (comboHits >= 2) {
+                    isComboMode = true;
+                    delay = 1000 / generate(cps.getValue() + range.getValue(), range.getValue() * 0.5);
+                }
+            } else {
+                if (isComboMode) {
+                    // 退出连击状态时，使用较低的CPS
+                    delay = 1000 / generate(cps.getValue() - range.getValue(), range.getValue() * 0.5);
+                }
+                comboHits = 0;
+                isComboMode = false;
+            }
+        } else {
+            delay = calculateInitialDelay();
+            isComboMode = false;
+            comboHits = 0;
+        }
+    }
+
     @Getter
     private Thread clickThread = null;
 
     public AutoClicker() {
         super("AC", ModuleCategory.COMBAT);
-        addValues(cps, range, pressPercentage, leftClick, rightClick, clickprio);
+        addValues(cps, range, pressPercentage, leftClick, rightClick, smartMode, clickprio);
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             Natives.SendLeft(false);
             Natives.SendRight(false);
         }));
     }
-
-    private static final Random random = new Random();
 
     public static double generate(double cps, double range) {
         double mean = 1000.0 / cps;
@@ -70,31 +103,59 @@ public class AutoClicker extends Module {
 
     private final Runnable leftClickRunnable = () -> {
         try {
-            float pressPercentageValue = pressPercentage.getValue() / 100f;
+            float pressPercentageValue = calculatePressPercentage();
             Natives.SendLeft(true);
-
-            Thread.sleep((long) (1000 / delay * pressPercentageValue));
+            Thread.sleep((long) (delay * pressPercentageValue));
             Natives.SendLeft(false);
-            Thread.sleep((long) (1000 / delay * (1 - pressPercentageValue)));
+            Thread.sleep((long) (delay * (1 - pressPercentageValue)));
         } catch (InterruptedException ignored) {
         }
     };
 
     private final Runnable rightClickRunnable = () -> {
         try {
-            float pressPercentageValue = pressPercentage.getValue() / 100f;
+            float pressPercentageValue = calculatePressPercentage();
             Natives.SendRight(true);
-            Thread.sleep((long) (1000 / delay * pressPercentageValue));
+            Thread.sleep((long) (delay * pressPercentageValue));
             Natives.SendRight(false);
-            Thread.sleep((long) (1000 / delay * (1 - pressPercentageValue)));
+            Thread.sleep((long) (delay * (1 - pressPercentageValue)));
         } catch (InterruptedException ignored) {
         }
     };
 
+    private float calculatePressPercentage() {
+        float base = pressPercentage.getValue() / 100f;
+        if (isComboMode) {
+            base *= 1.2f; // Combo模式下增加按压时间
+        }
+        return Math.min(base, 0.95f);
+    }
+
+    private boolean isBreakingBlock() {
+        return mc.gameMode != null && mc.gameMode.isDestroying();
+    }
+
     public void sendClick() throws InterruptedException {
         if (!isEnabled() || mc.screen != null || mc.player == null) return;
+
+        if (isBreakingBlock()) return;
+
+        if (smartMode.getValue()) {
+            Killaura ka = YolBi.instance.getka();
+            if (ka != null && ka.getTarget2() != null && ka.getTarget2().hurtTime > 0 && !isComboMode) {
+                Thread.sleep(50 + random.nextInt(30)); // 短暂延迟
+            }
+        }
+
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - lastClickTime < delay) {
+            return;
+        }
+        lastClickTime = currentTime;
+
         boolean left = leftClick.getValue() && Natives.IsKeyDown(VirtualKeyBoard.VK_LBUTTON);
         boolean right = rightClick.getValue() && Natives.IsKeyDown(VirtualKeyBoard.VK_RBUTTON);
+        
         if (left && right) {
             if (clickprio.getValue().equals("Left")) {
                 leftClickRunnable.run();
@@ -114,6 +175,6 @@ public class AutoClicker extends Module {
 
     @Override
     public String getSuffix() {
-        return (cps.getValue() - range.getValue()) + " ~ " + (cps.getValue() + range.getValue());
+        return String.format("%.1f ~ %.1f", cps.getValue() - range.getValue(), cps.getValue() + range.getValue());
     }
 }
