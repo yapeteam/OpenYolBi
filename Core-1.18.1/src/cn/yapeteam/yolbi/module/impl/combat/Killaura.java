@@ -8,15 +8,18 @@ import cn.yapeteam.yolbi.event.impl.render.EventRender2D;
 import cn.yapeteam.yolbi.module.Module;
 import cn.yapeteam.yolbi.module.ModuleCategory;
 import cn.yapeteam.yolbi.module.values.impl.NumberValue;
+import cn.yapeteam.yolbi.module.values.impl.BooleanValue;
 import cn.yapeteam.yolbi.utils.misc.VirtualKeyBoard;
+import cn.yapeteam.yolbi.utils.player.Rotation;
 import cn.yapeteam.yolbi.utils.player.RotationUtils;
+import cn.yapeteam.yolbi.utils.vector.Vector2f;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
 
 public class Killaura extends Module {
     private NumberValue<Double> rangeValue = new NumberValue<>("range", 3.1d, 2.0, 6.0, 0.01);
@@ -143,11 +146,7 @@ public class Killaura extends Module {
 
     private void applyRotations(float[] targetRotations, float smoothSpeed) {
         float[] smoothedRotations = calculateSmoothedRotations(targetRotations, smoothSpeed);
-        
-        mc.player.setYHeadRot(smoothedRotations[0]);
-        mc.player.setYRot(smoothedRotations[0]);
-        mc.player.setXRot(smoothedRotations[1]);
-        
+        YolBi.instance.getRotationManager().setRation(new Vector2f(smoothedRotations[0], smoothedRotations[1]));
         updateAimStatus(smoothedRotations, targetRotations);
     }
 

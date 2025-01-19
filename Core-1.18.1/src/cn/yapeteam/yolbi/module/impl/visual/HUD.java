@@ -38,7 +38,7 @@ public class HUD extends Module {
             .collect(Collectors.toList());
 
         y = 10;
-        
+
         for (Module module : enabledModules) {
             font.drawStringWithShadow(poseStack, module.getName(), x, y, -1);
             y += (int) font.getFontHeight("A");

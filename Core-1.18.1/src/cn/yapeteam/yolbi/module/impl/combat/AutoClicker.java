@@ -66,7 +66,6 @@ public class AutoClicker extends Module {
                 }
             } else {
                 if (isComboMode) {
-                    // 退出连击状态时，使用较低的CPS
                     delay = 1000 / generate(cps.getValue() - range.getValue(), range.getValue() * 0.5);
                 }
                 comboHits = 0;
@@ -126,7 +125,7 @@ public class AutoClicker extends Module {
     private float calculatePressPercentage() {
         float base = pressPercentage.getValue() / 100f;
         if (isComboMode) {
-            base *= 1.2f; // Combo模式下增加按压时间
+            base *= 1.2f;
         }
         return Math.min(base, 0.95f);
     }
@@ -143,7 +142,7 @@ public class AutoClicker extends Module {
         if (smartMode.getValue()) {
             Killaura ka = YolBi.instance.getka();
             if (ka != null && ka.getTarget2() != null && ka.getTarget2().hurtTime > 0 && !isComboMode) {
-                Thread.sleep(50 + random.nextInt(30)); // 短暂延迟
+                Thread.sleep(50 + random.nextInt(30));
             }
         }
 
