@@ -94,7 +94,7 @@ public class Killaura extends Module {
             handleRotations();
             if (nowta) {
                 long currentTime = System.currentTimeMillis();
-                if (currentTime - lastClickTime >= currentDelay) {
+                if (currentTime - lastClickTime >= currentDelay && mc.player.getAttackStrengthScale(0.0f) >= 0.9f) {
                     // 先执行攻击
                     mc.gameMode.attack(mc.player, target);
                     // 然后播放挥刀动画
@@ -190,9 +190,22 @@ public class Killaura extends Module {
     }
 
     private void updateAimStatus(float[] current, float[] target) {
+        // 计算水平和垂直角度差
         float yawDiff = Math.abs(wrapAngleTo180(current[0] - target[0]));
         float pitchDiff = Math.abs(current[1] - target[1]);
-        nowta = yawDiff < 20 && pitchDiff < 20;
+        
+        // 检查是否在180度范围内
+        boolean inRange = yawDiff <= 180 && pitchDiff <= 180;
+        
+        // 计算瞄准精度百分比
+        float yawAccuracy = (180 - yawDiff) / 180 * 100;
+        float pitchAccuracy = (180 - pitchDiff) / 180 * 100;
+        
+        // 只有当瞄准精度超过95%时才允许攻击
+        boolean highAccuracy = yawAccuracy > 95 && pitchAccuracy > 95;
+        
+        // 更新瞄准状态
+        nowta = inRange && highAccuracy;
     }
 
     private float wrapAngleTo180(float angle) {
@@ -287,6 +300,12 @@ public class Killaura extends Module {
         
         if (smartCPS.getValue()) {
             if (target != null) {
+                float attackStrength = mc.player.getAttackStrengthScale(0.0f);
+                if (attackStrength < 0.9f) {
+                    minCpsValue *= 0.5;
+                    maxCpsValue *= 0.5;
+                }
+                
                 if (target.hurtTime > 0) {
                     minCpsValue *= 0.8;
                     maxCpsValue *= 0.8;

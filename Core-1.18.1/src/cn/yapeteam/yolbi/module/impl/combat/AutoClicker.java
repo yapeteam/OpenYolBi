@@ -138,8 +138,10 @@ public class AutoClicker extends Module {
     public void onUpdate(cn.yapeteam.yolbi.event.impl.player.EventMotion event) {
         if (!isEnabled() || mc.player == null) return;
         
-        // 如果正在挖方块则不进行点击
-        if (isBreakingBlock()) return;
+        if (isBreakingBlock()) {
+            Natives.SendLeft(false);
+            return;
+        }
         
         long currentTime = System.currentTimeMillis();
         if (currentTime - lastClickTime >= delay) {
@@ -148,7 +150,6 @@ public class AutoClicker extends Module {
                 lastClickTime = currentTime;
                 updateClickingStrategy();
             } catch (InterruptedException ignored) {
-                // 忽略中断异常
             }
         }
     }
