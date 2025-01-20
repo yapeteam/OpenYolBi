@@ -20,9 +20,9 @@ import java.util.List;
 import java.util.Random;
 
 public class Killaura extends Module {
-    private NumberValue<Double> rangeValue = new NumberValue<>("Range", 3.1d, 2.0, 6.0, 0.01);
-    private NumberValue<Double> minCPS = new NumberValue<>("MinCPS", 8.0, 1.0, 20.0, 0.5);
-    private NumberValue<Double> maxCPS = new NumberValue<>("MaxCPS", 12.0, 1.0, 20.0, 0.5);
+    private final NumberValue<Double> minCPS = new NumberValue<>("MinCPS", 12.0, 1.0, 20.0, 0.5);
+    private final NumberValue<Double> maxCPS = new NumberValue<>("MaxCPS", 16.0, 1.0, 20.0, 0.5);
+    private final NumberValue<Double> range = new NumberValue<>("Range", 3.0, 1.0, 6.0, 0.1);
     private BooleanValue smartCPS = new BooleanValue("SmartCPS", true);
 
     private long lastHitTime = 0;
@@ -37,10 +37,11 @@ public class Killaura extends Module {
     private long lastClickTime = 0;
     private long currentDelay = 0;
     private Random random = new Random();
+    private long lastAttackTime = 0L;
 
     public Killaura() {
         super("Killaura", ModuleCategory.COMBAT, InputConstants.KEY_R);
-        addValues(rangeValue, minCPS, maxCPS, smartCPS);
+        addValues(range, minCPS, maxCPS, smartCPS);
     }
 
     @Override
@@ -80,28 +81,17 @@ public class Killaura extends Module {
 
     @Listener
     public void onUpdate(EventMotion event) {
-        if (mc.level == null) return;
+        if (!isEnabled() || mc.player == null || mc.level == null) return;
         
-        updateTargetSpeed();
+        // 更新目标和瞄准
         updateTarget();
         
-        if (target == null && mc.player != null) {
-            YolBi.instance.getRotationManager().setRation(new Vector2f(mc.player.getXRot(), mc.player.getYRot()));
-            return;
-        }
-        
-        if (target != null && unjztargetrange(target) <= rangeValue.getValue()) {
-            handleRotations();
-            if (nowta) {
-                long currentTime = System.currentTimeMillis();
-                if (currentTime - lastClickTime >= currentDelay && mc.player.getAttackStrengthScale(0.0f) >= 0.9f) {
-                    // 先执行攻击
-                    mc.gameMode.attack(mc.player, target);
-                    // 然后播放挥刀动画
-                    mc.player.swing(InteractionHand.MAIN_HAND);
-                    lastClickTime = currentTime;
-                    updateClickDelay();
-                }
+        // 如果有目标且瞄准完成,执行攻击
+        if (target != null) {
+            long currentTime = System.currentTimeMillis();
+            if (currentTime - lastAttackTime >= getAttackDelay()) {
+                attack();
+                lastAttackTime = currentTime;
             }
         }
     }
@@ -114,15 +104,28 @@ public class Killaura extends Module {
     }
 
     private void updateTarget() {
-        if (target == null) {
-            target = findTarget();
-        } else if (isTargetInvalid(target)) {
-            resetTarget();
+        if (mc.player == null || mc.level == null) return;
+        
+        // 获取范围内的目标
+        target = findTarget();
+        
+        // 如果找到目标,立即进行静默瞄准
+        if (target != null) {
+            float[] rotations = calculateRotations(target);
+            YolBi.instance.getRotationManager().setRation(new Vector2f(rotations[0], rotations[1]));
         }
     }
 
+    private void attack() {
+        if (target == null || mc.player == null) return;
+        
+        // 移除攻击间隔检查,直接攻击
+        mc.gameMode.attack(mc.player, target);
+        mc.player.swing(InteractionHand.MAIN_HAND);
+    }
+
     private boolean isTargetInvalid(Player entity) {
-        return entity.isDeadOrDying() || entity.isInvisible() || unjztargetrange(entity) > rangeValue.getValue();
+        return entity.isDeadOrDying() || entity.isInvisible() || unjztargetrange(entity) > range.getValue();
     }
 
     private void handleRotations() {
@@ -239,49 +242,46 @@ public class Killaura extends Module {
     }
 
     private Player findTarget() {
-        if (isLockedTargetValid()) {
-            return lockedTarget;
-        }
-
-        targets.clear();
-        double bestScore = Double.MAX_VALUE;
+        if (mc.player == null || mc.level == null) return null;
+        
         Entity bestTarget = null;
-
-        if (System.currentTimeMillis() - lastTargetSwitch < 200) {
-            return target;
-        }
-
+        double closestDistance = range.getValue();
+        
         for (Entity entity : mc.level.entitiesForRendering()) {
-            if (entity instanceof Player && entity != mc.player) {
-                Player player = (Player) entity;
-                if (isValidTarget(player)) {
-                    double score = calculateTargetScore(player);
-                    if (score < bestScore) {
-                        bestScore = score;
-                        bestTarget = entity;
-                    }
-                }
+            if (!(entity instanceof Player) || entity == mc.player) continue;
+            
+            double distance = mc.player.distanceTo(entity);
+            if (distance < closestDistance) {
+                bestTarget = entity;
+                closestDistance = distance;
             }
         }
+        
+        return bestTarget != null ? (Player) bestTarget : null;
+    }
 
-        if (bestTarget != null) {
-            lastTargetSwitch = System.currentTimeMillis();
-            lockedTarget = (Player) bestTarget;
-            return lockedTarget;
-        }
-
-        return null;
+    private float[] calculateRotations(Entity target) {
+        double x = target.getX() - mc.player.getX();
+        double y = target.getY() + target.getEyeHeight() - (mc.player.getY() + mc.player.getEyeHeight());
+        double z = target.getZ() - mc.player.getZ();
+        
+        double distance = Math.sqrt(x * x + z * z);
+        
+        float yaw = (float) Math.toDegrees(Math.atan2(z, x)) - 90F;
+        float pitch = (float) -Math.toDegrees(Math.atan2(y, distance));
+        
+        return new float[]{yaw, pitch};
     }
 
     private boolean isLockedTargetValid() {
         return lockedTarget != null && 
                !lockedTarget.isDeadOrDying() && 
                !lockedTarget.isInvisible() && 
-               unjztargetrange(lockedTarget) <= rangeValue.getValue();
+               unjztargetrange(lockedTarget) <= range.getValue();
     }
 
     private boolean isValidTarget(Player player) {
-        return unjztargetrange(player) < rangeValue.getValue() && check(player);
+        return unjztargetrange(player) < range.getValue() && check(player);
     }
 
     private double calculateTargetScore(Player player) {
@@ -323,5 +323,9 @@ public class Killaura extends Module {
         
         double cps = minCpsValue + random.nextDouble() * (maxCpsValue - minCpsValue);
         currentDelay = (long)(1000.0 / cps);
+    }
+
+    private long getAttackDelay() {
+        return (long)(1000.0 / random.nextInt(minCPS.getValue().intValue(), maxCPS.getValue().intValue() + 1));
     }
 }
