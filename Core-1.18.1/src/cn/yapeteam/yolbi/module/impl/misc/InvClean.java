@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class InvCleaner extends Module {
+public class InvClean extends Module {
     private final TimerUtil timer = new TimerUtil();
     private final int[] bestArmorPieces = new int[6];
     private final List<Integer> trash = new ArrayList<>();
@@ -35,7 +35,7 @@ public class InvCleaner extends Module {
     private boolean serverOpen;
     private boolean clientOpen;
 
-    public InvCleaner() {
+    public InvClean() {
         super("InvCleaner", ModuleCategory.PLAYER, 66);
     }
 
