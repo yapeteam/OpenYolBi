@@ -11,7 +11,6 @@ import cn.yapeteam.yolbi.module.impl.misc.SelfDestruct;
 import cn.yapeteam.yolbi.module.impl.movement.Eagle;
 import cn.yapeteam.yolbi.module.impl.movement.GrimRunEat;
 import cn.yapeteam.yolbi.module.impl.movement.Sprint;
-import cn.yapeteam.yolbi.module.impl.movement.YolBiTelly;
 import cn.yapeteam.yolbi.module.impl.visual.ClientTheme;
 import cn.yapeteam.yolbi.module.impl.visual.ESP;
 import cn.yapeteam.yolbi.module.impl.visual.HUD;
@@ -33,10 +32,9 @@ public class ModuleManager {
         modules.add(new AutoClicker());
         modules.add(new Eagle());
         modules.add(new HUD());
-        modules.add(new Killaura());
+        modules.add(new Aimbot());
         modules.add(new AntiKb());
         modules.add(new ESP());
-        modules.add(new YolBiTelly());
         modules.add(new Sprint());
         modules.add(new FuckBed());
         modules.add(new ChestStealer());
@@ -44,6 +42,7 @@ public class ModuleManager {
         modules.add(new GrimRunEat());
         modules.add(new YeShiEE());
         modules.add(new Reach());
+        modules.add(new Aimbot());
         modules.sort((m1, m2) -> -Integer.compare(m2.getName().charAt(0), m1.getName().charAt(0)));
     }
 
