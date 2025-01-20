@@ -134,6 +134,25 @@ public class AutoClicker extends Module {
         return mc.gameMode != null && mc.gameMode.isDestroying();
     }
 
+    @cn.yapeteam.yolbi.event.Listener
+    public void onUpdate(cn.yapeteam.yolbi.event.impl.player.EventMotion event) {
+        if (!isEnabled() || mc.player == null) return;
+        
+        // 如果正在挖方块则不进行点击
+        if (isBreakingBlock()) return;
+        
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - lastClickTime >= delay) {
+            try {
+                sendClick();
+                lastClickTime = currentTime;
+                updateClickingStrategy();
+            } catch (InterruptedException ignored) {
+                // 忽略中断异常
+            }
+        }
+    }
+
     public void sendClick() throws InterruptedException {
         if (!isEnabled() || mc.screen != null || mc.player == null) return;
 
