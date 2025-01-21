@@ -7,13 +7,12 @@ import cn.yapeteam.yolbi.module.Module;
 import cn.yapeteam.yolbi.module.ModuleCategory;
 import cn.yapeteam.yolbi.module.values.impl.BooleanValue;
 import cn.yapeteam.yolbi.module.values.impl.NumberValue;
-import cn.yapeteam.yolbi.utils.player.RotationUtils;
 import cn.yapeteam.yolbi.utils.vector.Vector2f;
 import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.InteractionHand;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +56,7 @@ public class Killaura extends Module {
         lockedTarget = null;
         b = false;
         if (mc.player != null) {
-            YolBi.instance.getRotationManager().setRotation(new Vector2f(mc.player.getXRot(), mc.player.getYRot()));
+            YolBi.instance.getRotationManager().resetServerRotation();
         }
     }
 
@@ -87,7 +86,7 @@ public class Killaura extends Module {
         updateTarget();
         
         // 如果有目标且瞄准完成,执行攻击
-        if (target != null) {
+        if (target != null && nowta) {
             long currentTime = System.currentTimeMillis();
             if (currentTime - lastAttackTime >= getAttackDelay()) {
                 attack();
@@ -109,13 +108,9 @@ public class Killaura extends Module {
         // 获取范围内的目标
         target = findTarget();
         
-        // 如果找到目标,进行静默瞄准
+        // 如果找到目标,进行瞄准
         if (target != null) {
-            float[] rotations = calculateRotations(target);
-            // 计算平滑后的旋转角度
-            float[] smoothedRotations = calculateSmoothedRotations(rotations, calculateSmoothSpeed(mc.player.distanceTo(target)));
-            // 应用旋转
-            YolBi.instance.getRotationManager().setRotation(new Vector2f(smoothedRotations[1], smoothedRotations[0]));
+            handleRotations();
         }
     }
 
@@ -125,14 +120,26 @@ public class Killaura extends Module {
         mc.player.swing(InteractionHand.MAIN_HAND);
     }
 
-    private boolean isTargetInvalid(Player entity) {
-        return entity.isDeadOrDying() || entity.isInvisible() || unjztargetrange(entity) > range.getValue();
+    private float[] calculateRotations(Player target) {
+        if (target == null) return null;
+        
+        double x = target.getX() - mc.player.getX();
+        double y = target.getY() + target.getEyeHeight() - (mc.player.getY() + mc.player.getEyeHeight());
+        double z = target.getZ() - mc.player.getZ();
+        
+        double distance = Math.sqrt(x * x + z * z);
+        
+        float yaw = (float) Math.toDegrees(Math.atan2(z, x)) - 90F;
+        float pitch = (float) -Math.toDegrees(Math.atan2(y, distance));
+        
+        return new float[]{yaw, pitch};
     }
 
     private void handleRotations() {
-        float[] targetRotations = RotationUtils.getSimpleRotations(target);
-        float distance = (float)jztargetrange(target);
+        float[] targetRotations = calculateRotations(target);
+        if (targetRotations == null) return;
         
+        float distance = (float)jztargetrange(target);
         applyRandomization(targetRotations);
         float smoothSpeed = calculateSmoothSpeed(distance);
         
@@ -172,7 +179,7 @@ public class Killaura extends Module {
 
     private void applyRotations(float[] targetRotations, float smoothSpeed) {
         float[] smoothedRotations = calculateSmoothedRotations(targetRotations, smoothSpeed);
-        applyRotations(smoothedRotations);
+        YolBi.instance.getRotationManager().setServerRotation(new Vector2f(smoothedRotations[1], smoothedRotations[0]));
         updateAimStatus(smoothedRotations, targetRotations);
     }
 
@@ -189,24 +196,15 @@ public class Killaura extends Module {
         return smoothed;
     }
 
-    private void applyRotations(float[] smoothedRotations) {
-        YolBi.instance.getRotationManager().setRotation(new Vector2f(smoothedRotations[1], smoothedRotations[0]));
-    }
-
     private void updateAimStatus(float[] current, float[] target) {
-        // 计算水平和垂直角度差
         float yawDiff = Math.abs(wrapAngleTo180(current[0] - target[0]));
         float pitchDiff = Math.abs(current[1] - target[1]);
 
         boolean inRange = yawDiff <= 180 && pitchDiff <= 180;
-        
-        // 计算瞄准精度百分比
         float yawAccuracy = (180 - yawDiff) / 180 * 100;
         float pitchAccuracy = (180 - pitchDiff) / 180 * 100;
-
         boolean highAccuracy = yawAccuracy > 95 && pitchAccuracy > 95;
         
-        // 更新瞄准状态
         nowta = inRange && highAccuracy;
     }
 
@@ -243,33 +241,27 @@ public class Killaura extends Module {
     private Player findTarget() {
         if (mc.player == null || mc.level == null) return null;
         
-        Entity bestTarget = null;
+        Player bestTarget = null;
         double closestDistance = range.getValue();
         
         for (Entity entity : mc.level.entitiesForRendering()) {
             if (!(entity instanceof Player) || entity == mc.player) continue;
             
-            double distance = mc.player.distanceTo(entity);
+            Player player = (Player) entity;
+            if (isTargetInvalid(player)) continue;
+            
+            double distance = mc.player.distanceTo(player);
             if (distance < closestDistance) {
-                bestTarget = entity;
                 closestDistance = distance;
+                bestTarget = player;
             }
         }
         
-        return bestTarget != null ? (Player) bestTarget : null;
+        return bestTarget;
     }
 
-    private float[] calculateRotations(Entity target) {
-        double x = target.getX() - mc.player.getX();
-        double y = target.getY() + target.getEyeHeight() - (mc.player.getY() + mc.player.getEyeHeight());
-        double z = target.getZ() - mc.player.getZ();
-        
-        double distance = Math.sqrt(x * x + z * z);
-        
-        float yaw = (float) Math.toDegrees(Math.atan2(z, x)) - 90F;
-        float pitch = (float) -Math.toDegrees(Math.atan2(y, distance));
-        
-        return new float[]{yaw, pitch};
+    private boolean isTargetInvalid(Player entity) {
+        return entity.isDeadOrDying() || entity.isInvisible() || unjztargetrange(entity) > range.getValue();
     }
 
     private boolean isLockedTargetValid() {
@@ -325,6 +317,10 @@ public class Killaura extends Module {
     }
 
     private long getAttackDelay() {
-        return (long)(1000.0 / random.nextInt(minCPS.getValue().intValue(), maxCPS.getValue().intValue() + 1));
+        return (long)(1000.0 / generate(minCPS.getValue(), maxCPS.getValue()));
+    }
+
+    private double generate(double min, double max) {
+        return min + (max - min) * random.nextDouble();
     }
 }

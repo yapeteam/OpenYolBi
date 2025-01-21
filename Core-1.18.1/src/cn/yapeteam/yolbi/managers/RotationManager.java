@@ -11,6 +11,7 @@ public class RotationManager {
     public Minecraft mc = Minecraft.getInstance();
     private boolean active;
     private int tick = 0;
+    private Vector2f serverRotation = null;
 
     public void setRation(Vector2f ration) {
         if (ration.equals(getLocalPlayer())) return;
@@ -21,7 +22,7 @@ public class RotationManager {
     // 兼容接口，供Killaura等模块使用
     public void setRotation(Vector2f rotation) {
         if (rotation == null) return;
-        setRation(rotation);
+        setServerRotation(rotation);
     }
 
     public Vector2f getRation() {
@@ -30,7 +31,7 @@ public class RotationManager {
 
     // 兼容接口，供Killaura等模块使用
     public Vector2f getRotation() {
-        return getRation();
+        return getServerRotation();
     }
 
     public Vector2f getLocalPlayer() {
@@ -39,8 +40,10 @@ public class RotationManager {
 
     @Listener
     public void onMotion(EventMotion event) {
-        event.setYaw(getRation().y);
-        event.setPitch(getRation().x);
+        if (serverRotation != null) {
+            event.setYaw(serverRotation.x);
+            event.setPitch(serverRotation.y);
+        }
         
         // 应用GCD修正
         float mouseSensitivity = (float) (mc.options.sensitivity * 0.6F + 0.2F);
@@ -64,5 +67,18 @@ public class RotationManager {
 
     public void setActive(boolean active) {
         tick = active ? 1 : 0;
+    }
+
+    public void setServerRotation(Vector2f rotation) {
+        if (rotation == null) return;
+        this.serverRotation = rotation;
+    }
+
+    public void resetServerRotation() {
+        this.serverRotation = null;
+    }
+
+    public Vector2f getServerRotation() {
+        return serverRotation;
     }
 }

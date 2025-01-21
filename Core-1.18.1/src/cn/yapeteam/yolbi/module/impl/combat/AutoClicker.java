@@ -2,134 +2,126 @@ package cn.yapeteam.yolbi.module.impl.combat;
 
 import cn.yapeteam.loader.Natives;
 import cn.yapeteam.yolbi.event.Listener;
-import cn.yapeteam.yolbi.event.impl.player.EventMotion;
+import cn.yapeteam.yolbi.event.impl.player.EventUpdate;
 import cn.yapeteam.yolbi.module.Module;
 import cn.yapeteam.yolbi.module.ModuleCategory;
 import cn.yapeteam.yolbi.module.values.impl.BooleanValue;
-import cn.yapeteam.yolbi.module.values.impl.ModeValue;
 import cn.yapeteam.yolbi.module.values.impl.NumberValue;
 import net.minecraft.client.Minecraft;
-import com.mojang.blaze3d.platform.InputConstants;
 
 import java.util.Random;
 
 public class AutoClicker extends Module {
-    private final NumberValue<Double> minCPS = new NumberValue<>("MinCPS", 8.0, 1.0, 20.0, 0.5);
-    private final NumberValue<Double> maxCPS = new NumberValue<>("MaxCPS", 12.0, 1.0, 20.0, 0.5);
-    private final BooleanValue smartMode = new BooleanValue("Smart", true);
+    private final NumberValue<Double> minCPS = new NumberValue<>("MinCPS", 12.0, 1.0, 20.0, 0.5);
+    private final NumberValue<Double> maxCPS = new NumberValue<>("MaxCPS", 16.0, 1.0, 20.0, 0.5);
     private final BooleanValue leftClick = new BooleanValue("LeftClick", true);
     private final BooleanValue rightClick = new BooleanValue("RightClick", false);
-    private final ModeValue<String> clickprio = new ModeValue<>("Priority", "Left", "Left", "Right", "Both");
     
     private long lastClickTime = 0;
     private long currentDelay = 0;
     private final Random random = new Random();
     protected final Minecraft mc = Minecraft.getInstance();
+    private boolean isLeftPressed = false;
+    private boolean isRightPressed = false;
     
     public AutoClicker() {
         super("AutoClicker", ModuleCategory.COMBAT);
-        addValues(minCPS, maxCPS, smartMode, leftClick, rightClick, clickprio);
+        addValues(minCPS, maxCPS, leftClick, rightClick);
     }
 
     @Override
-    public void onEnable() {
-        currentDelay = calculateInitialDelay();
+    protected void onEnable() {
+        lastClickTime = System.currentTimeMillis();
+        updateClickDelay();
+        isLeftPressed = false;
+        isRightPressed = false;
     }
 
-    private long calculateInitialDelay() {
-        return (long)(1000.0 / generate(minCPS.getValue(), maxCPS.getValue()));
+    @Override
+    protected void onDisable() {
+        // 确保释放所有按键
+        if(isLeftPressed) {
+            Natives.SendLeft(false);
+            isLeftPressed = false;
+        }
+        if(isRightPressed) {
+            Natives.SendRight(false);
+            isRightPressed = false;
+        }
     }
 
-    private double generate(double min, double max) {
-        return min + (max - min) * random.nextDouble();
-    }
-
-    private boolean isBreakingBlock() {
-        return mc.gameMode != null && mc.gameMode.isDestroying();
+    private boolean shouldClick() {
+        // 如果打开了UI界面,不点击
+        if (mc.screen != null) return false;
+        
+        // 如果正在挖掘方块,不点击
+        if (mc.gameMode != null && mc.gameMode.isDestroying()) return false;
+        
+        // 检查是否有任何一个按键需要点击
+        boolean shouldLeft = leftClick.getValue() && mc.options.keyAttack.isDown();
+        boolean shouldRight = rightClick.getValue() && mc.options.keyUse.isDown();
+        
+        return shouldLeft || shouldRight;
     }
 
     @Listener
-    public void onUpdate(EventMotion event) {
-        if (!isEnabled() || mc.player == null || mc.screen != null) return;
+    public void onUpdate(EventUpdate event) {
+        if (!isEnabled() || !shouldClick()) {
+            // 如果不应该点击，确保释放按键
+            if(isLeftPressed) {
+                Natives.SendLeft(false);
+                isLeftPressed = false;
+            }
+            if(isRightPressed) {
+                Natives.SendRight(false);
+                isRightPressed = false;
+            }
+            return;
+        }
         
-        if (isBreakingBlock()) return;
-
-        if (leftClick.getValue() && !Natives.IsKeyDown(InputConstants.MOUSE_BUTTON_LEFT)) return;
-        if (rightClick.getValue() && !Natives.IsKeyDown(InputConstants.MOUSE_BUTTON_RIGHT) && clickprio.getValue().equals("Right")) return;
-
         long currentTime = System.currentTimeMillis();
         if (currentTime - lastClickTime >= currentDelay) {
-            sendClick();
+            // 执行点击
+            if(leftClick.getValue() && mc.options.keyAttack.isDown()) {
+                Natives.SendLeft(true);
+                isLeftPressed = true;
+            }
+            if(rightClick.getValue() && mc.options.keyUse.isDown()) {
+                Natives.SendRight(true);
+                isRightPressed = true;
+            }
+            
+            // 短暂延迟后释放按键
+            try {
+                Thread.sleep(25); // 模拟真实点击时长
+            } catch (InterruptedException ignored) {}
+            
+            if(isLeftPressed) {
+                Natives.SendLeft(false);
+                isLeftPressed = false;
+            }
+            if(isRightPressed) {
+                Natives.SendRight(false);
+                isRightPressed = false;
+            }
+            
+            // 更新时间和延迟
             lastClickTime = currentTime;
-            updateClickingStrategy();
+            updateClickDelay();
         }
     }
 
-    private void sendClick() {
-        float pressPercentage = calculatePressPercentage();
+    private void updateClickDelay() {
+        double minCpsValue = minCPS.getValue();
+        double maxCpsValue = maxCPS.getValue();
         
-        if (clickprio.getValue().equals("Left")) {
-            if (leftClick.getValue()) {
-                Natives.SendLeft(true);
-                try {
-                    Thread.sleep((long) (currentDelay * pressPercentage));
-                } catch (InterruptedException ignored) {}
-                Natives.SendLeft(false);
-            }
-            if (rightClick.getValue()) {
-                Natives.SendRight(true);
-                try {
-                    Thread.sleep((long) (currentDelay * pressPercentage));
-                } catch (InterruptedException ignored) {}
-                Natives.SendRight(false);
-            }
-        } else if (clickprio.getValue().equals("Right")) {
-            if (rightClick.getValue()) {
-                Natives.SendRight(true);
-                try {
-                    Thread.sleep((long) (currentDelay * pressPercentage));
-                } catch (InterruptedException ignored) {}
-                Natives.SendRight(false);
-            }
-            if (leftClick.getValue()) {
-                Natives.SendLeft(true);
-                try {
-                    Thread.sleep((long) (currentDelay * pressPercentage));
-                } catch (InterruptedException ignored) {}
-                Natives.SendLeft(false);
-            }
-        } else {
-            if (leftClick.getValue()) {
-                Natives.SendLeft(true);
-                try {
-                    Thread.sleep((long) (currentDelay * pressPercentage));
-                } catch (InterruptedException ignored) {}
-                Natives.SendLeft(false);
-            }
-            if (rightClick.getValue()) {
-                Natives.SendRight(true);
-                try {
-                    Thread.sleep((long) (currentDelay * pressPercentage));
-                } catch (InterruptedException ignored) {}
-                Natives.SendRight(false);
-            }
-        }
-    }
-
-    private float calculatePressPercentage() {
-        float base = 0.5f;
-        if (smartMode.getValue()) {
-            base = 0.5f + (float) (random.nextGaussian() * 0.25);
-        }
-        return Math.min(Math.max(base, 0.05f), 0.95f);
-    }
-
-    private void updateClickingStrategy() {
-        if (smartMode.getValue()) {
-            currentDelay = (long)(1000.0 / generate(minCPS.getValue() + 2, maxCPS.getValue() + 2));
-        } else {
-            currentDelay = calculateInitialDelay();
-        }
+        // 确保CPS在有效范围内
+        minCpsValue = Math.max(1.0, Math.min(20.0, minCpsValue));
+        maxCpsValue = Math.max(minCpsValue, Math.min(20.0, maxCpsValue));
+        
+        // 生成随机CPS
+        double cps = minCpsValue + random.nextDouble() * (maxCpsValue - minCpsValue);
+        currentDelay = (long)(1000.0 / cps);
     }
 
     @Override
