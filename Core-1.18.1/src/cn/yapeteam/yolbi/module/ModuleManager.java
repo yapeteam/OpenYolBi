@@ -30,6 +30,7 @@ public class ModuleManager {
         modules.add(new SelfDestruct());
         modules.add(new ClientTheme());
         modules.add(new AutoClicker());
+        modules.add(new Killaura());
         modules.add(new Aimbot());
         modules.add(new Eagle());
         modules.add(new HUD());

@@ -18,7 +18,9 @@ public class RotationManager {
         active = true;
     }
 
+    // 兼容接口，供Killaura等模块使用
     public void setRotation(Vector2f rotation) {
+        if (rotation == null) return;
         setRation(rotation);
     }
 
@@ -26,6 +28,7 @@ public class RotationManager {
         return isActive() ? ration : new Vector2f(mc.player.getXRot(), mc.player.getYRot());
     }
 
+    // 兼容接口，供Killaura等模块使用
     public Vector2f getRotation() {
         return getRation();
     }
@@ -38,10 +41,12 @@ public class RotationManager {
     public void onMotion(EventMotion event) {
         event.setYaw(getRation().y);
         event.setPitch(getRation().x);
-
+        
+        // 应用GCD修正
         float mouseSensitivity = (float) (mc.options.sensitivity * 0.6F + 0.2F);
         float gcd = mouseSensitivity * mouseSensitivity * mouseSensitivity * 8.0F * 0.15F;
         
+        // 修正pitch
         float pitch = event.getPitch();
         pitch = Math.round(pitch / gcd) * gcd;
         event.setPitch(pitch);
