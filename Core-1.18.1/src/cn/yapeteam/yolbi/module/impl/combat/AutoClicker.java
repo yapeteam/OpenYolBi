@@ -9,7 +9,6 @@ import cn.yapeteam.yolbi.module.values.impl.BooleanValue;
 import cn.yapeteam.yolbi.module.values.impl.ModeValue;
 import cn.yapeteam.yolbi.module.values.impl.NumberValue;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.util.InputConstants;
 
 import java.util.Random;
 

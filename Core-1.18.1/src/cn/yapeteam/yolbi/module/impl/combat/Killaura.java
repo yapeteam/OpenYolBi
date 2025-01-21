@@ -57,7 +57,7 @@ public class Killaura extends Module {
         lockedTarget = null;
         b = false;
         if (mc.player != null) {
-            YolBi.instance.getRotationManager().setRation(new Vector2f(mc.player.getXRot(), mc.player.getYRot()));
+            YolBi.instance.getRotationManager().setRotation(new Vector2f(mc.player.getXRot(), mc.player.getYRot()));
         }
     }
 
@@ -109,10 +109,13 @@ public class Killaura extends Module {
         // 获取范围内的目标
         target = findTarget();
         
-        // 如果找到目标,立即进行静默瞄准
+        // 如果找到目标,进行静默瞄准
         if (target != null) {
             float[] rotations = calculateRotations(target);
-            YolBi.instance.getRotationManager().setRation(new Vector2f(rotations[0], rotations[1]));
+            // 计算平滑后的旋转角度
+            float[] smoothedRotations = calculateSmoothedRotations(rotations, calculateSmoothSpeed(mc.player.distanceTo(target)));
+            // 应用旋转
+            YolBi.instance.getRotationManager().setRotation(new Vector2f(smoothedRotations[1], smoothedRotations[0]));
         }
     }
 
@@ -187,7 +190,7 @@ public class Killaura extends Module {
     }
 
     private void applyRotations(float[] smoothedRotations) {
-        YolBi.instance.getRotationManager().setRation(new Vector2f(smoothedRotations[0], smoothedRotations[1]));
+        YolBi.instance.getRotationManager().setRotation(new Vector2f(smoothedRotations[1], smoothedRotations[0]));
     }
 
     private void updateAimStatus(float[] current, float[] target) {

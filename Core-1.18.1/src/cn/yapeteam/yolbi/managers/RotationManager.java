@@ -1,6 +1,5 @@
 package cn.yapeteam.yolbi.managers;
 
-
 import cn.yapeteam.yolbi.event.Listener;
 import cn.yapeteam.yolbi.event.impl.player.EventMotion;
 import cn.yapeteam.yolbi.event.impl.player.EventUpdate;
@@ -19,8 +18,16 @@ public class RotationManager {
         active = true;
     }
 
+    public void setRotation(Vector2f rotation) {
+        setRation(rotation);
+    }
+
     public Vector2f getRation() {
         return isActive() ? ration : new Vector2f(mc.player.getXRot(), mc.player.getYRot());
+    }
+
+    public Vector2f getRotation() {
+        return getRation();
     }
 
     public Vector2f getLocalPlayer() {
@@ -31,6 +38,13 @@ public class RotationManager {
     public void onMotion(EventMotion event) {
         event.setYaw(getRation().y);
         event.setPitch(getRation().x);
+
+        float mouseSensitivity = (float) (mc.options.sensitivity * 0.6F + 0.2F);
+        float gcd = mouseSensitivity * mouseSensitivity * mouseSensitivity * 8.0F * 0.15F;
+        
+        float pitch = event.getPitch();
+        pitch = Math.round(pitch / gcd) * gcd;
+        event.setPitch(pitch);
     }
 
     @Listener
