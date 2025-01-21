@@ -9,6 +9,7 @@ import cn.yapeteam.yolbi.module.values.impl.BooleanValue;
 import cn.yapeteam.yolbi.module.values.impl.ModeValue;
 import cn.yapeteam.yolbi.module.values.impl.NumberValue;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.util.InputConstants;
 
 import java.util.Random;
 
@@ -53,8 +54,8 @@ public class AutoClicker extends Module {
         
         if (isBreakingBlock()) return;
 
-        if (leftClick.getValue() && !Natives.IsKeyDown(0)) return;
-        if (rightClick.getValue() && !Natives.IsKeyDown(1) && clickprio.getValue().equals("Right")) return;
+        if (leftClick.getValue() && !mc.options.keyAttack.isDown()) return;
+        if (rightClick.getValue() && !mc.options.keyUse.isDown() && clickprio.getValue().equals("Right")) return;
 
         long currentTime = System.currentTimeMillis();
         if (currentTime - lastClickTime >= currentDelay) {

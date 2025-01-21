@@ -29,7 +29,7 @@ public class ChestStealer extends Module {
     private NumberValue<Integer> lastClick  = new NumberValue<Integer>("LastClick",50,0,1000,2);
     private NumberValue<Integer> lastSteal  = new NumberValue<Integer>("NextClick",50,0,1000,2);
     public ChestStealer() {
-        super("ChestStealer", ModuleCategory.MISC, InputConstants.KEY_B);
+        super("ChestStealer", ModuleCategory.PLAYER, InputConstants.KEY_B);
         addValues(nextClick,lastClick,lastSteal);
     }
 

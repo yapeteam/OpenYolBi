@@ -30,6 +30,7 @@ public class ModuleManager {
         modules.add(new SelfDestruct());
         modules.add(new ClientTheme());
         modules.add(new AutoClicker());
+        modules.add(new Aimbot());
         modules.add(new Eagle());
         modules.add(new HUD());
         modules.add(new Aimbot());
@@ -42,7 +43,6 @@ public class ModuleManager {
         modules.add(new GrimRunEat());
         modules.add(new YeShiEE());
         modules.add(new Reach());
-        modules.add(new Aimbot());
         modules.sort((m1, m2) -> -Integer.compare(m2.getName().charAt(0), m1.getName().charAt(0)));
     }
 

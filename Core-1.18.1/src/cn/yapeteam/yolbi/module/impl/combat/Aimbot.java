@@ -30,7 +30,7 @@ public class Aimbot extends Module {
     private List<LivingEntity> targets = new ArrayList<>();
 
     public Aimbot() {
-        super("Killaura", ModuleCategory.COMBAT, InputConstants.KEY_R);
+        super("Aimbot", ModuleCategory.COMBAT, InputConstants.KEY_M);
         addValues(rangeValue);
     }
 
