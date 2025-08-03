@@ -13,24 +13,6 @@
 
 使用YolBi Lite Legacy的源代码，你必须遵守位于仓库根目录下的`YOLBI_LICENSE.md`
 
-# Join Us
-
-QQ Group: 699481681
-
-# Support Us 支持我们的工作
-
-[![Afdian](https://img.shields.io/badge/爱发电-TIMER__err-8A2BE2)](https://afdian.com/a/TIMER_err)
-
-赞助分配实行按劳分配
-
-## TODO List
-
-- [X] 1.18.1 bypass for `布吉岛`
-- [ ] 1.18.1 more bypass for `宝马岛`
-- [ ] 更加美丽的视觉
-- [X] 注入器重构
-- [ ] 能打HVH😡
-
 ## Development 如何构建
 
 安装rustup并配置镜像源以构建新版注入器
