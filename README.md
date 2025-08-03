@@ -7,10 +7,6 @@
 
 [![GitHub Activity](https://img.shields.io/badge/GitHub-Active-brightgreen)](https://github.com/yapeteam)
 
-为支持Minecraft开源社区 ~~(打死妖猫的圈钱梦想)~~ ，我决定开放YolBi Lite Legacy分支
-
-此仓库将长期维护，欢迎各位加入开发
-
 # YolBi Lite Legacy
 
 ***Powered by Yape Development Team***
